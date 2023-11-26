@@ -1,0 +1,5 @@
+streamlit
+Pillow
+openai
+boto3
+hydralit
