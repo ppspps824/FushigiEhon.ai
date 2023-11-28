@@ -1,32 +1,27 @@
 import base64
-import glob
 import os
-import pickle
 
 import const
 import reveal_slides as rs
 import streamlit as st
+from modules.s3 import get_all_objects, s3_pickle_get
 
 
-def reading_books():
+def reading_book(key):
     # 保存している情報を読み込み
-    paths = glob.glob("books/*")
-    user_contents = {}
-    for path in paths:
-        name = os.path.splitext(os.path.basename(path))[0]
-        with open(path, "rb") as f:
-            user_contents[name] = pickle.load(f)
+    user_contents = s3_pickle_get(key)
 
-    book_names = [value for value in user_contents.keys()]
-
-    return book_names, user_contents
+    return user_contents
 
 
 def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
 
-    book_names, user_contents = reading_books()
+    book_names = [
+        os.path.splitext(os.path.basename(obj.key))[0]
+        for obj in iter(get_all_objects())
+    ]
 
     select_book = st.selectbox(
         " ",
@@ -37,7 +32,7 @@ def play():
     )
 
     if select_book:
-        book_info = user_contents[select_book]
+        book_info = reading_book(f"{st.session_state.user_id}/{select_book}.pickle")
         # 表紙
         title = book_info["about"]["title"]
         title_image = book_info["about"]["title_image"]
@@ -66,4 +61,6 @@ def play():
             content_markdown += content
 
         content_markdown += const.END_ROLE
-        response_dict = rs.slides(content_markdown, theme="solarized")
+        response_dict = rs.slides(
+            content_markdown, theme="solarized", display_only=True
+        )

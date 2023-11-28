@@ -20,12 +20,12 @@ def login():
     """
     correct_login = False
     with st.form("ログイン"):
-        user_id = st.text_input("User ID")
+        st.session_state.user_id = st.text_input("User ID")
         password = st.text_input("Password", type="password")
 
         if st.form_submit_button("ログイン"):
             # 認証処理
-            if user_id == "papasim824":
+            if st.session_state.user_id == "papasim824":
                 correct_login = True
 
             if correct_login:

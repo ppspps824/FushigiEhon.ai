@@ -5,3 +5,4 @@ boto3
 hydralit
 streamlit-reveal-slides
 streamlit-image-select
+boto3

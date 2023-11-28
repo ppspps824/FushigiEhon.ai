@@ -1,5 +1,5 @@
 import datetime
-import pickle
+import os
 
 import const
 import pytz
@@ -12,7 +12,16 @@ from modules.ai import (
     post_image_api,
     post_text_api,
 )
-from modules.play import reading_books
+from modules.play import reading_book
+from modules.s3 import get_all_objects, s3_upload
+
+
+def save_book(book_content, title):
+    s3_upload(
+        book_content,
+        f"{st.session_state.user_id}/{title}.pickle",
+    )
+    st.info("保存しました。")
 
 
 def modify():
@@ -79,13 +88,13 @@ def create():
                     },
                 }
 
-                with open(f"books/{tales.get('title')}.pickle ", "wb") as f:
-                    pickle.dump(book_content, f)
+                # with open(f"books/{tales.get('title')}.pickle ", "wb") as f:
+                #     pickle.dump(book_content, f)
 
                 # ログイン時は自動で保存される
                 if st.session_state.login:
                     # 保存処理
-                    st.info("保存しました。")
+                    save_book(book_content, tales.get("title"))
 
                 st.write(book_about["title"])
                 st.image(book_about["title_image"])
@@ -104,7 +113,10 @@ def create():
             st.session_state.audios = [""]
             st.session_state.not_modify = True
 
-        book_names, user_contents = reading_books()
+        book_names = [
+            os.path.splitext(os.path.basename(obj.key))[0]
+            for obj in iter(get_all_objects())
+        ]
 
         st.write("基本情報")
         select_book = st.selectbox(
@@ -117,7 +129,9 @@ def create():
 
         if select_book:
             if st.session_state.not_modify or st.session_state.title != select_book:
-                book_info = user_contents[select_book]
+                book_info = reading_book(
+                    f"{st.session_state.user_id}/{select_book}.pickle"
+                )
                 st.session_state.title = book_info["about"]["title"]
                 st.session_state.title_image = book_info["about"]["title_image"]
                 st.session_state.description = book_info["about"]["description"]
@@ -223,7 +237,7 @@ def create():
                 },
             }
 
-            with open(f"books/{st.session_state.title}.pickle ", "wb") as f:
-                pickle.dump(book_content, f)
-
-            st.info("保存しました。")
+            # 保存処理
+            # with open(f"books/{st.session_state.title}.pickle ", "wb") as f:
+            #     pickle.dump(book_content, f)
+            save_book(book_content, st.session_state.title)
