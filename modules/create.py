@@ -37,6 +37,7 @@ def adding_page():
 
 
 def create():
+    st.write(f"ようこそ。{st.session_state.user_id}さん")
     page_infos = []
 
     mode = st.selectbox("作り方", options=["一括", "ページごと"])

@@ -18,6 +18,8 @@ def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
 
+    st.write(f"ようこそ。{st.session_state.user_id}さん")
+
     book_names = [
         os.path.splitext(os.path.basename(obj.key))[0]
         for obj in iter(get_all_objects())

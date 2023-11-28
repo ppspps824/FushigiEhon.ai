@@ -2,49 +2,36 @@ import hydralit as hy
 import streamlit as st
 from modules.create import create
 from modules.play import play
+from streamlit_cognito_auth import CognitoAuthenticator
 
-
-def init():
+if __name__ == "__main__":
     if "login" not in st.session_state:
         st.session_state.client = None
         st.session_state.login = False
         st.session_state.guest_login = False
         st.session_state.user_id = ""
 
+    if not st.session_state.login:
+        authenticator = CognitoAuthenticator(
+            pool_id=st.secrets["pool_id"],
+            app_client_id=st.secrets["app_client_id"],
+            app_client_secret=st.secrets["app_client_secret"],
+        )
 
-def login():
-    """
-    ログインページ
-    - ログイン画面（ゲストログインもあり）
-    ユーザーIDとパスワードを入力
-    """
-    correct_login = False
-    with st.form("ログイン"):
-        st.session_state.user_id = st.text_input("User ID")
-        password = st.text_input("Password", type="password")
+        st.session_state.login = authenticator.login()
+        st.link_button(
+            "Signup",
+            st.secrets["signup_url"],
+        )
 
-        if st.form_submit_button("ログイン"):
-            # 認証処理
-            if st.session_state.user_id == "papasim824":
-                correct_login = True
+        if not st.session_state.login:
+            st.stop()
 
-            if correct_login:
-                st.session_state.login = True
-                st.experimental_rerun()
-            else:
-                st.error("ログイン失敗")
-
-    if st.button("ゲストログイン"):
-        st.session_state.guest_login = True
+        st.session_state.user_id = authenticator.get_username()
         st.experimental_rerun()
-
-
-if __name__ == "__main__":
-    init()
-
-    if st.session_state.login or st.session_state.guest_login:
+    else:
         app = hy.HydraApp(
-            title="ehon",
+            title="ふしぎえほん.ai",
             hide_streamlit_markers=True,
             use_loader=False,
         )
@@ -53,12 +40,8 @@ if __name__ == "__main__":
         def page1():
             create()
 
-        if st.session_state.login:
-
-            @app.addapp(title="えほんをよむ")
-            def page3():
-                play()
+        @app.addapp(title="えほんをよむ")
+        def page3():
+            play()
 
         app.run()
-    else:
-        login()
