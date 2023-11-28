@@ -1,133 +1,59 @@
 import datetime
-import json
-import io
-
-import urllib.request
-import boto3
-import const
-import openai
-import pytz
-import streamlit as st
-from PIL import Image
 import pickle
 
+import const
+import pytz
+import streamlit as st
+from modules.ai import (
+    create_audios,
+    create_images,
+    create_tales,
+    post_audio_api,
+    post_image_api,
+    post_text_api,
+)
+from modules.play import reading_books
+
+
+def modify():
+    st.session_state.not_modify = False
+    st.experimental_rerun()
+
+
+def adding_page():
+    st.session_state.tales.append("")
+    st.session_state.images.append("")
+    st.session_state.audios.append("")
+    modify()
 
 
 def create():
-    openai.api_key = st.secrets["OPEN_AI_KEY"]
+    page_infos = []
 
-    def create_tales(description,page_num,characters_per_page,page_infos=[]):
-        tales = ""
-        content = const.TALES_PROMPT.replace("%%description_placeholder%%", description).replace("%%page_number_placeholder%%", page_num).replace("%%characters_per_page_placeholder%%", characters_per_page).replace("%%page_info_placeholder%%", "\n".join(page_infos))
-        with st.spinner("生成中...(文章)"):
-            for _ in range(3):
-                try:
-                    response = openai.chat.completions.create(
-                        model="gpt-4-1106-preview",
-                        response_format={"type": "json_object"},
-                        messages=[{"role": "system", "content": content}],
-                    )
-                    content_text = response.choices[0].message.content
-                    tales = json.loads(content_text)
-                    break
-                except Exception as e:
-                    print(e.args)
-                    continue
+    mode = st.selectbox("作り方", options=["一括", "ページごと"])
+    col1, col2 = st.columns(2)
 
-        if tales:
-            return tales
-        else:
-            st.info("リトライしてください")
-            st.stop
-
-    def post_image_api(prompt,size):
-        image_url = ""
-        for _ in range(3):
-            try:
-                response = openai.images.generate(
-                    model="dall-e-3",
-                    prompt=prompt,
-                    size="1024x1024",
-                    quality="standard",
-                    n=1,
-                )
-                image_url = response.data[0].url
-                break
-            except Exception as e:
-                print(e.args)
-                continue
-
-        if image_url:
-            with urllib.request.urlopen(image_url) as web_file:
-                image_data = web_file.read()
-
-            image = Image.open(io.BytesIO(image_data))
-            image = image.resize(size)
-
-            buffered = io.BytesIO()
-            image.save(buffered, format="PNG")
-            return buffered.getvalue()
-        else:
-            st.info("リトライしてください")
-            st.stop
-
-    def create_images(tales):
-        images = {"description": "", "content": []}
-
-        title = tales["title"]
-        description = tales["description"]
-        images["title"] = post_image_api(description,size=(512,512))
-        pages = len(tales["content"])
-        for num, tale in enumerate(tales["content"]):
-            with st.spinner(f"生成中...(イラスト {num+1}/{pages})"):
-                prompt = (
-                    const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
-                    .replace("%%description_placeholder%%", description)
-                    .replace("%%tale_placeholder%%", tale)
-                )
-                images["content"].append(post_image_api(prompt,size=(512,512)))
-
-        return images
-
-    def create_audios(tales):
-        audios = []
-        pages = len(tales["content"])
-        for num, tale in enumerate(tales["content"]):
-            with st.spinner(f"生成中...(音声 {num}/{pages})"):
-                response = openai.audio.speech.create(
-                    model="tts-1",
-                    voice="nova",
-                    input=tale,
-                )
-
-            # Convert the binary response content to a byte stream
-            audios.append(io.BytesIO(response.content))
-
-        return audios
-
-    def create_book():
-        page_infos=[]
-
-        col1,col2,col3 = st.columns(3)
+    if mode == "一括":
         with col1:
-            mode = st.selectbox("作り方",options=["一括","ページごと"])
+            page_num = st.number_input(
+                "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=5
+            )
         with col2:
-            page_num=st.number_input("ページ数",min_value=1,max_value=const.MAX_PAGE_NUM,value=5)
-        with col3:
-            characters_per_page=st.number_input("ページごとの文字数",min_value=10,max_value=100,value=40)
+            characters_per_page = st.number_input(
+                "ページごとの文字数", min_value=10, max_value=100, value=40
+            )
 
         description = st.text_area(
             "タイトル、あらすじなど", placeholder=const.DESCRIPTION_PLACEHOLDER
         )
 
-        if mode == "ページごと":
-            page_infos = [st.text_area(f"page{num+1} 内容", placeholder=const.DESCRIPTION_PLACEHOLDER) for num in range(page_num)]
-
         if st.button("作成する"):
             if description:
                 # 生成処理
                 # 物語を生成
-                tales = create_tales(description,str(page_num),str(characters_per_page),page_infos)
+                tales = create_tales(
+                    description, str(page_num), str(characters_per_page), page_infos
+                )
 
                 # イラストを生成
                 images = create_images(tales)
@@ -154,8 +80,8 @@ def create():
                 }
 
                 with open(f"books/{tales.get('title')}.pickle ", "wb") as f:
-                    pickle.dump(book_content,f)
-                    
+                    pickle.dump(book_content, f)
+
                 # ログイン時は自動で保存される
                 if st.session_state.login:
                     # 保存処理
@@ -168,4 +94,136 @@ def create():
             else:
                 st.info("内容を入力してください。")
 
-    create_book()
+    if mode == "ページごと":
+        if "title" not in st.session_state:
+            st.session_state.title = ""
+            st.session_state.title_image = ""
+            st.session_state.description = ""
+            st.session_state.tales = [""]
+            st.session_state.images = [""]
+            st.session_state.audios = [""]
+            st.session_state.not_modify = True
+
+        book_names, user_contents = reading_books()
+
+        st.write("基本情報")
+        select_book = st.selectbox(
+            " ",
+            options=book_names,
+            label_visibility="collapsed",
+            placeholder="絵本を選ぶ",
+            index=None,
+        )
+
+        if select_book:
+            if st.session_state.not_modify or st.session_state.title != select_book:
+                book_info = user_contents[select_book]
+                st.session_state.title = book_info["about"]["title"]
+                st.session_state.title_image = book_info["about"]["title_image"]
+                st.session_state.description = book_info["about"]["description"]
+
+                st.session_state.tales = book_info["details"]["tales"]["content"]
+                st.session_state.images = book_info["details"]["images"]["content"]
+                st.session_state.audios = book_info["details"]["audios"]
+
+        st.session_state.title = st.text_input("タイトル", value=st.session_state.title)
+        st.session_state.description = st.text_area(
+            "あらすじ", value=st.session_state.description
+        )
+        try:
+            st.image(st.session_state.title_image)
+        except:
+            pass
+
+        if st.button("あらすじを生成する", key="description_create_button"):
+            tales_text = "\n".join(st.session_state.tales)
+            with st.spinner("生成中...(あらすじ)"):
+                st.session_state.description = post_text_api(
+                    const.DESCRIPTION_PROMPT.replace(
+                        "%%tales__placeholder%%", tales_text
+                    ).replace("%%title_placeholder%%", st.session_state.title),
+                    response_format=None,
+                )
+                modify()
+
+        if st.button("表紙を生成する", key="title_image_create_button"):
+            with st.spinner("生成中...(イラスト)"):
+                st.session_state.title_image = post_image_api(
+                    st.session_state.description, (720, 720)
+                )
+                modify()
+
+        st.write("---")
+
+        for num, info in enumerate(
+            zip(
+                st.session_state.tales, st.session_state.images, st.session_state.audios
+            )
+        ):
+            tale, image, audio = info
+            st.write(f"page{num + 1}")
+            col1, col2 = st.columns(2)
+            with col1:
+                try:
+                    st.image(image)
+                except:
+                    pass
+            with col2:
+                tale = st.text_area("内容", key=f"{num}_tale", value=tale)
+                if st.button("イラストを生成する", key=f"{num}_image_create_button"):
+                    st.session_state.tales[num] = tale
+                    with st.spinner("生成中...(イラスト)"):
+                        st.session_state.images[num] = post_image_api(
+                            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
+                            .replace("%%title_placeholder%%", st.session_state.title)
+                            .replace(
+                                "%%description_placeholder%%",
+                                st.session_state.description,
+                            ),
+                            (512, 512),
+                        )
+
+                    modify()
+
+                if st.button("音声を生成する", key=f"{num}_audio_create_button"):
+                    st.session_state.tales[num] = tale
+                    with st.spinner("生成中...(音声)"):
+                        st.session_state.audios[num] = post_audio_api(tale)
+
+                    modify()
+
+                if st.button("削除", key=f"{num}_del_button"):
+                    st.session_state.tales.pop(num)
+                    st.session_state.images.pop(num)
+                    st.session_state.audios.pop(num)
+                    modify()
+            try:
+                st.audio(audio)
+            except:
+                pass
+        if st.session_state.tales[-1]:
+            st.button("ページを追加", on_click=adding_page)
+
+        if st.button("保存する"):
+            create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
+            create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
+            book_about = {
+                "create_date": create_date_yyyymdd,
+                "title": st.session_state.title,
+                "title_image": st.session_state.title_image,
+                "description": st.session_state.description,
+            }
+
+            book_content = {
+                "about": book_about,
+                "details": {
+                    "tales": {"content": st.session_state.tales},
+                    "images": {"content": st.session_state.images},
+                    "audios": st.session_state.audios,
+                },
+            }
+
+            with open(f"books/{st.session_state.title}.pickle ", "wb") as f:
+                pickle.dump(book_content, f)
+
+            st.info("保存しました。")

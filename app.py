@@ -1,10 +1,4 @@
-import datetime
-import json
-
-import const
 import hydralit as hy
-import openai
-import pytz
 import streamlit as st
 from modules.create import create
 from modules.play import play
@@ -62,7 +56,7 @@ if __name__ == "__main__":
         if st.session_state.login:
 
             @app.addapp(title="えほんをよむ")
-            def page2():
+            def page3():
                 play()
 
         app.run()
