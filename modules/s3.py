@@ -18,21 +18,23 @@ def get_client_bucket():
 
 
 def s3_upload(file, key):
-    bucket = get_client_bucket()
-    with io.BytesIO() as bf:
-        pickle.dump(file, bf)
-        bf.seek(0)
-        result = bucket.upload_fileobj(bf, key)
+    with st.spinner("保存中..."):
+        bucket = get_client_bucket()
+        with io.BytesIO() as bf:
+            pickle.dump(file, bf)
+            bf.seek(0)
+            result = bucket.upload_fileobj(bf, key)
 
 
 def s3_pickle_get(key):
-    bucket = get_client_bucket()
-    with io.BytesIO() as f:
-        bucket.download_fileobj(key, f)
-        f.seek(0)
-        result = pickle.load(f)
+    with st.spinner("よみこみちゅう..."):
+        bucket = get_client_bucket()
+        with io.BytesIO() as f:
+            bucket.download_fileobj(key, f)
+            f.seek(0)
+            result = pickle.load(f)
 
-    return result
+        return result
 
 
 def get_all_objects():

@@ -5,6 +5,9 @@ MAX_PAGE_NUM = 20
 TALES_PROMPT = """
 あなたはプロの絵本作家です。与えられた内容から以下の内容に沿って絵本の物語を作成してください。
 
+## タイトル
+%%title_placeholder%%
+
 ## 内容
 %%description_placeholder%%
 

@@ -52,16 +52,21 @@ def create():
                 "ページごとの文字数", min_value=10, max_value=100, value=40
             )
 
+        title = st.text_input("タイトル", placeholder=const.DESCRIPTION_PLACEHOLDER)
         description = st.text_area(
-            "タイトル、あらすじなど", placeholder=const.DESCRIPTION_PLACEHOLDER
+            "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER
         )
 
         if st.button("作成する"):
-            if description:
+            if title or description:
                 # 生成処理
                 # 物語を生成
                 tales = create_tales(
-                    description, str(page_num), str(characters_per_page), page_infos
+                    title,
+                    description,
+                    str(page_num),
+                    str(characters_per_page),
+                    page_infos,
                 )
 
                 # イラストを生成
@@ -101,7 +106,7 @@ def create():
                 st.write(book_about["description"])
 
             else:
-                st.info("内容を入力してください。")
+                st.info("タイトルかあらすじを内容を入力してください。")
 
     if mode == "ページごと":
         if "title" not in st.session_state:
@@ -118,7 +123,6 @@ def create():
             for obj in iter(get_all_objects())
         ]
 
-        st.write("基本情報")
         select_book = st.selectbox(
             " ",
             options=book_names,
@@ -126,6 +130,8 @@ def create():
             placeholder="絵本を選ぶ",
             index=None,
         )
+        st.write("---")
+        st.write("基本情報")
 
         if select_book:
             if st.session_state.not_modify or st.session_state.title != select_book:

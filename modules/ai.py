@@ -21,10 +21,11 @@ def post_text_api(prompt, response_format={"type": "json_object"}):
     return content_text
 
 
-def create_tales(description, page_num, characters_per_page, page_infos=[]):
+def create_tales(title, description, page_num, characters_per_page, page_infos=[]):
     tales = ""
     content = (
-        const.TALES_PROMPT.replace("%%description_placeholder%%", description)
+        const.TALES_PROMPT.replace("%%title_placeholder%%", title)
+        .replace("%%description_placeholder%%", description)
         .replace("%%page_number_placeholder%%", page_num)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%page_info_placeholder%%", "\n".join(page_infos))
