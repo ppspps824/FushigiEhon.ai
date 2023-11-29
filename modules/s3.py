@@ -39,4 +39,5 @@ def s3_pickle_get(key):
 
 def get_all_objects():
     bucket = get_client_bucket()
-    return bucket.objects.all()
+
+    return bucket.objects.filter(Prefix=f"{st.session_state.user_id}/book_info/")

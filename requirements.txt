@@ -2,7 +2,7 @@ streamlit
 Pillow
 openai
 boto3
-hydralit
+streamlit-option-menu
 streamlit-reveal-slides
 streamlit-image-select
 boto3

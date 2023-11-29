@@ -13,13 +13,27 @@ from modules.ai import (
     post_text_api,
 )
 from modules.play import reading_book
-from modules.s3 import get_all_objects, s3_upload
+from modules.s3 import get_all_objects, s3_pickle_get, s3_upload
 
 
 def save_book(book_content, title):
+    try:
+        all_image = s3_pickle_get(
+            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+        )
+        all_image[title] = book_content["about"]["title_image"]
+    except Exception as e:
+        print(e.args)
+        all_image = {title: book_content["about"]["title_image"]}
+
+    s3_upload(
+        all_image,
+        f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle",
+    )
+
     s3_upload(
         book_content,
-        f"{st.session_state.user_id}/{title}.pickle",
+        f"{st.session_state.user_id}/book_info/{title}.pickle",
     )
     st.info("保存しました。")
 
@@ -37,7 +51,6 @@ def adding_page():
 
 
 def create():
-    st.write(f"ようこそ。{st.session_state.user_id}さん")
     page_infos = []
 
     mode = st.selectbox("作り方", options=["一括", "ページごと"])
@@ -94,13 +107,7 @@ def create():
                     },
                 }
 
-                # with open(f"books/{tales.get('title')}.pickle ", "wb") as f:
-                #     pickle.dump(book_content, f)
-
-                # ログイン時は自動で保存される
-                if st.session_state.login:
-                    # 保存処理
-                    save_book(book_content, tales.get("title"))
+                save_book(book_content, tales.get("title"))
 
                 st.write(book_about["title"])
                 st.image(book_about["title_image"])
@@ -124,6 +131,8 @@ def create():
             for obj in iter(get_all_objects())
         ]
 
+        book_names = [book_name for book_name in book_names if book_name]
+
         select_book = st.selectbox(
             " ",
             options=book_names,
@@ -137,7 +146,7 @@ def create():
         if select_book:
             if st.session_state.not_modify or st.session_state.title != select_book:
                 book_info = reading_book(
-                    f"{st.session_state.user_id}/{select_book}.pickle"
+                    f"{st.session_state.user_id}/book_info/{select_book}.pickle"
                 )
                 st.session_state.title = book_info["about"]["title"]
                 st.session_state.title_image = book_info["about"]["title_image"]

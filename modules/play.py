@@ -1,10 +1,12 @@
 import base64
-import os
+import io
 
 import const
 import reveal_slides as rs
 import streamlit as st
-from modules.s3 import get_all_objects, s3_pickle_get
+from modules.s3 import s3_pickle_get
+from PIL import Image
+from streamlit_image_select import image_select
 
 
 def reading_book(key):
@@ -17,24 +19,39 @@ def reading_book(key):
 def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
+    try:
+        all_image = s3_pickle_get(
+            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+        )
+    except:
+        all_image = {}
 
-    st.write(f"ようこそ。{st.session_state.user_id}さん")
-
-    book_names = [
-        os.path.splitext(os.path.basename(obj.key))[0]
-        for obj in iter(get_all_objects())
+    captions = list(all_image.keys())
+    images = [
+        Image.open(io.BytesIO(data)).resize((256, 256)) for data in all_image.values()
     ]
 
-    select_book = st.selectbox(
-        " ",
-        options=book_names,
-        label_visibility="collapsed",
-        placeholder="おはなしをえらんでね",
-        index=None,
-    )
+    select_book = 0
+    if images:
+        select_book = (
+            image_select(
+                label="おはなしをえらんでね",
+                images=images,
+                captions=captions,
+                return_value="index",
+                use_container_width=False,
+            )
+            + 1
+        )
+    else:
+        st.info(
+            "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"
+        )
 
     if select_book:
-        book_info = reading_book(f"{st.session_state.user_id}/{select_book}.pickle")
+        book_info = reading_book(
+            f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
+        )
         # 表紙
         title = book_info["about"]["title"]
         title_image = book_info["about"]["title_image"]
