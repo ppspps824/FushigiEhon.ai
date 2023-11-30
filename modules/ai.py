@@ -7,8 +7,6 @@ import openai
 import streamlit as st
 from PIL import Image
 
-openai.api_key = st.secrets["OPEN_AI_KEY"]
-
 
 def post_text_api(prompt, response_format={"type": "json_object"}):
     response = openai.chat.completions.create(
@@ -84,7 +82,9 @@ def create_images(tales):
 
     title = tales["title"]
     description = tales["description"]
-    images["title"] = post_image_api(description, size=(720, 720))
+    with st.spinner("生成中...(表紙)"):
+        images["title"] = post_image_api(description, size=(720, 720))
+
     pages = len(tales["content"])
     for num, tale in enumerate(tales["content"]):
         with st.spinner(f"生成中...(イラスト {num+1}/{pages})"):

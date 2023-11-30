@@ -27,14 +27,13 @@ def s3_upload(file, key):
 
 
 def s3_pickle_get(key):
-    with st.spinner("よみこみちゅう..."):
-        bucket = get_client_bucket()
-        with io.BytesIO() as f:
-            bucket.download_fileobj(key, f)
-            f.seek(0)
-            result = pickle.load(f)
+    bucket = get_client_bucket()
+    with io.BytesIO() as f:
+        bucket.download_fileobj(key, f)
+        f.seek(0)
+        result = pickle.load(f)
 
-        return result
+    return result
 
 
 def get_all_objects():

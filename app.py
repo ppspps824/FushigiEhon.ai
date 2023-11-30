@@ -1,8 +1,11 @@
 import const
+import openai
 import streamlit as st
 import streamlit.components.v1 as components
+from modules.about import about
 from modules.create import create
 from modules.play import play
+from modules.settings import settings
 from streamlit_cognito_auth import CognitoAuthenticator
 from streamlit_option_menu import option_menu
 
@@ -11,8 +14,21 @@ if "login" not in st.session_state:
     st.session_state.login = False
     st.session_state.guest_login = False
     st.session_state.user_id = ""
+    st.session_state.api_key = ""
+    st.session_state.disable_audio = False
 
-st.set_page_config(page_title="ふしぎえほん.ai", layout="wide")
+    # create
+    st.session_state.title = ""
+    st.session_state.title_image = ""
+    st.session_state.description = ""
+    st.session_state.tales = []
+    st.session_state.images = []
+    st.session_state.audios = []
+    st.session_state.not_modify = True
+
+st.set_page_config(
+    page_title="ふしぎえほん.ai", page_icon="assets/logo.png", layout="wide"
+)
 
 st.markdown(
     const.HIDE_ST_STYLE,
@@ -41,26 +57,39 @@ if not st.session_state.login:
     st.session_state.user_id = authenticator.get_username()
     st.experimental_rerun()
 else:
+    if st.session_state.api_key:
+        openai.api_key = st.session_state.api_key
+    else:
+        openai.api_key = st.secrets["OPEN_AI_KEY"]
+
     selected = option_menu(
-        f"ふしぎえほん.ai　{st.session_state.user_id}さん",
-        ["つかいかた", "えほんをつくる", "えほんをよむ", "といあわせ"],
-        icons=["house", "cloud-upload", "list-task", "gear"],
+        "ふしぎえほん.ai",
+        ["つかいかた", "つくる", "みる", "せってい"],
+        icons=["bi-universal-access", "bi-brush", "bi-play-btn", "gear"],
+        menu_icon="bi-book",
         default_index=0,
         orientation="horizontal",
         styles={
-            "container": {"padding": "0!important", "background-color": "#fafafa"},
+            "container": {
+                "margin": "0px !important",
+                "background-color": "#fafafa",
+            },
             "icon": {"color": "fafafa", "font-size": "25px"},
             "nav-link": {
-                "font-size": "25px",
-                "text-align": "left",
+                "font-size": "20px",
                 "margin": "0px",
+                "text-align": "left",
                 "--hover-color": "#eee",
             },
             "nav-link-selected": {"background-color": "004a55"},
         },
     )
 
-    if selected == "えほんをつくる":
+    if selected == "つかいかた":
+        about()
+    elif selected == "つくる":
         create()
-    elif selected == "えほんをよむ":
+    elif selected == "みる":
         play()
+    elif selected == "せってい":
+        settings()
