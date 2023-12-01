@@ -1,13 +1,13 @@
 import streamlit as st
-from modules.s3 import s3_pickle_get
+from modules.s3 import s3_joblib_get
 from streamlit_image_select import image_select
 
 
 def image_select_menu():
     select_book = ""
     try:
-        all_image = s3_pickle_get(
-            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+        all_image = s3_joblib_get(
+            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
         )
     except:
         all_image = {}

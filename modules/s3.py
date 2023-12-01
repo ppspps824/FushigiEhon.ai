@@ -1,7 +1,7 @@
 import io
-import pickle
 
 import boto3
+import joblib
 import streamlit as st
 
 
@@ -21,7 +21,7 @@ def get_client_bucket():
 def s3_upload(file, key):
     bucket = get_client_bucket()
     with io.BytesIO() as bf:
-        pickle.dump(file, bf)
+        joblib.dump(file, bf, compress=3)
         bf.seek(0)
         result = bucket.upload_fileobj(bf, key)
 
@@ -33,12 +33,12 @@ def s3_delete(key):
 
 
 @st.cache_data(show_spinner=False)
-def s3_pickle_get(key):
+def s3_joblib_get(key):
     bucket = get_client_bucket()
     with io.BytesIO() as f:
         bucket.download_fileobj(key, f)
         f.seek(0)
-        result = pickle.load(f)
+        result = joblib.load(f)
 
     return result
 

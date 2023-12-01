@@ -12,8 +12,8 @@ from modules.ai import (
     post_image_api,
     post_text_api,
 )
-from modules.s3 import s3_delete, s3_pickle_get, s3_upload
-from modules.utils import image_select_menu, s3_pickle_get
+from modules.s3 import s3_delete, s3_joblib_get, s3_upload
+from modules.utils import image_select_menu, s3_joblib_get
 
 
 def view_edit(mode):
@@ -182,17 +182,17 @@ def view_edit(mode):
 def delete_book(title):
     if title:
         with st.spinner("えほんを削除中..."):
-            all_image = s3_pickle_get(
-                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+            all_image = s3_joblib_get(
+                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
             )
             del all_image[title]
 
             s3_upload(
                 all_image,
-                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle",
+                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib",
             )
 
-            s3_delete(f"{st.session_state.user_id}/book_info/{title}.pickle")
+            s3_delete(f"{st.session_state.user_id}/book_info/{title}.joblib")
 
             st.cache_data.clear()
             st.rerun()
@@ -202,8 +202,8 @@ def save_book(book_content, title):
     if title:
         with st.spinner("えほんを保存中..."):
             try:
-                all_image = s3_pickle_get(
-                    f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+                all_image = s3_joblib_get(
+                    f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
                 )
             except:
                 all_image = {}
@@ -211,12 +211,12 @@ def save_book(book_content, title):
             all_image[title] = book_content["details"]["images"]["title"]
             s3_upload(
                 all_image,
-                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle",
+                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib",
             )
 
             s3_upload(
                 book_content,
-                f"{st.session_state.user_id}/book_info/{title}.pickle",
+                f"{st.session_state.user_id}/book_info/{title}.joblib",
             )
         st.info("保存しました。")
         time.sleep(0.5)
@@ -360,8 +360,8 @@ def create():
                 st.session_state.not_modify
                 or st.session_state.tales["title"] != captions[select_book - 1]
             ):
-                book_info = s3_pickle_get(
-                    f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
+                book_info = s3_joblib_get(
+                    f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.joblib"
                 )
                 st.session_state.tales = book_info["details"]["tales"]
                 st.session_state.images = book_info["details"]["images"]

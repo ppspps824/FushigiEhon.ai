@@ -7,3 +7,4 @@ streamlit-reveal-slides
 streamlit-image-select
 boto3
 streamlit-cognito-auth
+joblib
