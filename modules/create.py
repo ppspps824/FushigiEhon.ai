@@ -193,11 +193,14 @@ def delete_book(title):
 def save_book(book_content, title):
     if title:
         with st.spinner("えほんを保存中..."):
-            all_image = s3_pickle_get(
-                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
-            )
-            all_image[title] = book_content["about"]["title_image"]
+            try:
+                all_image = s3_pickle_get(
+                    f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
+                )
+            except:
+                all_image = {}
 
+            all_image[title] = book_content["details"]["images"]["title"]
             s3_upload(
                 all_image,
                 f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle",

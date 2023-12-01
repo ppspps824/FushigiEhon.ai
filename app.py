@@ -25,6 +25,10 @@ if "login" not in st.session_state:
     st.session_state.audios = []
     st.session_state.not_modify = True
 
+    # ai
+    st.session_state.text_model = "gpt-4-1106-preview"
+    st.session_state.image_model = "dall-e-3"
+
 st.set_page_config(
     page_title="ふしぎえほん.ai", page_icon="assets/logo.png", layout="wide"
 )

@@ -1,8 +1,5 @@
-import io
-
 import streamlit as st
 from modules.s3 import s3_pickle_get
-from PIL import Image
 from streamlit_image_select import image_select
 
 
@@ -18,9 +15,7 @@ def image_select_menu():
     captions = list(all_image.keys())
 
     images = [
-        Image.open(io.BytesIO(data)).resize((256, 256))
-        if data
-        else "assets/noimage.png"
+        data.resize((256, 256)) if data else "assets/noimage.png"
         for data in all_image.values()
     ]
 

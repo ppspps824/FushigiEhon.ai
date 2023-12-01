@@ -1,9 +1,18 @@
 import base64
+from io import BytesIO
 
 import const
 import reveal_slides as rs
 import streamlit as st
 from modules.utils import image_select_menu, s3_pickle_get
+
+
+def pil_to_base64(img, format="png"):
+    buffer = BytesIO()
+    img.save(buffer, format)
+    img_str = base64.b64encode(buffer.getvalue()).decode("ascii")
+
+    return img_str
 
 
 def play():
@@ -26,7 +35,7 @@ def play():
             audios = book_info["details"]["audios"]
 
             if title_image:
-                b64_title_image = base64.b64encode(title_image).decode()
+                b64_title_image = pil_to_base64(title_image)
                 content_markdown = const.TITLE_MARKDOWN.replace(
                     "%%title_placeholder%%", title
                 ).replace("%%title_image_placeholder%%", b64_title_image)
@@ -38,7 +47,7 @@ def play():
             for num, info in enumerate(zip(tales, images, audios)):
                 tale, image, audio = info
                 if image:
-                    b64_image = base64.b64encode(image).decode()
+                    b64_image = pil_to_base64(image)
                 if audio:
                     b64_audio = base64.b64encode(audio.getvalue()).decode()
 

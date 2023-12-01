@@ -43,17 +43,22 @@ def create_tales(title, description, page_num, characters_per_page, page_infos=[
         return tales
     else:
         st.info("生成に失敗しました。リトライしてください")
-        st.stop
+        st.stop()
 
 
 def post_image_api(prompt, size):
     image_url = ""
+    if st.session_state.image_model == "dall-e-3":
+        gen_size = "1024x1024"
+    else:
+        gen_size = "512x512"
+
     for _ in range(3):
         try:
             response = openai.images.generate(
-                model="dall-e-3",
+                model=st.session_state.image_model,
                 prompt=prompt,
-                size="1024x1024",
+                size=gen_size,
                 quality="standard",
                 n=1,
             )
@@ -70,12 +75,10 @@ def post_image_api(prompt, size):
         image = Image.open(io.BytesIO(image_data))
         image = image.resize(size)
 
-        buffered = io.BytesIO()
-        image.save(buffered, format="PNG")
-        return buffered.getvalue()
+        return image
     else:
-        st.info("リトライしてください")
-        st.stop
+        st.info("生成に失敗しました。リトライしてください")
+        st.stop()
 
 
 def create_images(tales):
@@ -103,7 +106,7 @@ def create_audios(tales):
     audios = []
     pages = len(tales["content"])
     for num, tale in enumerate(tales["content"]):
-        with st.spinner(f"生成中...(音声 {num}/{pages})"):
+        with st.spinner(f"生成中...(音声 {num+1}/{pages})"):
             audios.append(post_audio_api(tale))
 
     return audios
