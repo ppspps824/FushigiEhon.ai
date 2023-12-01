@@ -31,36 +31,7 @@ def view_edit(mode):
             except:
                 st.image("assets/noimage.png")
         with col2:
-            if st.button("テキスト以外を一括で生成する", key="description_create_all"):
-                book_content = create_all(ignore_tale=True)
-                save_book(book_content, st.session_state.tales["title"])
-                modify()
-                st.rerun()
-
-            if st.button("あらすじを生成する", key="description_create_button"):
-                tales_text = "\n".join(st.session_state.tales["content"])
-                with st.spinner("生成中...(あらすじ)"):
-                    st.session_state.tales["description"] = post_text_api(
-                        const.DESCRIPTION_PROMPT.replace(
-                            "%%tales_placeholder%%", tales_text
-                        ).replace(
-                            "%%title_placeholder%%", st.session_state.tales["title"]
-                        )
-                    )
-                    modify()
-                    st.rerun()
-
-            if st.button("表紙を生成する", key="title_image_create_button"):
-                with st.spinner("生成中...(イラスト)"):
-                    st.session_state.images["title"] = post_image_api(
-                        st.session_state.tales["description"], (720, 720)
-                    )
-                    modify()
-                    st.rerun()
-            if st.button("ページを追加する", key="adding_page_button"):
-                adding_page(0)
-
-            if st.button("保存する"):
+            if st.button("えほんを保存する"):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
 
@@ -72,9 +43,49 @@ def view_edit(mode):
                         "audios": st.session_state.audios,
                     },
                 }
-
                 # 保存処理
                 save_book(book_content, st.session_state.tales["title"])
+
+            if st.button("次のページを追加する", key="adding_page_button"):
+                adding_page(0)
+
+            ai_container = st.container(border=True)
+            with ai_container:
+                st.write("AI機能")
+
+                if st.button("あらすじを生成する", key="description_create_button"):
+                    tales_text = "\n".join(st.session_state.tales["content"])
+                    with st.spinner("生成中...(あらすじ)"):
+                        st.session_state.tales["description"] = post_text_api(
+                            const.DESCRIPTION_PROMPT.replace(
+                                "%%tales_placeholder%%", tales_text
+                            ).replace(
+                                "%%title_placeholder%%", st.session_state.tales["title"]
+                            )
+                        )
+                        modify()
+                        st.rerun()
+
+                if st.button("表紙を生成する", key="title_image_create_button"):
+                    with st.spinner("生成中...(イラスト)"):
+                        st.session_state.images["title"] = post_image_api(
+                            st.session_state.tales["description"], (720, 720)
+                        )
+                        modify()
+                        st.rerun()
+                if st.button(
+                    "テキスト以外を一括で生成する", key="description_create_all"
+                ):
+                    book_content = create_all(ignore_tale=True)
+                    save_book(book_content, st.session_state.tales["title"])
+                    modify()
+                    st.rerun()
+
+                if st.button(
+                    "次のページを生成する", key="adding_page_and_create_button"
+                ):
+                    adding_and_create_page(0)
+                    st.rerun()
 
         with col3:
             if not mode:
@@ -92,7 +103,7 @@ def view_edit(mode):
     ):
         tale, image, audio = info
         with st.expander(f"ページ{num + 1}: {tale}"):
-            col1, col2, col3 = st.columns([3, 2, 1])
+            col1, col2, col3 = st.columns([2, 2, 1])
             with col1:
                 try:
                     st.image(image)
@@ -108,75 +119,98 @@ def view_edit(mode):
                 except:
                     pass
 
-                if st.button("内容を生成する", key=f"{num}_tale_create_button"):
-                    with st.spinner("生成中...(内容)"):
-                        prompt = (
-                            const.ONE_TALE_PROMPT.replace(
-                                "%%title_placeholder%%", st.session_state.tales["title"]
-                            )
-                            .replace(
-                                "%%description_placeholder%%",
-                                st.session_state.tales["description"],
-                            )
-                            .replace(
-                                "%%page_number_placeholder%%",
-                                str(st.session_state.page_num),
-                            )
-                            .replace(
-                                "%%characters_per_page_placeholder%%",
-                                str(st.session_state.characters_per_page),
-                            )
-                            .replace(
-                                "%%using_text_types_placeholder%%",
-                                str(st.session_state.using_text_types),
-                            )
-                            .replace(
-                                "%%age_placeholder%%",
-                                st.session_state.age,
-                            )
-                            .replace(
-                                "%%pre_pages_info_placeholder%%",
-                                "\n".join(st.session_state.tales["content"][: num - 1]),
-                            )
-                            .replace(
-                                "%%post_pages_info_placeholder%%",
-                                "\n".join(st.session_state.tales["content"][num - 1 :]),
-                            )
-                        )
-                        st.session_state.tales["content"][num] = post_text_api(prompt)
-                        modify()
+                if st.button("次のページを追加する", key=f"{num}_adding_page_button"):
+                    adding_page(num + 1)
+
+                ai_container = st.container(border=True)
+                with ai_container:
+                    st.write("AI機能")
+                    if st.button(
+                        "次のページを生成する",
+                        key=f"{num}_adding_page_and_create_button",
+                    ):
+                        adding_and_create_page(num + 1)
                         st.rerun()
 
-                if st.button("イラストを生成する", key=f"{num}_image_create_button"):
-                    with st.spinner("生成中...(イラスト)"):
-                        st.session_state.images["content"][num] = post_image_api(
-                            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
-                            .replace(
-                                "%%title_placeholder%%", st.session_state.tales["title"]
-                            )
-                            .replace(
-                                "%%description_placeholder%%",
-                                st.session_state.tales["description"],
-                            ),
-                            (512, 512),
-                        )
+                    if st.button("内容を生成する", key=f"{num}_tale_create_button"):
+                        create_one_tale(num)
+                        st.rerun()
 
-                    modify()
-                    st.rerun()
+                    if st.button(
+                        "イラストを生成する", key=f"{num}_image_create_button"
+                    ):
+                        create_one_image(num, tale)
+                        st.rerun()
 
-                if st.button("音声を生成する", key=f"{num}_audio_create_button"):
-                    with st.spinner("生成中...(音声)"):
-                        st.session_state.audios[num] = post_audio_api(tale)
+                    if st.button("音声を生成する", key=f"{num}_audio_create_button"):
+                        create_one_audio(num)
+                        st.rerun()
 
-                    modify()
-                    st.rerun()
-                if st.button("ページを追加する", key=f"{num}_adding_page_button"):
-                    adding_page(num + 1)
             with col3:
                 if st.button(
                     "ページを削除する", key=f"{num}_del_button", type="primary"
                 ):
                     delete_page(num)
+
+
+def create_one_audio(num, tale):
+    with st.spinner("生成中...(音声)"):
+        st.session_state.audios[num] = post_audio_api(tale)
+    modify()
+
+
+def create_one_image(num, tale):
+    with st.spinner("生成中...(イラスト)"):
+        st.session_state.images["content"][num] = post_image_api(
+            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
+            .replace("%%title_placeholder%%", st.session_state.tales["title"])
+            .replace(
+                "%%description_placeholder%%",
+                st.session_state.tales["description"],
+            ),
+            (512, 512),
+        )
+
+    modify()
+
+
+def create_one_tale(num):
+    with st.spinner("生成中...(内容)"):
+        prompt = (
+            const.ONE_TALE_PROMPT.replace(
+                "%%title_placeholder%%", st.session_state.tales["title"]
+            )
+            .replace(
+                "%%description_placeholder%%",
+                st.session_state.tales["description"],
+            )
+            .replace(
+                "%%page_number_placeholder%%",
+                str(st.session_state.page_num),
+            )
+            .replace(
+                "%%characters_per_page_placeholder%%",
+                str(st.session_state.characters_per_page),
+            )
+            .replace(
+                "%%using_text_types_placeholder%%",
+                str(st.session_state.using_text_types),
+            )
+            .replace(
+                "%%age_placeholder%%",
+                st.session_state.age,
+            )
+            .replace(
+                "%%pre_pages_info_placeholder%%",
+                "\n".join(st.session_state.tales["content"][: num - 1]),
+            )
+            .replace(
+                "%%post_pages_info_placeholder%%",
+                "\n".join(st.session_state.tales["content"][num - 1 :]),
+            )
+        )
+        st.session_state.tales["content"][num] = post_text_api(prompt)
+        modify()
 
 
 def delete_book(title):
@@ -243,6 +277,14 @@ def adding_page(num):
     st.session_state.images["content"].insert(num, "")
     st.session_state.audios.insert(num, "")
     modify()
+
+
+def adding_and_create_page(num):
+    adding_page(num)
+    create_one_tale(num)
+    create_one_image(num, st.session_state.tales["content"][num])
+    create_one_audio(num, st.session_state.tales["content"][num])
+    st.rerun()
 
 
 def clear_session_state():
