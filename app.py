@@ -20,6 +20,8 @@ if "login" not in st.session_state:
     # create
     st.session_state.page_num = 5
     st.session_state.characters_per_page = 40
+    st.session_state.using_text_types = ""
+    st.session_state.age = ""
     st.session_state.tales = {"title": "", "description": "", "content": []}
     st.session_state.images = {"title": "", "content": []}
     st.session_state.audios = []

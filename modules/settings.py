@@ -18,7 +18,7 @@ def settings():
             "テキスト生成モデル", options=text_models, key="text_model_selectbox"
         )
         st.session_state.image_model = st.selectbox(
-            "テキスト生成モデル", options=image_models, key="image_model_selectbox"
+            "イラスト生成モデル", options=image_models, key="image_model_selectbox"
         )
 
         st.session_state.disable_audio = st.toggle(

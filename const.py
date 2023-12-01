@@ -74,9 +74,14 @@ TALES_PROMPT = """
 ## 1ページの文字数
 %%characters_per_page_placeholder%%
 
+## 利用する文字種類の制限
+%%using_text_types_placeholder%%
+
+## 読者の年齢
+%%age_placeholder%%
+
 ## 注意事項
 - 起承転結にわけて作成する。
-- すべてひらがなで作成する。
 - 出力はJsonで、出力サンプルに指定した形式に必ず従う。
 - 出力は```json ```で囲わない
 
@@ -108,6 +113,12 @@ ONE_TALE_PROMPT = """
 ## 1ページの文字数
 %%characters_per_page_placeholder%%
 
+## 利用する文字種類の制限
+%%using_text_types_placeholder%%
+
+## 読者の年齢
+%%age_placeholder%%
+
 ## 前の内容
 %%pre_pages_info_placeholder%%
 
@@ -130,6 +141,9 @@ DESCRIPTION_PROMPT = """
 
 ## 内容
 %%tales_placeholder%%
+
+## 利用する文字種類の制限
+%%using_text_types_placeholder%%
 
 ## 注意事項
 - 40字程度で作成する。
@@ -178,11 +192,13 @@ PAGE_MARKDOWN = """
   float: left;
   width: 47.5%;
   text-align: left;
+  font-size: 80%;
 }
 .column-right{
   float: right;
   width: 47.5%;
   text-align: left;
+  font-size: 80%;
 }
 .column-one{
   float: left;

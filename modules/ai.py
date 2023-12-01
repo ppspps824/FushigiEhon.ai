@@ -18,14 +18,17 @@ def post_text_api(prompt):
     return content_text
 
 
-def create_tales(title, description, page_num, characters_per_page, page_infos=[]):
+def create_tales(
+    title, description, page_num, characters_per_page, using_text_types, age
+):
     tales = ""
     content = (
         const.TALES_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
         .replace("%%page_number_placeholder%%", page_num)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
-        .replace("%%page_info_placeholder%%", "\n".join(page_infos))
+        .replace("%%using_text_types_placeholder%%", using_text_types)
+        .replace("%%age_placeholder%%", age)
     )
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):

@@ -127,6 +127,14 @@ def view_edit(mode):
                                 str(st.session_state.characters_per_page),
                             )
                             .replace(
+                                "%%using_text_types_placeholder%%",
+                                str(st.session_state.using_text_types),
+                            )
+                            .replace(
+                                "%%age_placeholder%%",
+                                st.session_state.age,
+                            )
+                            .replace(
                                 "%%pre_pages_info_placeholder%%",
                                 "\n".join(st.session_state.tales["content"][: num - 1]),
                             )
@@ -255,6 +263,8 @@ def create_all(only_tale=False, ignore_tale=False):
             st.session_state.tales["description"],
             str(st.session_state.page_num),
             str(st.session_state.characters_per_page),
+            st.session_state.using_text_types,
+            st.session_state.age,
         )
     if only_tale:
         st.session_state.images["content"] = [
@@ -297,7 +307,7 @@ def create():
         request_container = st.container(border=True)
         with request_container:
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
-            col1, col2 = st.columns(2)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 st.session_state.page_num = st.number_input(
                     "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=5
@@ -305,6 +315,16 @@ def create():
             with col2:
                 st.session_state.characters_per_page = st.number_input(
                     "ページごとの文字数", min_value=10, max_value=100, value=40
+                )
+            with col3:
+                st.session_state.using_text_types = st.selectbox(
+                    "使用文字",
+                    options=["ひらがなのみ", "ひらがなとカタカナ", "制限なし"],
+                )
+            with col4:
+                st.session_state.age = st.selectbox(
+                    "対象年齢",
+                    options=["1～2歳", "3～5歳", "6～10歳", "11歳～"],
                 )
 
             st.session_state.tales["title"] = st.text_input(
