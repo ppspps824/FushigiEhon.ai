@@ -293,24 +293,27 @@ def create():
         on_change=clear_session_state,
     )
 
-    col1, col2 = st.columns(2)
     if mode == "おまかせでつくる":
-        with col1:
-            st.session_state.page_num = st.number_input(
-                "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=5
-            )
-        with col2:
-            st.session_state.characters_per_page = st.number_input(
-                "ページごとの文字数", min_value=10, max_value=100, value=40
-            )
+        request_container = st.container(border=True)
+        with request_container:
+            st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.session_state.page_num = st.number_input(
+                    "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=5
+                )
+            with col2:
+                st.session_state.characters_per_page = st.number_input(
+                    "ページごとの文字数", min_value=10, max_value=100, value=40
+                )
 
-        st.session_state.tales["title"] = st.text_input(
-            "タイトル", placeholder=const.DESCRIPTION_PLACEHOLDER
-        )
-        st.session_state.tales["description"] = st.text_area(
-            "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER
-        )
-        only_tale = st.toggle("テキストだけ作成する")
+            st.session_state.tales["title"] = st.text_input(
+                "タイトル", placeholder=const.DESCRIPTION_PLACEHOLDER
+            )
+            st.session_state.tales["description"] = st.text_area(
+                "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER
+            )
+            only_tale = st.toggle("テキストだけ作成する")
 
         if st.button("作成する"):
             if st.session_state.tales["title"] or st.session_state.tales["description"]:

@@ -26,7 +26,7 @@ div[data-testid="stToolbar"] {
                             padding-top: 1rem;
                             padding-right: 3rem;
                             padding-left: 3rem;
-                            padding-bottom: 0rem;
+                            padding-bottom: 1rem;
                         }  
                         .appview-container .sidebar-content {
                             padding-top: 0rem;
@@ -52,9 +52,6 @@ div[data-testid="stToolbar"] {
                         .reportview-container .sidebar-content {
                             padding-top: 0rem;
                         }
-                        div[data-stale="false"] > iframe[title="hydralit_components.NavBar.nav_bar"] {
-                        z-index: 99;
-                    }
                 </style>
                 """
 
