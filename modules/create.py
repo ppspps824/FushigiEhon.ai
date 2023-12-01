@@ -13,7 +13,7 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import s3_delete, s3_pickle_get, s3_upload
-from modules.utils import image_select_menu, reading_book
+from modules.utils import image_select_menu, s3_pickle_get
 
 
 def view_edit(mode):
@@ -32,7 +32,7 @@ def view_edit(mode):
                 st.image("assets/noimage.png")
         with col2:
             if st.button("テキスト以外を一括で生成する", key="description_create_all"):
-                book_about, book_content = create_all(ignore_tale=True)
+                book_content = create_all(ignore_tale=True)
                 save_book(book_content, st.session_state.tales["title"])
                 modify()
                 st.rerun()
@@ -63,15 +63,9 @@ def view_edit(mode):
             if st.button("保存する"):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-                book_about = {
-                    "create_date": create_date_yyyymdd,
-                    "title": st.session_state.tales["title"],
-                    "title_image": st.session_state.images["title"],
-                    "description": st.session_state.tales["description"],
-                }
 
                 book_content = {
-                    "about": book_about,
+                    "create_date": create_date_yyyymdd,
                     "details": {
                         "tales": st.session_state.tales,
                         "images": st.session_state.images,
@@ -277,15 +271,8 @@ def create_all(only_tale=False, ignore_tale=False):
     create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
     create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
 
-    book_about = {
-        "create_date": create_date_yyyymdd,
-        "title": st.session_state.tales.get("title"),
-        "title_image": st.session_state.images.get("title", ""),
-        "description": st.session_state.tales.get("description", ""),
-    }
-
     book_content = {
-        "about": book_about,
+        "create_date": create_date_yyyymdd,
         "details": {
             "tales": st.session_state.tales,
             "images": st.session_state.images,
@@ -293,7 +280,7 @@ def create_all(only_tale=False, ignore_tale=False):
         },
     }
 
-    return book_about, book_content
+    return book_content
 
 
 def create():
@@ -324,16 +311,16 @@ def create():
 
         if st.button("作成する"):
             if st.session_state.tales["title"] or st.session_state.tales["description"]:
-                book_about, book_content = create_all(only_tale=only_tale)
+                book_content = create_all(only_tale=only_tale)
 
                 save_book(book_content, st.session_state.tales["title"])
 
-                st.write(book_about["title"])
+                st.write(book_content["details"]["tales"]["title"])
                 try:
-                    st.image(book_about["title_image"])
+                    st.image(book_content["details"]["images"]["title"])
                 except:
                     st.image("assets/noimage.png")
-                st.write(book_about["description"])
+                st.write(book_content["details"]["tales"]["description"])
 
             else:
                 st.info("タイトルかあらすじを内容を入力してください。")
@@ -347,11 +334,10 @@ def create():
                 st.session_state.not_modify
                 or st.session_state.tales["title"] != captions[select_book - 1]
             ):
-                book_info = reading_book(
+                book_info = s3_pickle_get(
                     f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
                 )
                 st.session_state.tales = book_info["details"]["tales"]
                 st.session_state.images = book_info["details"]["images"]
                 st.session_state.audios = book_info["details"]["audios"]
-
             view_edit(mode)

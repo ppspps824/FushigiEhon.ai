@@ -3,7 +3,7 @@ import base64
 import const
 import reveal_slides as rs
 import streamlit as st
-from modules.utils import image_select_menu, reading_book
+from modules.utils import image_select_menu, s3_pickle_get
 
 
 def play():
@@ -14,12 +14,12 @@ def play():
 
     if select_book:
         with st.spinner("よみこみちゅう..."):
-            book_info = reading_book(
+            book_info = s3_pickle_get(
                 f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
             )
             # 表紙
-            title = book_info["about"]["title"]
-            title_image = book_info["about"]["title_image"]
+            title = book_info["details"]["tales"]["title"]
+            title_image = book_info["details"]["images"]["title"]
 
             tales = book_info["details"]["tales"]["content"]
             images = book_info["details"]["images"]["content"]

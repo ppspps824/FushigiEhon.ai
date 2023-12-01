@@ -6,13 +6,6 @@ from PIL import Image
 from streamlit_image_select import image_select
 
 
-def reading_book(key):
-    # 保存している情報を読み込み
-    user_contents = s3_pickle_get(key)
-
-    return user_contents
-
-
 def image_select_menu():
     select_book = ""
     try:
