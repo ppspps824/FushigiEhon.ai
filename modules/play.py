@@ -1,52 +1,16 @@
 import base64
-import io
 
 import const
 import reveal_slides as rs
 import streamlit as st
-from modules.s3 import s3_pickle_get
-from PIL import Image
-from streamlit_image_select import image_select
-
-
-def reading_book(key):
-    # 保存している情報を読み込み
-    user_contents = s3_pickle_get(key)
-
-    return user_contents
+from modules.utils import image_select_menu, reading_book
 
 
 def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
-    try:
-        all_image = s3_pickle_get(
-            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.pickle"
-        )
-    except:
-        all_image = {}
 
-    captions = list(all_image.keys())
-    images = [
-        Image.open(io.BytesIO(data)).resize((256, 256)) for data in all_image.values()
-    ]
-
-    if images:
-        select_book = (
-            image_select(
-                label="",
-                images=images,
-                captions=captions,
-                return_value="index",
-                index=-1,
-                use_container_width=False,
-            )
-            + 1
-        )
-    else:
-        st.info(
-            "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"
-        )
+    select_book, captions = image_select_menu()
 
     if select_book:
         with st.spinner("よみこみちゅう..."):

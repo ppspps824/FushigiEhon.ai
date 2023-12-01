@@ -8,10 +8,9 @@ import streamlit as st
 from PIL import Image
 
 
-def post_text_api(prompt, response_format={"type": "json_object"}):
+def post_text_api(prompt):
     response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
-        response_format=response_format,
         messages=[{"role": "system", "content": prompt}],
     )
     content_text = response.choices[0].message.content
@@ -32,6 +31,7 @@ def create_tales(title, description, page_num, characters_per_page, page_infos=[
         for _ in range(3):
             try:
                 content_text = post_text_api(content)
+                content_text = content_text.replace("json", "").replace("```", "")
                 tales = json.loads(content_text)
                 break
             except Exception as e:
@@ -41,7 +41,8 @@ def create_tales(title, description, page_num, characters_per_page, page_infos=[
     if tales:
         return tales
     else:
-        st.info("リトライしてください")
+        st.info("生成に失敗しました。リトライしてください")
+        print(f"生成された内容：{content_text}")
         st.stop
 
 

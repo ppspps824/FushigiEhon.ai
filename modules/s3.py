@@ -19,12 +19,17 @@ def get_client_bucket():
 
 
 def s3_upload(file, key):
-    with st.spinner("保存中..."):
+    bucket = get_client_bucket()
+    with io.BytesIO() as bf:
+        pickle.dump(file, bf)
+        bf.seek(0)
+        result = bucket.upload_fileobj(bf, key)
+
+
+def s3_delete(key):
+    with st.spinner("えほんを削除中..."):
         bucket = get_client_bucket()
-        with io.BytesIO() as bf:
-            pickle.dump(file, bf)
-            bf.seek(0)
-            result = bucket.upload_fileobj(bf, key)
+        bucket.Object(key).delete()
 
 
 @st.cache_data(show_spinner=False)
@@ -38,7 +43,7 @@ def s3_pickle_get(key):
     return result
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def get_all_objects():
     bucket = get_client_bucket()
 

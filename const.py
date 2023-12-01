@@ -68,7 +68,7 @@ TALES_PROMPT = """
 ## タイトル
 %%title_placeholder%%
 
-## 内容
+## あらすじ
 %%description_placeholder%%
 
 ## ページ数
@@ -77,13 +77,11 @@ TALES_PROMPT = """
 ## 1ページの文字数
 %%characters_per_page_placeholder%%
 
-## ページごとの内容
-%%page_info_placeholder%%
-
 ## 注意事項
 - 起承転結にわけて作成する。
 - すべてひらがなで作成する。
 - 出力はJsonで、出力サンプルに指定した形式に必ず従う。
+- 出力は```json ```で囲わない
 
 ## 出力サンプル
 {
@@ -98,6 +96,35 @@ TALES_PROMPT = """
 }
 """
 
+ONE_TALE_PROMPT = """
+あなたはプロの絵本作家です。与えられた内容から1ページ分の内容を作成してください。
+
+## タイトル
+%%title_placeholder%%
+
+## あらすじ
+%%description_placeholder%%
+
+## ページ数
+%%page_number_placeholder%%
+
+## 1ページの文字数
+%%characters_per_page_placeholder%%
+
+## 前の内容
+%%pre_pages_info_placeholder%%
+
+## 後の内容
+%%post_pages_info_placeholder%%
+
+## 注意事項
+- 前の内容と後の内容に繋がるように作成する。
+- 前の内容や後の内容が指定されない場合は、タイトルとあらすじから生成する。
+- すべてひらがなで作成する。
+- 出力はテキストのみで説明等は出力しない。
+
+"""
+
 DESCRIPTION_PROMPT = """
 あなたはプロの絵本作家です。与えられた内容から以下の内容に沿って絵本の物語を作成してください。
 
@@ -105,7 +132,7 @@ DESCRIPTION_PROMPT = """
 %%title_placeholder%%
 
 ## 内容
-%%tales__placeholder%%
+%%tales_placeholder%%
 
 ## 注意事項
 - 40字程度で作成する。
