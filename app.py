@@ -69,7 +69,7 @@ else:
 
     selected = option_menu(
         "ふしぎえほん.ai",
-        ["つかいかた", "つくる", "みる", "せってい"],
+        ["つかいかた", "えほんをつくる", "えほんをよむ", "せってい"],
         icons=["bi-universal-access", "bi-brush", "bi-play-btn", "gear"],
         menu_icon="bi-book",
         default_index=0,
@@ -92,9 +92,9 @@ else:
 
     if selected == "つかいかた":
         about()
-    elif selected == "つくる":
+    elif selected == "えほんをつくる":
         create()
-    elif selected == "みる":
+    elif selected == "えほんをよむ":
         play()
     elif selected == "せってい":
         settings()
