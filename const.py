@@ -166,6 +166,13 @@ TITLE_MARKDOWN = """
 ---
 
 """
+NO_IMAGE_TITLE_MARKDOWN = """
+
+### %%title_placeholder%%
+
+---
+
+"""
 
 PAGE_MARKDOWN = """
 
@@ -194,6 +201,15 @@ PAGE_MARKDOWN = """
 <div class="column-right">
 %%content_placeholder%%
 </div>
+
+<audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
+
+---
+
+"""
+NO_IMAGE_PAGE_MARKDOWN = """
+
+%%content_placeholder%%
 
 <audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
 

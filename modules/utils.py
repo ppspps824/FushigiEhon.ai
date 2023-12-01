@@ -8,7 +8,6 @@ from streamlit_image_select import image_select
 
 def reading_book(key):
     # 保存している情報を読み込み
-    print("よみこみ")
     user_contents = s3_pickle_get(key)
 
     return user_contents

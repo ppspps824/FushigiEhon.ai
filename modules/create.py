@@ -1,4 +1,5 @@
 import datetime
+import time
 
 import const
 import pytz
@@ -16,33 +17,43 @@ from modules.utils import image_select_menu, reading_book
 
 
 def view_edit(mode):
-    with st.expander(f"タイトル:{st.session_state.title}", expanded=True):
-        st.session_state.title = st.text_input("タイトル", value=st.session_state.title)
-        st.session_state.description = st.text_area(
-            "あらすじ", value=st.session_state.description
+    with st.expander(f"タイトル:{st.session_state.tales['title']}", expanded=True):
+        st.session_state.tales["title"] = st.text_input(
+            "タイトル", value=st.session_state.tales["title"]
+        )
+        st.session_state.tales["description"] = st.text_area(
+            "あらすじ", value=st.session_state.tales["description"]
         )
         col1, col2, col3 = st.columns([3, 2, 1])
         with col1:
             try:
-                st.image(st.session_state.title_image)
+                st.image(st.session_state.images["title"])
             except:
                 st.image("assets/noimage.png")
         with col2:
+            if st.button("テキスト以外を一括で生成する", key="description_create_all"):
+                book_about, book_content = create_all(ignore_tale=True)
+                save_book(book_content, st.session_state.tales["title"])
+                modify()
+                st.rerun()
+
             if st.button("あらすじを生成する", key="description_create_button"):
-                tales_text = "\n".join(st.session_state.tales)
+                tales_text = "\n".join(st.session_state.tales["content"])
                 with st.spinner("生成中...(あらすじ)"):
-                    st.session_state.description = post_text_api(
+                    st.session_state.tales["description"] = post_text_api(
                         const.DESCRIPTION_PROMPT.replace(
                             "%%tales_placeholder%%", tales_text
-                        ).replace("%%title_placeholder%%", st.session_state.title)
+                        ).replace(
+                            "%%title_placeholder%%", st.session_state.tales["title"]
+                        )
                     )
                     modify()
                     st.rerun()
 
             if st.button("表紙を生成する", key="title_image_create_button"):
                 with st.spinner("生成中...(イラスト)"):
-                    st.session_state.title_image = post_image_api(
-                        st.session_state.description, (720, 720)
+                    st.session_state.images["title"] = post_image_api(
+                        st.session_state.tales["description"], (720, 720)
                     )
                     modify()
                     st.rerun()
@@ -54,34 +65,34 @@ def view_edit(mode):
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
                 book_about = {
                     "create_date": create_date_yyyymdd,
-                    "title": st.session_state.title,
-                    "title_image": st.session_state.title_image,
-                    "description": st.session_state.description,
+                    "title": st.session_state.tales["title"],
+                    "title_image": st.session_state.images["title"],
+                    "description": st.session_state.tales["description"],
                 }
 
                 book_content = {
                     "about": book_about,
                     "details": {
-                        "tales": {"content": st.session_state.tales},
-                        "images": {"content": st.session_state.images},
+                        "tales": st.session_state.tales,
+                        "images": st.session_state.images,
                         "audios": st.session_state.audios,
                     },
                 }
 
                 # 保存処理
-                save_book(book_content, st.session_state.title)
+                save_book(book_content, st.session_state.tales["title"])
 
         with col3:
             if mode == "つくりなおす":
                 if st.button(
                     "えほんを削除する", key="delete_book_button", type="primary"
                 ):
-                    delete_book(st.session_state.title)
+                    delete_book(st.session_state.tales["title"])
 
     for num, info in enumerate(
         zip(
-            st.session_state.tales,
-            st.session_state.images,
+            st.session_state.tales["content"],
+            st.session_state.images["content"],
             st.session_state.audios,
         )
     ):
@@ -94,7 +105,7 @@ def view_edit(mode):
                 except:
                     st.image("assets/noimage.png")
             with col2:
-                st.session_state.tales[num] = st.text_area(
+                st.session_state.tales["content"][num] = st.text_area(
                     "内容", key=f"{num}_tale", value=tale
                 )
 
@@ -107,11 +118,11 @@ def view_edit(mode):
                     with st.spinner("生成中...(内容)"):
                         prompt = (
                             const.ONE_TALE_PROMPT.replace(
-                                "%%title_placeholder%%", st.session_state.title
+                                "%%title_placeholder%%", st.session_state.tales["title"]
                             )
                             .replace(
                                 "%%description_placeholder%%",
-                                st.session_state.description,
+                                st.session_state.tales["description"],
                             )
                             .replace(
                                 "%%page_number_placeholder%%",
@@ -123,25 +134,27 @@ def view_edit(mode):
                             )
                             .replace(
                                 "%%pre_pages_info_placeholder%%",
-                                "\n".join(st.session_state.tales[: num - 1]),
+                                "\n".join(st.session_state.tales["content"][: num - 1]),
                             )
                             .replace(
                                 "%%post_pages_info_placeholder%%",
-                                "\n".join(st.session_state.tales[num - 1 :]),
+                                "\n".join(st.session_state.tales["content"][num - 1 :]),
                             )
                         )
-                        st.session_state.tales[num] = post_text_api(prompt)
+                        st.session_state.tales["content"][num] = post_text_api(prompt)
                         modify()
                         st.rerun()
 
                 if st.button("イラストを生成する", key=f"{num}_image_create_button"):
                     with st.spinner("生成中...(イラスト)"):
-                        st.session_state.images[num] = post_image_api(
+                        st.session_state.images["content"][num] = post_image_api(
                             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
-                            .replace("%%title_placeholder%%", st.session_state.title)
+                            .replace(
+                                "%%title_placeholder%%", st.session_state.tales["title"]
+                            )
                             .replace(
                                 "%%description_placeholder%%",
-                                st.session_state.description,
+                                st.session_state.tales["description"],
                             ),
                             (512, 512),
                         )
@@ -201,6 +214,7 @@ def save_book(book_content, title):
                 f"{st.session_state.user_id}/book_info/{title}.pickle",
             )
         st.info("保存しました。")
+        time.sleep(0.5)
         st.cache_data.clear()
         st.rerun()
     else:
@@ -212,39 +226,84 @@ def modify():
 
 
 def delete_page(num):
-    del st.session_state.tales[num]
-    del st.session_state.images[num]
+    del st.session_state.tales["content"][num]
+    del st.session_state.images["content"][num]
     del st.session_state.audios[num]
     modify()
     st.rerun()
 
 
 def adding_page(num):
-    st.session_state.tales.insert(num, "")
-    st.session_state.images.insert(num, "")
+    st.session_state.tales["content"].insert(num, "")
+    st.session_state.images["content"].insert(num, "")
     st.session_state.audios.insert(num, "")
     modify()
-    st.rerun()
 
 
 def clear_session_state():
-    st.session_state.title = ""
-    st.session_state.title_image = ""
-    st.session_state.description = ""
-    st.session_state.tales = []
-    st.session_state.images = []
+    st.session_state.tales = {"title": "", "description": "", "content": []}
+    st.session_state.images = {"title": "", "content": []}
     st.session_state.audios = []
     st.session_state.not_modify = True
 
 
+def create_all(only_tale=False, ignore_tale=False):
+    # 生成処理
+    # 物語を生成
+    if ignore_tale:
+        pass
+    else:
+        st.session_state.tales = create_tales(
+            st.session_state.tales["title"],
+            st.session_state.tales["description"],
+            str(st.session_state.page_num),
+            str(st.session_state.characters_per_page),
+        )
+    if only_tale:
+        st.session_state.images["content"] = [
+            "" for _ in range(len(st.session_state.tales["content"]))
+        ]
+
+        st.session_state.audios = [
+            "" for _ in range(len(st.session_state.tales["content"]))
+        ]
+    else:
+        # イラストを生成
+        st.session_state.images = create_images(st.session_state.tales)
+
+        # 音声を生成
+        st.session_state.audios = create_audios(st.session_state.tales)
+
+    create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
+    create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
+
+    book_about = {
+        "create_date": create_date_yyyymdd,
+        "title": st.session_state.tales.get("title"),
+        "title_image": st.session_state.images.get("title", ""),
+        "description": st.session_state.tales.get("description", ""),
+    }
+
+    book_content = {
+        "about": book_about,
+        "details": {
+            "tales": st.session_state.tales,
+            "images": st.session_state.images,
+            "audios": st.session_state.audios,
+        },
+    }
+
+    return book_about, book_content
+
+
 def create():
     mode = st.selectbox(
-        "つくりかた",
-        options=["おまかせでつくる", "いちからつくる", "つくりなおす"],
+        "あたらしくつくる",
+        options=["", "おまかせでつくる", "いちからつくる"],
         on_change=clear_session_state,
     )
-    col1, col2 = st.columns(2)
 
+    col1, col2 = st.columns(2)
     if mode == "おまかせでつくる":
         with col1:
             st.session_state.page_num = st.number_input(
@@ -255,54 +314,19 @@ def create():
                 "ページごとの文字数", min_value=10, max_value=100, value=40
             )
 
-        st.session_state.title = st.text_input(
+        st.session_state.tales["title"] = st.text_input(
             "タイトル", placeholder=const.DESCRIPTION_PLACEHOLDER
         )
-        st.session_state.description = st.text_area(
+        st.session_state.tales["description"] = st.text_area(
             "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER
         )
         only_tale = st.toggle("テキストだけ作成する")
 
         if st.button("作成する"):
-            if st.session_state.title or st.session_state.description:
-                # 生成処理
-                # 物語を生成
-                tales = create_tales(
-                    st.session_state.title,
-                    st.session_state.description,
-                    str(st.session_state.page_num),
-                    str(st.session_state.characters_per_page),
-                )
-                if only_tale:
-                    images = {"content": ["" for _ in range(len(tales))]}
-                    audios = {["" for _ in range(len(tales))]}
-                else:
-                    # イラストを生成
-                    images = create_images(tales)
+            if st.session_state.tales["title"] or st.session_state.tales["description"]:
+                book_about, book_content = create_all(only_tale=only_tale)
 
-                    # 音声を生成
-                    audios = create_audios(tales)
-
-                create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
-                create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-
-                book_about = {
-                    "create_date": create_date_yyyymdd,
-                    "title": tales.get("title"),
-                    "title_image": images.get("title", ""),
-                    "description": tales.get("description", ""),
-                }
-
-                book_content = {
-                    "about": book_about,
-                    "details": {
-                        "tales": tales,
-                        "images": images,
-                        "audios": audios,
-                    },
-                }
-
-                save_book(book_content, tales.get("title"))
+                save_book(book_content, st.session_state.tales["title"])
 
                 st.write(book_about["title"])
                 try:
@@ -314,26 +338,20 @@ def create():
             else:
                 st.info("タイトルかあらすじを内容を入力してください。")
 
-    if mode in ["いちからつくる", "つくりなおす"]:
-        if mode == "つくりなおす":
-            select_book, captions = image_select_menu()
+    elif mode == "いちからつくる":
+        view_edit(mode)
+    else:
+        select_book, captions = image_select_menu()
+        if select_book:
+            if (
+                st.session_state.not_modify
+                or st.session_state.tales["title"] != captions[select_book - 1]
+            ):
+                book_info = reading_book(
+                    f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
+                )
+                st.session_state.tales = book_info["details"]["tales"]
+                st.session_state.images = book_info["details"]["images"]
+                st.session_state.audios = book_info["details"]["audios"]
 
-            if select_book:
-                if (
-                    st.session_state.not_modify
-                    or st.session_state.title != captions[select_book - 1]
-                ):
-                    book_info = reading_book(
-                        f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.pickle"
-                    )
-                    st.session_state.title = book_info["about"]["title"]
-                    st.session_state.title_image = book_info["about"]["title_image"]
-                    st.session_state.description = book_info["about"]["description"]
-
-                    st.session_state.tales = book_info["details"]["tales"]["content"]
-                    st.session_state.images = book_info["details"]["images"]["content"]
-                    st.session_state.audios = book_info["details"]["audios"]
-
-                view_edit(mode)
-        else:
             view_edit(mode)

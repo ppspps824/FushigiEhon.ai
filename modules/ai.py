@@ -27,7 +27,7 @@ def create_tales(title, description, page_num, characters_per_page, page_infos=[
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%page_info_placeholder%%", "\n".join(page_infos))
     )
-    with st.spinner("生成中...(文章)"):
+    with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
             try:
                 content_text = post_text_api(content)
@@ -36,13 +36,13 @@ def create_tales(title, description, page_num, characters_per_page, page_infos=[
                 break
             except Exception as e:
                 print(e.args)
+                print(f"生成された内容：{content_text}")
                 continue
 
     if tales:
         return tales
     else:
         st.info("生成に失敗しました。リトライしてください")
-        print(f"生成された内容：{content_text}")
         st.stop
 
 

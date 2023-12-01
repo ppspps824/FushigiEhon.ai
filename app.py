@@ -18,13 +18,10 @@ if "login" not in st.session_state:
     st.session_state.disable_audio = False
 
     # create
-    st.session_state.title = ""
-    st.session_state.title_image = ""
-    st.session_state.description = ""
     st.session_state.page_num = 5
     st.session_state.characters_per_page = 40
-    st.session_state.tales = []
-    st.session_state.images = []
+    st.session_state.tales = {"title": "", "description": "", "content": []}
+    st.session_state.images = {"title": "", "content": []}
     st.session_state.audios = []
     st.session_state.not_modify = True
 
