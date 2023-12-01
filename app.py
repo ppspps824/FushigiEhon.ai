@@ -83,7 +83,6 @@ else:
             "nav-link": {
                 "font-size": "20px",
                 "margin": "0px",
-                "text-align": "left",
                 "--hover-color": "#eee",
             },
             "nav-link-selected": {"background-color": "004a55"},
