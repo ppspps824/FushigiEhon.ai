@@ -54,7 +54,7 @@ if not st.session_state.login:
         st.stop()
 
     st.session_state.user_id = authenticator.get_username()
-    st.experimental_rerun()
+    st.rerun()
 else:
     if st.session_state.api_key:
         openai.api_key = st.session_state.api_key
