@@ -77,7 +77,7 @@ def view_edit(mode):
                 save_book(book_content, st.session_state.tales["title"])
 
         with col3:
-            if mode == "つくりなおす":
+            if not mode:
                 if st.button(
                     "えほんを削除する", key="delete_book_button", type="primary"
                 ):
