@@ -2,9 +2,11 @@ import streamlit as st
 
 
 def about():
-    with st.expander("えほんをつくる"):
-        st.write("えほんをつくる")
-    with st.expander("えほんをよむ"):
-        st.write("えほんをつくる")
-    with st.expander("APIキーの取得方法"):
-        st.write("OpenAIのサイトで取得")
+    with st.container(border=True):
+        st.write("### ふしぎえほん.aiとは")
+    with st.container(border=True):
+        st.write("### えほんをつくる")
+    with st.container(border=True):
+        st.write("### えほんをみる")
+    with st.container(border=True):
+        st.write("### APIキーの取得方法")

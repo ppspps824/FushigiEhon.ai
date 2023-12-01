@@ -5,6 +5,7 @@ import boto3
 import streamlit as st
 
 
+@st.cache_resource(show_spinner=False)
 def get_client_bucket():
     s3 = boto3.resource(
         "s3",
@@ -26,6 +27,7 @@ def s3_upload(file, key):
             result = bucket.upload_fileobj(bf, key)
 
 
+@st.cache_data(show_spinner=False)
 def s3_pickle_get(key):
     bucket = get_client_bucket()
     with io.BytesIO() as f:
@@ -36,6 +38,7 @@ def s3_pickle_get(key):
     return result
 
 
+@st.cache_data(show_spinner=False)
 def get_all_objects():
     bucket = get_client_bucket()
 

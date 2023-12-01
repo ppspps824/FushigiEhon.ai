@@ -89,6 +89,4 @@ def play():
 
             content_markdown += const.END_ROLE
 
-            response_dict = rs.slides(
-                content_markdown, theme="solarized", display_only=True
-            )
+            rs.slides(content_markdown, theme="solarized", display_only=True)
