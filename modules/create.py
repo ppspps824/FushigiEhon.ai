@@ -1,6 +1,6 @@
 import datetime
 import time
-
+import random
 import const
 import pytz
 import streamlit as st
@@ -13,7 +13,7 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import s3_delete, s3_joblib_get, s3_upload
-from modules.utils import image_select_menu, s3_joblib_get
+from modules.utils import image_select_menu
 
 
 def view_edit(mode):
@@ -337,6 +337,15 @@ def create_all(only_tale=False, ignore_tale=False):
 
     return book_content
 
+def create_random_book_info():
+    title_set_ix =random.randint(0,len(const.TITLE_SET)-1)
+    print(title_set_ix)
+    st.session_state.tales["title"]=const.TITLE_SET[title_set_ix]["title"]
+    st.session_state.tales["description"]=const.TITLE_SET[title_set_ix]["description"]
+    st.session_state.page_num=const.TITLE_SET[title_set_ix]["page_num"]
+    st.session_state.characters_per_page=const.CHARACTORS_PER_PAGE
+    st.session_state.using_text_types=const.USING_TEXT_TYPE.index(const.TITLE_SET[title_set_ix]["using_text_types"])
+    st.session_state.age=const.AGE.index(const.TITLE_SET[title_set_ix]["age"])
 
 def create():
     mode = st.selectbox(
@@ -349,31 +358,34 @@ def create():
         request_container = st.container(border=True)
         with request_container:
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
+            create_random_book_info()
             col1, col2, col3, col4 = st.columns(4)
             with col1:
                 st.session_state.page_num = st.number_input(
-                    "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=5
+                    "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=st.session_state.page_num
                 )
             with col2:
                 st.session_state.characters_per_page = st.number_input(
-                    "ページごとの文字数", min_value=10, max_value=100, value=40
+                    "ページごとの文字数", min_value=10, max_value=100, value=st.session_state.characters_per_page
                 )
             with col3:
                 st.session_state.using_text_types = st.selectbox(
                     "使用文字",
-                    options=["ひらがなのみ", "ひらがなとカタカナ", "制限なし"],
+                    options=const.USING_TEXT_TYPE,
+                    index=st.session_state.using_text_types
                 )
             with col4:
                 st.session_state.age = st.selectbox(
                     "対象年齢",
-                    options=["1～2歳", "3～5歳", "6～10歳", "11歳～"],
+                    options=const.AGE,
+                    index=st.session_state.age,
                 )
 
             st.session_state.tales["title"] = st.text_input(
-                "タイトル", placeholder=const.DESCRIPTION_PLACEHOLDER
+                "タイトル ※必須", placeholder=const.DESCRIPTION_PLACEHOLDER,value=st.session_state.tales["title"]
             )
             st.session_state.tales["description"] = st.text_area(
-                "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER
+                "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER,value=st.session_state.tales["description"]
             )
             only_tale = st.toggle("テキストだけ作成する")
 

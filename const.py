@@ -55,6 +55,12 @@ div[data-testid="stToolbar"] {
                 </style>
                 """
 
+PAGE_NUM=5
+CHARACTORS_PER_PAGE=40
+USING_TEXT_TYPE=["ひらがなのみ", "ひらがなとカタカナ", "制限なし"]
+AGE=["1～2歳", "3～5歳", "6～10歳", "11歳～"]
+
+
 DESCRIPTION_PLACEHOLDER = """入力なしでランダム生成します。"""
 
 MAX_PAGE_NUM = 20
@@ -235,3 +241,78 @@ END_ROLE = """
 # おしまい
 
 """
+
+
+TITLE_SET=[
+    {
+      "title": "ひかりのもりのぼうけん",
+      "description": "まほうのもりで、あかるいひかりをさがすことぼうけんのはなし。",
+      "page_num": 7,
+      "using_text_types": "ひらがなのみ",
+      "age": "3～5歳"
+    },
+    {
+      "title": "ゆめみるかいじゅう",
+      "description": "かわいいかいじゅうがゆめをみて、ともだちをつくるはなし。",
+      "page_num": 6,
+      "using_text_types": "ひらがなとカタカナ",
+      "age": "1～2歳"
+    },
+    {
+      "title": "うちゅうのおともだち",
+      "description": "うちゅうせんをつくって、ほしにたびするこどものはなし。",
+      "page_num": 8,
+      "using_text_types": "ひらがなのみ",
+      "age": "3～5歳"
+    },
+    {
+      "title": "しろいくものひみつ",
+      "description": "くもにのって、そらのひみつをしらべるたんけんのはなし。",
+      "page_num": 10,
+      "using_text_types": "ひらがなとカタカナ",
+      "age": "6～10歳"
+    },
+    {
+      "title": "まほうのくつした",
+      "description": "まほうのくつしたをはいて、ふしぎなちきゅうをたんけんするはなし。",
+      "page_num": 5,
+      "using_text_types": "ひらがなのみ",
+      "age": "3～5歳"
+    },
+    {
+      "title": "かがやくほしのプリンセス",
+      "description": "ほしのくにのプリンセスがぼうけんして、ゆうきをみつけるはなし。",
+      "page_num": 9,
+      "using_text_types": "制限なし",
+      "age": "6～10歳"
+    },
+    {
+      "title": "たからものはどこ？",
+      "description": "たからじまをさがして、ともだちとたからをみつけるはなし。",
+      "page_num": 7,
+      "using_text_types": "ひらがなとカタカナ",
+      "age": "3～5歳"
+    },
+    {
+      "title": "ふしぎなおうち",
+      "description": "ふしぎなおうちをたんけんして、ひみつをみつけるはなし。",
+      "page_num": 6,
+      "using_text_types": "ひらがなのみ",
+      "age": "1～2歳"
+    },
+    {
+      "title": "すいぞくかんのなぞ",
+      "description": "すいぞくかんでおこったなぞをかいけつするディテクティブのはなし。",
+      "page_num": 10,
+      "using_text_types": "制限なし",
+      "age": "11歳～"
+    },
+    {
+      "title": "おつきみパーティー",
+      "description": "つきにおつきみパーティーをするうさぎのはなし。",
+      "page_num": 8,
+      "using_text_types": "ひらがなとカタカナ",
+      "age": "3～5歳"
+    }
+  ]
+
