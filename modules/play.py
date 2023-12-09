@@ -4,10 +4,10 @@ from io import BytesIO
 import const
 import reveal_slides as rs
 import streamlit as st
-from modules.utils import image_select_menu, s3_joblib_get
+from modules.utils import image_select_menu, get_book_object
 
 
-def pil_to_base64(img, format="png"):
+def pil_to_base64(img, format="jpeg"):
     buffer = BytesIO()
     img.save(buffer, format)
     img_str = base64.b64encode(buffer.getvalue()).decode("ascii")
@@ -23,8 +23,8 @@ def play():
 
     if select_book:
         with st.spinner("よみこみちゅう..."):
-            book_info = s3_joblib_get(
-                f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.joblib"
+            book_info = get_book_object(
+                captions[select_book-1]
             )
             # 表紙
             title = book_info["details"]["tales"]["title"]

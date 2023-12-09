@@ -1,7 +1,7 @@
 import io
 
 import boto3
-import joblib
+import json
 import streamlit as st
 
 
@@ -20,28 +20,43 @@ def get_client_bucket():
 
 def s3_upload(file, key):
     bucket = get_client_bucket()
-    with io.BytesIO() as bf:
-        joblib.dump(file, bf, compress=3)
-        bf.seek(0)
-        result = bucket.upload_fileobj(bf, key)
+    file = io.BytesIO(file)
+        
+    bucket.upload_fileobj(file, key)
 
 
 def s3_delete(key):
     with st.spinner("えほんを削除中..."):
         bucket = get_client_bucket()
-        bucket.Object(key).delete()
+        bucket.objects.filter(Prefix="key").delete()
 
+def get_book_object(title):
+    book_object={
+    st.session_state.tales : json.loads(get_tales(title)),
+    st.session_state.images["title"] : get_title_image(title),
+    st.session_state.images["content"] : get_images(title),
+    st.session_state.audios : get_audios(title),
+    }
 
-@st.cache_data(show_spinner=False)
-def s3_joblib_get(key):
+    return book_object
+
+def s3_get(key):
     bucket = get_client_bucket()
-    with io.BytesIO() as f:
-        bucket.download_fileobj(key, f)
-        f.seek(0)
-        result = joblib.load(f)
-
+    result =bucket.objects.filter(Prefix=key)
+    print(result)
     return result
 
+def get_tales(title):
+    return s3_get(f"{st.session_state.user_id}/book_info/{title}/tales.json")
+
+def get_title_image(title):
+    return s3_get(f"{st.session_state.user_id}/book_info/{title}/images/title.jpeg")
+
+def get_images(title):
+    return s3_get(f"{st.session_state.user_id}/book_info/{title}/images/")
+
+def get_audios(title):
+    return s3_get(f"{st.session_state.user_id}/book_info/{title}/audios/")
 
 @st.cache_resource(show_spinner=False)
 def get_all_objects():

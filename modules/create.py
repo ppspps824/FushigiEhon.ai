@@ -12,6 +12,8 @@ from modules.ai import (
     post_image_api,
     post_text_api,
 )
+import json
+import io
 from modules.s3 import s3_delete, s3_joblib_get, s3_upload
 from modules.utils import image_select_menu
 
@@ -143,7 +145,7 @@ def view_edit(mode):
                         st.rerun()
 
                     if st.button("音声を生成する", key=f"{num}_audio_create_button"):
-                        create_one_audio(num)
+                        create_one_audio(num, tale)
                         st.rerun()
 
             with col3:
@@ -226,7 +228,7 @@ def delete_book(title):
                 f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib",
             )
 
-            s3_delete(f"{st.session_state.user_id}/book_info/{title}.joblib")
+            s3_delete(f"{st.session_state.user_id}/book_info/{title}")
 
             st.cache_data.clear()
             st.rerun()
@@ -235,23 +237,50 @@ def delete_book(title):
 def save_book(book_content, title):
     if title:
         with st.spinner("えほんを保存中..."):
-            try:
-                all_image = s3_joblib_get(
-                    f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
+            save_infos = []
+            
+            title_image_path=f"{st.session_state.user_id}/book_info/{title}/images/title.jpeg"
+            tales_path=f"{st.session_state.user_id}/book_info/{title}/tales.json"
+
+            bf = io.BytesIO()
+            book_content["details"]["images"]["title"].save(bf, format="jpeg")
+            save_infos.append(
+                [
+                    bf.getvalue(),
+                    title_image_path
+                ]
+            )
+
+            save_infos.append(
+                [
+                    json.dumps(
+                        book_content["details"]["tales"], indent=4, ensure_ascii=False
+                    ).encode(),
+                    tales_path
+                ],
+            )
+
+            for ix, file in enumerate(book_content["details"]["images"]["content"]):
+                bf = io.BytesIO()
+                file.save(bf, format="jpeg")
+                bytes = bf.getvalue()
+                save_infos.append(
+                    [
+                        bytes,
+                        f"{st.session_state.user_id}/book_info/{title}/images/image_{ix}.jpeg"
+                    ]
                 )
-            except:
-                all_image = {}
 
-            all_image[title] = book_content["details"]["images"]["title"]
-            s3_upload(
-                all_image,
-                f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib",
-            )
+            for ix, file in enumerate(book_content["details"]["audios"]):
+                save_infos.append(
+                    [
+                        file.getvalue(),
+                        f"{st.session_state.user_id}/book_info/{title}/audios/audio_{ix}.mp3"
+                    ]
+                )
 
-            s3_upload(
-                book_content,
-                f"{st.session_state.user_id}/book_info/{title}.joblib",
-            )
+            [s3_upload(file, path) for file, path in save_infos]
+
         st.info("保存しました。")
         time.sleep(0.5)
         st.cache_data.clear()
@@ -337,15 +366,18 @@ def create_all(only_tale=False, ignore_tale=False):
 
     return book_content
 
+
 def create_random_book_info():
-    title_set_ix =random.randint(0,len(const.TITLE_SET)-1)
-    print(title_set_ix)
-    st.session_state.tales["title"]=const.TITLE_SET[title_set_ix]["title"]
-    st.session_state.tales["description"]=const.TITLE_SET[title_set_ix]["description"]
-    st.session_state.page_num=const.TITLE_SET[title_set_ix]["page_num"]
-    st.session_state.characters_per_page=const.CHARACTORS_PER_PAGE
-    st.session_state.using_text_types=const.USING_TEXT_TYPE.index(const.TITLE_SET[title_set_ix]["using_text_types"])
-    st.session_state.age=const.AGE.index(const.TITLE_SET[title_set_ix]["age"])
+    title_set_ix = random.randint(0, len(const.TITLE_SET) - 1)
+    st.session_state.tales["title"] = const.TITLE_SET[title_set_ix]["title"]
+    st.session_state.tales["description"] = const.TITLE_SET[title_set_ix]["description"]
+    st.session_state.page_num = const.TITLE_SET[title_set_ix]["page_num"]
+    st.session_state.characters_per_page = const.CHARACTORS_PER_PAGE
+    st.session_state.using_text_types = const.USING_TEXT_TYPE.index(
+        const.TITLE_SET[title_set_ix]["using_text_types"]
+    )
+    st.session_state.age = const.AGE.index(const.TITLE_SET[title_set_ix]["age"])
+
 
 def create():
     mode = st.selectbox(
@@ -362,17 +394,23 @@ def create():
             col1, col2, col3, col4 = st.columns(4)
             with col1:
                 st.session_state.page_num = st.number_input(
-                    "ページ数", min_value=1, max_value=const.MAX_PAGE_NUM, value=st.session_state.page_num
+                    "ページ数",
+                    min_value=1,
+                    max_value=const.MAX_PAGE_NUM,
+                    value=st.session_state.page_num,
                 )
             with col2:
                 st.session_state.characters_per_page = st.number_input(
-                    "ページごとの文字数", min_value=10, max_value=100, value=st.session_state.characters_per_page
+                    "ページごとの文字数",
+                    min_value=10,
+                    max_value=100,
+                    value=st.session_state.characters_per_page,
                 )
             with col3:
                 st.session_state.using_text_types = st.selectbox(
                     "使用文字",
                     options=const.USING_TEXT_TYPE,
-                    index=st.session_state.using_text_types
+                    index=st.session_state.using_text_types,
                 )
             with col4:
                 st.session_state.age = st.selectbox(
@@ -382,10 +420,14 @@ def create():
                 )
 
             st.session_state.tales["title"] = st.text_input(
-                "タイトル ※必須", placeholder=const.DESCRIPTION_PLACEHOLDER,value=st.session_state.tales["title"]
+                "タイトル ※必須",
+                placeholder=const.DESCRIPTION_PLACEHOLDER,
+                value=st.session_state.tales["title"],
             )
             st.session_state.tales["description"] = st.text_area(
-                "設定やあらすじ", placeholder=const.DESCRIPTION_PLACEHOLDER,value=st.session_state.tales["description"]
+                "設定やあらすじ",
+                placeholder=const.DESCRIPTION_PLACEHOLDER,
+                value=st.session_state.tales["description"],
             )
             only_tale = st.toggle("テキストだけ作成する")
 

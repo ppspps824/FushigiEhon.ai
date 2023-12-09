@@ -78,6 +78,14 @@ def post_image_api(prompt, size):
         image = Image.open(io.BytesIO(image_data))
         image = image.resize(size)
 
+        buffer = io.BytesIO()
+        image.save(
+            buffer,
+            format='JPEG',
+            quality=50)
+
+        image = Image.open(buffer)
+
         return image
     else:
         st.info("生成に失敗しました。リトライしてください")
@@ -121,5 +129,5 @@ def post_audio_api(tale):
         voice="nova",
         input=tale,
     )
-
+    
     return io.BytesIO(response.content)
