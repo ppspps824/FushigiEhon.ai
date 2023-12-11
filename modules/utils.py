@@ -1,18 +1,15 @@
 import streamlit as st
-from modules.s3 import s3_joblib_get
+from modules.s3 import get_title_image
 from streamlit_image_select import image_select
 
 
-def image_select_menu():
-    select_book = ""
+def image_select_menu(titles):
     try:
-        all_image = s3_joblib_get(
-            f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
-        )
-    except:
+        all_image = {title:get_title_image(title) for title in titles}
+    except Exception as e:
+        print(e.args)
         all_image = {}
 
-    captions = list(all_image.keys())
 
     images = [
         data.resize((256, 256)) if data else "assets/noimage.png"
@@ -24,7 +21,7 @@ def image_select_menu():
             image_select(
                 label="",
                 images=images,
-                captions=captions,
+                captions=titles,
                 return_value="index",
                 index=-1,
                 use_container_width=False,
@@ -32,9 +29,10 @@ def image_select_menu():
             + 1
         )
 
+        return select_book, captions
     else:
         st.info(
             "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"
         )
+        st.stop()
 
-    return select_book, captions

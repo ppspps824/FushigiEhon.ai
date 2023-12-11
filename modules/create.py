@@ -14,7 +14,7 @@ from modules.ai import (
 )
 import json
 import io
-from modules.s3 import s3_delete, s3_joblib_get, s3_upload
+from modules.s3 import s3_delete, get_book_object, s3_upload,get_all_title
 from modules.utils import image_select_menu
 
 
@@ -218,7 +218,7 @@ def create_one_tale(num):
 def delete_book(title):
     if title:
         with st.spinner("えほんを削除中..."):
-            all_image = s3_joblib_get(
+            all_image = get_book_object(
                 f"{st.session_state.user_id}/title_images/{st.session_state.user_id}.joblib"
             )
             del all_image[title]
@@ -450,13 +450,13 @@ def create():
     elif mode == "いちからつくる":
         view_edit(mode)
     else:
-        select_book, captions = image_select_menu()
+        select_book, captions = image_select_menu(get_all_title())
         if select_book:
             if (
                 st.session_state.not_modify
                 or st.session_state.tales["title"] != captions[select_book - 1]
             ):
-                book_info = s3_joblib_get(
+                book_info = get_book_object(
                     f"{st.session_state.user_id}/book_info/{captions[select_book-1]}.joblib"
                 )
                 st.session_state.tales = book_info["details"]["tales"]

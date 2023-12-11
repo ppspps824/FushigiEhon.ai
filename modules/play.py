@@ -4,7 +4,8 @@ from io import BytesIO
 import const
 import reveal_slides as rs
 import streamlit as st
-from modules.utils import image_select_menu, get_book_object
+from modules.utils import image_select_menu
+from modules.s3 import get_book_object,get_all_title
 
 
 def pil_to_base64(img, format="jpeg"):
@@ -19,7 +20,7 @@ def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
 
-    select_book, captions = image_select_menu()
+    select_book, captions = image_select_menu(get_all_title())
 
     if select_book:
         with st.spinner("よみこみちゅう..."):
