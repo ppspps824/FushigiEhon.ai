@@ -20,10 +20,21 @@ if "login" not in st.session_state:
     # create
     st.session_state.page_num = const.PAGE_NUM
     st.session_state.characters_per_page = const.CHARACTORS_PER_PAGE
-    st.session_state.using_text_types = const.USING_TEXT_TYPE
-    st.session_state.age = const.AGE
-    st.session_state.tales = {"title": "", "description": "", "content": []}
-    st.session_state.images = {"title": "", "content": []}
+    st.session_state.using_text_types = "ひらがなのみ"
+    st.session_state.age = "1～2歳"
+    st.session_state.tales = {
+        "title": "",
+        "description": "",
+        "characters": {
+            "lead": {"name": "", "appearance": ""},
+            "others": [
+                {"name": "", "appearance": ""},
+            ],
+        },
+        "content": [],
+    }
+    st.session_state.title_image = ""
+    st.session_state.images = []
     st.session_state.audios = []
     st.session_state.not_modify = True
 

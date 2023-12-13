@@ -5,6 +5,8 @@ boto3
 streamlit-option-menu
 streamlit-reveal-slides
 streamlit-image-select
-boto3
 streamlit-cognito-auth
-joblib
+streamlit-audiorec
+streamlit_drawable_canvas
+requests
+streamlit_antd_components 

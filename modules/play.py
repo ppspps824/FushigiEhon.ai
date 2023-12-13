@@ -1,18 +1,15 @@
 import base64
-from io import BytesIO
 
 import const
 import reveal_slides as rs
 import streamlit as st
+from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
-from modules.s3 import get_book_object,get_all_title
 
 
-def pil_to_base64(img, format="jpeg"):
-    buffer = BytesIO()
-    img.save(buffer, format)
-    img_str = base64.b64encode(buffer.getvalue()).decode("ascii")
-
+def bytes_to_base64(bytes):
+    data_base64 = base64.b64encode(bytes)
+    img_str = data_base64.decode("utf-8")
     return img_str
 
 
@@ -20,62 +17,47 @@ def play():
     if "page_index" not in st.session_state:
         st.session_state.page_index = 0
 
-    select_book, captions = image_select_menu(get_all_title())
+    select_book, captions = image_select_menu(
+        get_all_book_titles("story-user-data", st.session_state.user_id)
+    )
 
     if select_book:
         with st.spinner("よみこみちゅう..."):
-            book_info = get_book_object(
-                captions[select_book-1]
+            book_info = get_book_data(
+                "story-user-data", st.session_state.user_id, captions[select_book - 1]
             )
-            # 表紙
-            title = book_info["details"]["tales"]["title"]
-            title_image = book_info["details"]["images"]["title"]
+            title = book_info["tales"]["title"]
+            title_image = book_info["title_image"]
+            tales = book_info["tales"]["content"]
+            images = book_info["images"]
+            audios = book_info["audios"]
 
-            tales = book_info["details"]["tales"]["content"]
-            images = book_info["details"]["images"]["content"]
-            audios = book_info["details"]["audios"]
-
+            content_markdown = ""
             if title_image:
-                b64_title_image = pil_to_base64(title_image)
-                content_markdown = const.TITLE_MARKDOWN.replace(
+                b64_title_image = bytes_to_base64(title_image)
+                content_markdown += const.TITLE_MARKDOWN.replace(
                     "%%title_placeholder%%", title
                 ).replace("%%title_image_placeholder%%", b64_title_image)
             else:
-                content_markdown = const.NO_IMAGE_TITLE_MARKDOWN.replace(
+                content_markdown += const.NO_IMAGE_TITLE_MARKDOWN.replace(
                     "%%title_placeholder%%", title
                 )
+            for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
+                page_content = tale
+                b64_image = bytes_to_base64(image) if image else None
+                b64_audio = base64.b64encode(audio).decode() if audio else ""
 
-            for num, info in enumerate(zip(tales, images, audios)):
-                tale, image, audio = info
-                if image:
-                    b64_image = pil_to_base64(image)
-                if audio:
-                    b64_audio = base64.b64encode(audio.getvalue()).decode()
+                page_markdown = const.PAGE_MARKDOWN.replace(
+                    "%%content_placeholder%%", page_content
+                )
+                page_markdown = page_markdown.replace(
+                    "%%page_image_placeholder%%", b64_image or ""
+                )
+                page_markdown = page_markdown.replace(
+                    "%%page_audio_placeholder%%", b64_audio
+                )
 
-                if image:
-                    if st.session_state.disable_audio or not audio:
-                        content = (
-                            const.PAGE_MARKDOWN.replace("%%content_placeholder%%", tale)
-                            .replace("%%page_image_placeholder%%", b64_image)
-                            .replace("%%page_audio_placeholder%%", "")
-                        )
-                    else:
-                        content = (
-                            const.PAGE_MARKDOWN.replace("%%content_placeholder%%", tale)
-                            .replace("%%page_image_placeholder%%", b64_image)
-                            .replace("%%page_audio_placeholder%%", b64_audio)
-                        )
-                else:
-                    if st.session_state.disable_audio or not audio:
-                        content = const.NO_IMAGE_PAGE_MARKDOWN.replace(
-                            "%%content_placeholder%%", tale
-                        ).replace("%%page_audio_placeholder%%", "")
-                    else:
-                        content = const.NO_IMAGE_PAGE_MARKDOWN.replace(
-                            "%%content_placeholder%%", tale
-                        ).replace("%%page_audio_placeholder%%", b64_audio)
-
-                content_markdown += content
+                content_markdown += page_markdown
 
             content_markdown += const.END_ROLE
 

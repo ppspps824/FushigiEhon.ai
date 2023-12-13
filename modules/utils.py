@@ -1,20 +1,36 @@
+import io
+
 import streamlit as st
-from modules.s3 import get_title_image
+from modules.s3 import s3_download
+from PIL import Image
 from streamlit_image_select import image_select
 
 
 def image_select_menu(titles):
     try:
-        all_image = {title:get_title_image(title) for title in titles}
+        all_image = {
+            title: s3_download(
+                "story-user-data",
+                f"{st.session_state.user_id}/book_info/{title}/images/title.jpeg",
+            )
+            for title in titles
+        }
     except Exception as e:
         print(e.args)
         all_image = {}
 
+    images = []
+    for data in all_image.values():
+        if data:
+            # バイト型データをPIL.Imageオブジェクトに変換
+            image = Image.open(io.BytesIO(data))
+            # 画像のリサイズ
+            resized_image = image.resize((256, 256))
+            images.append(resized_image)
+        else:
+            images.append("assets/noimage.png")
 
-    images = [
-        data.resize((256, 256)) if data else "assets/noimage.png"
-        for data in all_image.values()
-    ]
+    captions = list(all_image.keys())
 
     if images:
         select_book = (
@@ -35,4 +51,3 @@ def image_select_menu(titles):
             "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"
         )
         st.stop()
-

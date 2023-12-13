@@ -1,94 +1,102 @@
-import io
-
-import boto3
 import json
-import streamlit as st
 import os
 
+import boto3
+import streamlit as st
 
-@st.cache_resource(show_spinner=False)
-def get_client_bucket():
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=st.secrets["aws_access_key_id"],
-        aws_secret_access_key=st.secrets["aws_secret_access_key"],
-        region_name="ap-northeast-1",
-    )
+# AWSクレデンシャルを環境変数から取得
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+REGION_NAME = "ap-northeast-1"
 
-    bucket = s3.Bucket("story-user-data")
-    return bucket
-
-
-def s3_upload(file, key):
-    bucket = get_client_bucket()
-    file = io.BytesIO(file)
-
-    bucket.upload_fileobj(file, key)
+# S3クライアントの初期化
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=st.secrets["aws_access_key_id"],
+    aws_secret_access_key=st.secrets["aws_secret_access_key"],
+    region_name=st.secrets["region_name"],
+)
 
 
-def s3_delete(key):
-    with st.spinner("えほんを削除中..."):
-        bucket = get_client_bucket()
-        bucket.objects.filter(Prefix="key").delete()
+def get_all_book_titles(bucket_name, user_id):
+    """指定されたユーザーのすべてのえほんのタイトルを取得"""
+    try:
+        # 指定されたユーザーのbook_infoフォルダ内のオブジェクトをリストアップ
+        response = s3_client.list_objects_v2(
+            Bucket=bucket_name, Prefix=f"{user_id}/book_info/", Delimiter="/"
+        )
+        titles = []
+
+        # 各サブフォルダ（えほんのタイトル）を抽出
+        for content in response.get("CommonPrefixes", []):
+            title = content["Prefix"].split("/")[-2]  # タイトルを抽出
+            titles.append(title)
+        return titles
+    except Exception as e:
+        st.error(f"タイトル取得エラー: {e}")
+        return []
 
 
-def get_book_object(title):
-    book_object = {
-        "details": {
-            "tales": {
-                "title": title,
-                "content": json.loads(get_tales(title)),
-            },
-            "images": {
-                "title": get_title_image(title),
-                "content": get_images(title),
-            },
-            "audios": get_audios(title),
-        }
+def s3_upload(bucket_name, file_data, key):
+    """S3バケットにファイルをアップロード"""
+    try:
+        s3_client.put_object(Bucket=bucket_name, Key=key, Body=file_data)
+    except Exception as e:
+        st.error(f"アップロードエラー: {e}")
+
+
+def s3_download(bucket_name, key):
+    """S3バケットからファイルをダウンロード"""
+    try:
+        file = s3_client.get_object(Bucket=bucket_name, Key=key)
+        return file["Body"].read()
+    except Exception as e:
+        st.error(f"ダウンロードエラー: {e}")
+        return None
+
+
+def s3_delete_folder(bucket_name, prefix):
+    """S3バケット内の指定されたプレフィックス（フォルダ）にあるすべてのオブジェクトを削除"""
+    try:
+        # フォルダ内のすべてのオブジェクトをリストアップ
+        objects_to_delete = s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
+
+        # 削除対象がある場合、それらを削除
+        if "Contents" in objects_to_delete:
+            delete_keys = {
+                "Objects": [
+                    {"Key": obj["Key"]} for obj in objects_to_delete["Contents"]
+                ]
+            }
+            s3_client.delete_objects(Bucket=bucket_name, Delete=delete_keys)
+    except Exception as e:
+        st.error(f"フォルダ削除エラー: {e}")
+
+
+def get_book_data(bucket_name, user_id, title):
+    base_path = f"{user_id}/book_info/{title}/"
+    book_content = {
+        "create_date": "",
+        "tales": {"title": title, "description": "", "tales": []},
+        "title_image": "",
+        "images": [],
+        "audios": [],
     }
 
-    return book_object
+    # tales.jsonの取得
+    tales_path = base_path + "tales.json"
+    tales_data = json.loads(s3_download(bucket_name, tales_path))
+    book_content["tales"].update(tales_data)
 
+    # タイトル画像の取得
+    title_image_path = base_path + "images/title.jpeg"
+    book_content["title_image"] = s3_download(bucket_name, title_image_path)
 
-def s3_get(key, is_folder=False):
-    bucket = get_client_bucket()
-    if is_folder:
-        result = bucket.meta.client.list_objects(Bucket=bucket.name, Prefix=key,Delimiter="/")
-        contents = [content for content in result.get('CommonPrefixes')]
-    else:
-        result = bucket.Object(key)
-        contents = result.get()['Body'].read()
-    return contents
+    # ページ毎の画像とオーディオの取得
+    for ix in range(len(book_content["tales"]["content"])):
+        image_path = base_path + f"images/image_{ix}.jpeg"
+        audio_path = base_path + f"audios/audio_{ix}.mp3"
+        book_content["images"].append(s3_download(bucket_name, image_path))
+        book_content["audios"].append(s3_download(bucket_name, audio_path))
 
-
-def get_all_title():
-    result = s3_get(f"{st.session_state.user_id}/book_info/",is_folder=True)
-    titles = [os.path.dirname(filepath["Prefix"]).split("/")[-1] for filepath in result]
-    return titles
-
-
-def get_tales(title):
-    return s3_get(f"{st.session_state.user_id}/book_info/{title}/tales.json")[0]
-
-
-def get_title_image(title):
-    path = f"{st.session_state.user_id}/book_info/{title}/images/title.jpeg"
-    result=s3_get(path)[0]
-    print(type(result))
-    print(result)
-    return result.getvalue()
-
-
-def get_images(title):
-    return s3_get(f"{st.session_state.user_id}/book_info/{title}/images/")
-
-
-def get_audios(title):
-    return s3_get(f"{st.session_state.user_id}/book_info/{title}/audios/")
-
-
-@st.cache_resource(show_spinner=False)
-def get_all_objects():
-    bucket = get_client_bucket()
-
-    return bucket.objects.filter(Prefix=f"{st.session_state.user_id}/book_info/")
+    return book_content
