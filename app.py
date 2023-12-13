@@ -25,6 +25,7 @@ if "login" not in st.session_state:
     st.session_state.tales = {
         "title": "",
         "description": "",
+        "theme": "",
         "characters": {
             "lead": {"name": "", "appearance": ""},
             "others": [

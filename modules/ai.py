@@ -22,12 +22,13 @@ def post_text_api(prompt):
 
 
 def create_tales(
-    title, description, page_num, characters_per_page, using_text_types, age
+    title, description, theme, page_num, characters_per_page, using_text_types, age
 ):
     tales = ""
     content = (
         const.TALES_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
+        .replace("%%theme_placeholder%%", theme)
         .replace("%%page_number_placeholder%%", page_num)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%using_text_types_placeholder%%", using_text_types)
@@ -98,9 +99,16 @@ def create_images(tales):
 
     title = tales["title"]
     description = tales["description"]
+    theme = tales["theme"]
     characters = json.dumps(tales["characters"], ensure_ascii=False)
+    prompt = (
+        const.DESCRIPTION_IMAGE_PROMPT.replace("%%title_placeholder%%", title)
+        .replace("%%description_placeholder%%", description)
+        .replace("%%theme_placeholder%%", theme)
+        .replace("%%characters_placeholder%%", characters)
+    )
     with st.spinner("生成中...(表紙)"):
-        images["title"] = post_image_api(description, size=(512, 512))
+        images["title"] = post_image_api(prompt, size=(512, 512))
     try:
         st.image(images["title"], width=512)
     except Exception as e:
@@ -114,6 +122,7 @@ def create_images(tales):
             prompt = (
                 const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
                 .replace("%%description_placeholder%%", description)
+                .replace("%%theme_placeholder%%", theme)
                 .replace("%%characters_placeholder%%", characters)
                 .replace("%%tale_placeholder%%", tale)
             )
