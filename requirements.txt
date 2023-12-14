@@ -10,3 +10,4 @@ streamlit-audiorec
 streamlit_drawable_canvas
 requests
 streamlit_antd_components 
+streamlit_shadcn_ui

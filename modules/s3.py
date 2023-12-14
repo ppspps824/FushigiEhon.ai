@@ -42,16 +42,17 @@ def s3_upload(bucket_name, file_data, key):
     try:
         s3_client.put_object(Bucket=bucket_name, Key=key, Body=file_data)
     except Exception as e:
-        st.error(f"アップロードエラー: {e}")
+        print(f"アップロードエラー: {e.args}")
 
 
 def s3_download(bucket_name, key):
     """S3バケットからファイルをダウンロード"""
+    # print(bucket_name, key)
     try:
         file = s3_client.get_object(Bucket=bucket_name, Key=key)
         return file["Body"].read()
-    except Exception as e:
-        st.error(f"ダウンロードエラー: {e}")
+    except Exception:
+        # print(f"ダウンロードエラー: {e}")
         return None
 
 
@@ -77,26 +78,24 @@ def get_book_data(bucket_name, user_id, title):
     base_path = f"{user_id}/book_info/{title}/"
     book_content = {
         "create_date": "",
-        "tales": {"title": title, "description": "", "tales": []},
-        "title_image": "",
-        "images": [],
+        "tales": {},
+        "images": {"title": "", "content": []},
         "audios": [],
     }
 
     # tales.jsonの取得
     tales_path = base_path + "tales.json"
-    tales_data = json.loads(s3_download(bucket_name, tales_path))
-    book_content["tales"].update(tales_data)
+    book_content["tales"] = json.loads(s3_download(bucket_name, tales_path))
 
     # タイトル画像の取得
     title_image_path = base_path + "images/title.jpeg"
-    book_content["title_image"] = s3_download(bucket_name, title_image_path)
+    book_content["images"]["title"] = s3_download(bucket_name, title_image_path)
 
     # ページ毎の画像とオーディオの取得
     for ix in range(len(book_content["tales"]["content"])):
         image_path = base_path + f"images/image_{ix}.jpeg"
         audio_path = base_path + f"audios/audio_{ix}.mp3"
-        book_content["images"].append(s3_download(bucket_name, image_path))
+        book_content["images"]["content"].append(s3_download(bucket_name, image_path))
         book_content["audios"].append(s3_download(bucket_name, audio_path))
 
     return book_content

@@ -8,7 +8,6 @@ import openai
 import requests
 import streamlit as st
 from PIL import Image
-from streamlit_drawable_canvas import st_canvas
 
 
 def post_text_api(prompt):
@@ -22,16 +21,24 @@ def post_text_api(prompt):
 
 
 def create_tales(
-    title, description, theme, page_num, characters_per_page, using_text_types, age
+    title,
+    description,
+    characters,
+    theme,
+    number_of_pages,
+    characters_per_page,
+    character_set,
+    age,
 ):
     tales = ""
     content = (
         const.TALES_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
+        .replace("%%characters_placeholder%%", characters)
         .replace("%%theme_placeholder%%", theme)
-        .replace("%%page_number_placeholder%%", page_num)
+        .replace("%%number_of_pages_placeholder%%", number_of_pages)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
-        .replace("%%using_text_types_placeholder%%", using_text_types)
+        .replace("%%character_set_placeholder%%", character_set)
         .replace("%%age_placeholder%%", age)
     )
     with st.spinner("生成中...(テキスト)"):
@@ -55,7 +62,6 @@ def create_tales(
 
 
 def post_image_api(prompt, size):
-    print(prompt)
     image_url = ""
     if st.session_state.image_model == "dall-e-3":
         gen_size = "1024x1024"
@@ -95,7 +101,7 @@ def post_image_api(prompt, size):
 
 
 def create_images(tales):
-    images = {"description": "", "content": []}
+    images = {"title": "", "content": []}
 
     title = tales["title"]
     description = tales["description"]
@@ -158,72 +164,44 @@ def post_audio_api(tale):
     return io.BytesIO(response.content)
 
 
-def draw_image(num, mode):
-    col1, col2, col3 = st.columns([1, 4, 2])
-    with col1:
-        stroke_color = st.color_picker("色: ", key=f"color_picke1_{num}")
-    with col2:
-        stroke_width = st.slider("線の太さ: ", 1, 25, 3, key=f"slider1_{num}")
-    with col3:
-        st.write("")
-        button_place = st.empty()
-
-    canvas_result = st_canvas(
-        fill_color="rgba(255, 255, 255, 1.0)",  # Fixed fill color with some opacity
-        stroke_width=stroke_width,
-        stroke_color=stroke_color,
-        background_color="#EEEEEE",
-        update_streamlit=False,
-        height=450,
-        width=450,
-        drawing_mode="freedraw",
-        key=f"canvas_{num}",
-    )
-    if canvas_result.image_data is not None:
-        image = canvas_result.image_data
-        image = Image.fromarray(image.astype("uint8"), mode="RGBA")
-
-    if button_place.button("AI補正", key=num):
-        if image:
-            buffered = io.BytesIO()
-            image.save(buffered, format="PNG")
-            image = buffered.getvalue()
-            base_prompt = """
-            あなたの役割は入力された画像と説明を理解し、より詳細な画像を生成するためのプロンプトテキストを生成することです。
-            画像が非常に簡素なものであってもできる限りの特徴を捉え、それにあった色や背景についても最大限に想像力を働かせて表現してください。
-            絵のスタイルは絵本にふさわしいポップなものにしてください。
-            説明等は不要ですので、必ずプロンプトテキストのみ出力してください。"""
-            payload = {
-                "model": "gpt-4-vision-preview",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": base_prompt},
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/jpeg;base64,{base64.b64encode(image).decode()}"
-                                },
+def image_upgrade(image, title, description, theme, characters, tale):
+    if image:
+        base_prompt = """
+        あなたの役割は入力された画像と説明を理解し、より詳細な画像を生成するためのプロンプトテキストを生成することです。
+        画像が非常に簡素なものであってもできる限りの特徴を捉え、それにあった色や背景についても最大限に想像力を働かせて表現してください。
+        絵のスタイルは絵本にふさわしいポップなものにしてください。
+        説明等は不要ですので、必ずプロンプトテキストのみ出力してください。"""
+        payload = {
+            "model": "gpt-4-vision-preview",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": base_prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64.b64encode(image).decode()}"
                             },
-                        ],
-                    }
-                ],
-                "max_tokens": 300,
-            }
-            with st.spinner("生成中..."):
-                response = requests.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {openai.api_key}"},
-                    json=payload,
-                ).json()
-                response_text = response["choices"][0]["message"]["content"]
-            if mode == "title":
-                st.session_state.title_image = post_image_api(
-                    response_text, size=(1024, 1024)
-                )
-            else:
-                st.session_state.images[num] = post_image_api(
-                    response_text, size=(1024, 1024)
-                )
-            st.rerun()
+                        },
+                    ],
+                }
+            ],
+            "max_tokens": 300,
+        }
+        with st.spinner("イラストを補正中..."):
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={"Authorization": f"Bearer {openai.api_key}"},
+                json=payload,
+            ).json()
+            response_text = response["choices"][0]["message"]["content"]
+            prompt = (
+                const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
+                .replace("%%description_placeholder%%", description)
+                .replace("%%theme_placeholder%%", theme)
+                .replace("%%characters_placeholder%%", characters)
+                .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
+            )
+            result = post_image_api(prompt, size=(1024, 1024))
+        return result

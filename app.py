@@ -2,10 +2,10 @@ import const
 import openai
 import streamlit as st
 import streamlit.components.v1 as components
-from modules.about import about
 from modules.create import create
 from modules.play import play
 from modules.settings import settings
+from PIL import Image
 from streamlit_cognito_auth import CognitoAuthenticator
 from streamlit_option_menu import option_menu
 
@@ -18,24 +18,29 @@ if "login" not in st.session_state:
     st.session_state.disable_audio = False
 
     # create
-    st.session_state.page_num = const.PAGE_NUM
-    st.session_state.characters_per_page = const.CHARACTORS_PER_PAGE
-    st.session_state.using_text_types = "ひらがなのみ"
-    st.session_state.age = "1～2歳"
     st.session_state.tales = {
         "title": "",
+        "number_of_pages": 3,
+        "characters_per_page": const.CHARACTORS_PER_PAGE,
+        "age_group": "1～2歳",
+        "character_set": "ひらがなのみ",
         "description": "",
         "theme": "",
         "characters": {
-            "lead": {"name": "", "appearance": ""},
+            "lead": {
+                "name": "",
+                "appearance": "",
+            },
             "others": [
-                {"name": "", "appearance": ""},
+                {
+                    "name": "",
+                    "appearance": "",
+                },
             ],
         },
         "content": [],
     }
-    st.session_state.title_image = ""
-    st.session_state.images = []
+    st.session_state.images = {"title": "", "content": []}
     st.session_state.audios = []
     st.session_state.not_modify = True
 
@@ -44,7 +49,7 @@ if "login" not in st.session_state:
     st.session_state.image_model = "dall-e-3"
 
 st.set_page_config(
-    page_title="ふしぎえほん.ai", page_icon="assets/logo.png", layout="wide"
+    page_title="ふしぎえほん.ai", page_icon=Image.open("assets/logo.png"), layout="wide"
 )
 
 st.markdown(
@@ -78,12 +83,11 @@ else:
         openai.api_key = st.session_state.api_key
     else:
         openai.api_key = st.secrets["OPEN_AI_KEY"]
-
     selected = option_menu(
         "ふしぎえほん.ai",
-        ["つかいかた", "えほんをつくる", "えほんをよむ", "せってい"],
-        icons=["bi-universal-access", "bi-brush", "bi-play-btn", "gear"],
-        menu_icon="bi-book",
+        ["えほんをよむ", "えほんをつくる", "せってい"],
+        icons=["bi-play-btn", "bi-brush", "gear"],
+        menu_icon=None,
         default_index=0,
         orientation="horizontal",
         styles={
@@ -101,9 +105,7 @@ else:
         },
     )
 
-    if selected == "つかいかた":
-        about()
-    elif selected == "えほんをつくる":
+    if selected == "えほんをつくる":
         create()
     elif selected == "えほんをよむ":
         play()

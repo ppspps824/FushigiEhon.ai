@@ -6,7 +6,7 @@ from PIL import Image
 from streamlit_image_select import image_select
 
 
-def image_select_menu(titles):
+def image_select_menu(titles, label):
     try:
         all_image = {
             title: s3_download(
@@ -35,12 +35,13 @@ def image_select_menu(titles):
     if images:
         select_book = (
             image_select(
-                label="",
+                label=label,
                 images=images,
                 captions=titles,
                 return_value="index",
                 index=-1,
                 use_container_width=False,
+                key=label,
             )
             + 1
         )
