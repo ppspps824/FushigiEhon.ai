@@ -5,6 +5,7 @@ import reveal_slides as rs
 import streamlit as st
 from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
+from streamlit_modal import Modal
 
 
 def bytes_to_base64(bytes):
@@ -50,11 +51,11 @@ def play():
                 get_all_book_titles("story-user-data", st.session_state.user_id),
                 "けんかくけっか",
             )
-
-    if select_book:
-        with st.spinner("よみこみちゅう..."):
+        if select_book:
             book_info = get_book_data(
-                "story-user-data", st.session_state.user_id, captions[select_book - 1]
+                "story-user-data",
+                st.session_state.user_id,
+                captions[select_book - 1],
             )
             title = book_info["tales"]["title"]
             title_image = book_info["images"]["title"]
@@ -99,4 +100,13 @@ def play():
 
             content_markdown += const.END_ROLE
 
-            rs.slides(content_markdown, theme="solarized", display_only=True)
+            # if select_book:
+            modal = Modal(
+                book_info["tales"]["title"],
+                key="modal",  # Optional
+                padding=20,  # default value
+                max_width=744,  # default value
+            )
+            with modal.container():
+                with st.spinner("よみこみちゅう..."):
+                    rs.slides(content_markdown, theme="solarized", display_only=True)

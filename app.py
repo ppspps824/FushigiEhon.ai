@@ -85,7 +85,7 @@ else:
         openai.api_key = st.secrets["OPEN_AI_KEY"]
     selected = option_menu(
         "ふしぎえほん.ai",
-        ["えほんをよむ", "えほんをつくる", "せってい"],
+        ["よむ", "つくる", "せってい"],
         icons=["bi-play-btn", "bi-brush", "gear"],
         menu_icon=None,
         default_index=0,
@@ -105,9 +105,9 @@ else:
         },
     )
 
-    if selected == "えほんをつくる":
+    if selected == "つくる":
         create()
-    elif selected == "えほんをよむ":
+    elif selected == "よむ":
         play()
     elif selected == "せってい":
         settings()
