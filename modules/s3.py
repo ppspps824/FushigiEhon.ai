@@ -18,6 +18,7 @@ s3_client = boto3.client(
 )
 
 
+@st.cache_data(show_spinner=False)
 def get_all_book_titles(bucket_name, user_id):
     """指定されたユーザーのすべてのえほんのタイトルを取得"""
     try:
@@ -45,6 +46,7 @@ def s3_upload(bucket_name, file_data, key):
         print(f"アップロードエラー: {e.args}")
 
 
+@st.cache_data(show_spinner=False)
 def s3_download(bucket_name, key):
     """S3バケットからファイルをダウンロード"""
     # print(bucket_name, key)
@@ -74,6 +76,7 @@ def s3_delete_folder(bucket_name, prefix):
         st.error(f"フォルダ削除エラー: {e}")
 
 
+@st.cache_data(show_spinner=False)
 def get_book_data(bucket_name, user_id, title):
     base_path = f"{user_id}/book_info/{title}/"
     book_content = {

@@ -6,7 +6,8 @@ from PIL import Image
 from streamlit_image_select import image_select
 
 
-def image_select_menu(titles, label):
+@st.cache_data
+def get_images(titles):
     try:
         all_image = {
             title: s3_download(
@@ -29,7 +30,11 @@ def image_select_menu(titles, label):
             images.append(resized_image)
         else:
             images.append("assets/noimage.png")
+    return images, all_image
 
+
+def image_select_menu(titles, label):
+    images, all_image = get_images(titles)
     captions = list(all_image.keys())
 
     if images:

@@ -628,27 +628,32 @@ def create():
                     )
 
                 with chara_col2:
-                    for chara_num in range(
+                    chara_num_list = range(
                         len(st.session_state.tales["characters"]["others"])
-                    ):
-                        st.session_state.tales["characters"]["others"][chara_num][
-                            "name"
-                        ] = st.text_input(
-                            f"キャラクター{chara_num+1}の名前",
-                            placeholder=const.RAMDOM_PLACEHOLDER,
-                            value=st.session_state.tales["characters"]["others"][
-                                chara_num
-                            ]["name"],
-                        )
-                        st.session_state.tales["characters"]["others"][chara_num][
-                            "appearance"
-                        ] = st.text_area(
-                            f"キャラクター{chara_num+1}の見た目",
-                            placeholder=const.RAMDOM_PLACEHOLDER,
-                            value=st.session_state.tales["characters"]["others"][
-                                chara_num
-                            ]["appearance"],
-                        )
+                    )
+                    chara_tabs = st.tabs([str(num + 1) for num in chara_num_list])
+                    for chara_num in chara_num_list:
+                        with chara_tabs[chara_num]:
+                            st.session_state.tales["characters"]["others"][chara_num][
+                                "name"
+                            ] = st.text_input(
+                                "名前",
+                                placeholder=const.RAMDOM_PLACEHOLDER,
+                                value=st.session_state.tales["characters"]["others"][
+                                    chara_num
+                                ]["name"],
+                                key=f"chara_name{chara_num}",
+                            )
+                            st.session_state.tales["characters"]["others"][chara_num][
+                                "appearance"
+                            ] = st.text_area(
+                                "見た目",
+                                placeholder=const.RAMDOM_PLACEHOLDER,
+                                value=st.session_state.tales["characters"]["others"][
+                                    chara_num
+                                ]["appearance"],
+                                key=f"chara_appearance{chara_num}",
+                            )
 
             only_tale = st.toggle("テキストだけ作成する")
 

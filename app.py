@@ -85,8 +85,8 @@ else:
         openai.api_key = st.secrets["OPEN_AI_KEY"]
     selected = option_menu(
         "ふしぎえほん.ai",
-        ["よむ", "つくる", "せってい"],
-        icons=["bi-play-btn", "bi-brush", "gear"],
+        ["よむ", "つくる"],
+        icons=["bi-play-btn", "bi-brush"],
         menu_icon=None,
         default_index=0,
         orientation="horizontal",
