@@ -91,18 +91,19 @@ def play():
         if st.button("よむ", type="primary", key="button1"):
             with modal_place:
                 modal1 = Modal(
-                    f'　{book_info["tales"]["title"]}',
+                    "",
                     key="modal1",  # Optional
                     padding=-70,
                 )
                 modal2 = Modal(
-                    f'　{book_info["tales"]["title"]}',
+                    "",
                     key="modal2",  # Optional
                     padding=-70,
                 )
                 with modal1.container():
-                    _, col1, col2, _ = st.columns([0.1, 1, 1, 0.1])
+                    _, col1, col2, _ = st.columns([0.5, 1, 1,0.1])
                     with col1:
+                        st.write("")
                         st.image(title_image)
                     with col2:
                         st.write(f'### {book_info["tales"]["description"]}')
