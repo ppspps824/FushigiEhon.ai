@@ -1,38 +1,45 @@
 import base64
-
+import io
+from PIL import Image, ImageDraw, ImageFont
+import textwrap
 import const
 import reveal_slides as rs
 import streamlit as st
 from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
-from streamlit_modal import Modal
 
 
-def bytes_to_base64(bytes):
-    data_base64 = base64.b64encode(bytes)
-    img_str = data_base64.decode("utf-8")
+def create_text_img(text, height, width, font_size):
+    im = Image.new(
+        "RGB", (height, width), (255, 255, 255)
+    )  # 下地となるイメージオブジェクトの生成
+    draw = ImageDraw.Draw(im)  # drawオブジェクトを生成
+    font = ImageFont.truetype("assets/ZenMaruGothic-Bold.ttf", font_size)
+    # テキストのサイズを取得
+
+    wrap_list = textwrap.wrap(text, 14)  # テキストを16文字で改行しリストwrap_listに代入
+    line_counter = 0  # 行数のカウンター
+    for line in wrap_list:  # wrap_listから1行づつ取り出しline に代入
+        y = line_counter * 70  # y座標をline_counterに応じて下げる
+        draw.multiline_text(
+            (35, y), line, fill=(0, 0, 0), font=font
+        )  # 1行分の文字列を画像に描画
+        line_counter = line_counter + 1  # 行数のカウンターに1
+    return im
+
+
+def pil_to_base64(image):
+    buffered = io.BytesIO()
+    image.save(buffered, format="JPEG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+
     return img_str
 
 
-def open_main_modal(modal_place, modal2, content_markdown):
-    with modal_place:
-        with modal2.container():
-            rs.slides(
-                content_markdown,
-                theme="simple",
-                height=500,
-                config={
-                    "height": 450,
-                },
-                display_only=True,
-            )
-
-
 def play():
-    modal_place = st.container()
     select_book, captions = image_select_menu(
         get_all_book_titles("story-user-data", st.session_state.user_id),
-        "じぶんのえほん",
+        "",
     )
 
     if select_book:
@@ -42,76 +49,58 @@ def play():
             captions[select_book - 1],
         )
         title = book_info["tales"]["title"]
-        title_image = book_info["images"]["title"]
+        title_image_bytes = book_info["images"]["title"]
         tales = book_info["tales"]["content"]
         images = book_info["images"]["content"]
         audios = book_info["audios"]
 
         content_markdown = ""
-        if title_image:
-            b64_title_image = bytes_to_base64(title_image)
-            content_markdown += const.TITLE_MARKDOWN.replace(
-                "%%title_placeholder%%", title
-            ).replace("%%title_image_placeholder%%", b64_title_image)
-        else:
-            content_markdown += const.NO_IMAGE_TITLE_MARKDOWN.replace(
-                "%%title_placeholder%%", title
+        if title_image_bytes:
+            title_text_img = create_text_img(title, 512, 512, font_size=42)
+            title_image = Image.open(io.BytesIO(title_image_bytes))
+            title_dst = Image.new(
+                "RGB",
+                (title_image.width + title_text_img.width, title_image.height),
+                (255, 255, 255),
             )
+            title_dst.paste(title_image, (0, 0))
+            title_dst.paste(
+                title_text_img, (title_image.width, int(title_image.height / 3))
+            )
+        else:
+            title_dst = Image.open(io.BytesIO(title_image_bytes))
+
+        content_markdown += const.TITLE_MARKDOWN.replace(
+            "%%image_placeholder%%", pil_to_base64(title_dst)
+        )
+
         for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
-            page_content = tale
-            b64_image = bytes_to_base64(image) if image else ""
+            page_text_image = create_text_img(tale, 512, 512, font_size=32)
+            page_image = Image.open(io.BytesIO(image))
+            page_image = page_image.resize((512, 512))
             b64_audio = base64.b64encode(audio).decode() if audio else ""
-
-            if num % 2 == 0:
-                base_markdown = const.PAGE_MARKDOWN_RIGHT
+            dst = Image.new(
+                "RGB", (page_image.width + page_text_image.width, page_image.height)
+            )
+            if num % 2 == 1:
+                dst.paste(page_image, (0, 0))
+                dst.paste(page_text_image, (page_image.width, 0))
             else:
-                base_markdown = const.PAGE_MARKDOWN_LEFT
+                dst.paste(page_text_image, (0, 0))
+                dst.paste(page_image, (page_text_image.width, 0))
 
-            if b64_image:
-                page_markdown = base_markdown.replace(
-                    "%%content_placeholder%%", page_content
-                )
-                page_markdown = page_markdown.replace(
-                    "%%page_image_placeholder%%", b64_image or ""
-                )
-                page_markdown = page_markdown.replace(
-                    "%%page_audio_placeholder%%", b64_audio
-                )
-            else:
-                page_markdown = const.NO_IMAGE_PAGE_MARKDOWN.replace(
-                    "%%content_placeholder%%", page_content
-                )
-                page_markdown = page_markdown.replace(
-                    "%%page_audio_placeholder%%", b64_audio
-                )
-
-            content_markdown += page_markdown
+            content_markdown += const.PAGE_MARKDOWN.replace(
+                "%%image_placeholder%%", pil_to_base64(dst)
+            ).replace("%%page_audio_placeholder%%", b64_audio)
 
         content_markdown += const.END_ROLE
-        if st.button("よむ", type="primary", key="button1"):
-            with modal_place:
-                modal1 = Modal(
-                    "",
-                    key="modal1",  # Optional
-                    padding=-70,
-                )
-                modal2 = Modal(
-                    "",
-                    key="modal2",  # Optional
-                    padding=-70,
-                )
-                with modal1.container():
-                    _, col1, col2, _ = st.columns([0.5, 1, 1,0.1])
-                    with col1:
-                        st.write("")
-                        st.image(title_image)
-                    with col2:
-                        st.write(f'### {book_info["tales"]["description"]}')
 
-                        st.button(
-                            "よむ",
-                            type="primary",
-                            on_click=open_main_modal,
-                            args=(modal_place, modal2, content_markdown),
-                            key="button2",
-                        )
+        rs.slides(
+            content_markdown,
+            theme="simple",
+            height=500,
+            config={
+                "height": 450,
+            },
+            display_only=True,
+        )

@@ -236,83 +236,14 @@ IMAGES_PROMPT = """
 
 TITLE_MARKDOWN = """
 
-<img src="data:image/jpg;base64,%%title_image_placeholder%%" height="400" />
----
-
-"""
-NO_IMAGE_TITLE_MARKDOWN = """
-
-### %%title_placeholder%%
-
+<img src="data:image/jpg;base64,%%image_placeholder%%" height="400" />
 ---
 
 """
 
-PAGE_MARKDOWN_RIGHT = """
+PAGE_MARKDOWN = """
 
-<style>
-.column-left{
-  float: left;
-  width: 47.5%;
-  text-align: left;
-  font-size: 80%;
-}
-.column-right{
-  float: right;
-  width: 47.5%;
-  text-align: left;
-  font-size: 80%;
-}
-.column-one{
-  float: left;
-  width: 100%;
-  text-align: left;
-}
-</style>
-
-<div class="column-left">
-<img src="data:image/jpg;base64,%%page_image_placeholder%%" />
-</div>
-
-<div class="column-right">
-%%content_placeholder%%
-</div>
-
-<audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
-
----
-
-"""
-PAGE_MARKDOWN_LEFT = """
-
-<style>
-.column-left{
-  float: left;
-  width: 47.5%;
-  text-align: left;
-  font-size: 80%;
-}
-.column-right{
-  float: right;
-  width: 47.5%;
-  text-align: left;
-  font-size: 80%;
-}
-.column-one{
-  float: left;
-  width: 100%;
-  text-align: left;
-}
-</style>
-
-<div class="column-right">
-<img src="data:image/jpg;base64,%%page_image_placeholder%%" />
-</div>
-
-<div class="column-left">
-%%content_placeholder%%
-</div>
-
+<img src="data:image/jpg;base64,%%image_placeholder%%" height="400" />
 <audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
 
 ---
