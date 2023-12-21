@@ -378,11 +378,7 @@ def delete_book(title):
     if title:
         with st.spinner("えほんを削除中..."):
             bucket_name = "story-user-data"
-            user_id = st.session_state.user_id
-            s3_delete_folder(bucket_name, f"{user_id}/book_info/{title}")
-            st.info("削除しました。")
-            time.sleep(0.5)
-            st.rerun()
+            s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
     else:
         st.info("タイトルを入力してください")
 
