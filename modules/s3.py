@@ -61,8 +61,6 @@ def s3_delete_folder(bucket_name, prefix):
     try:
         # フォルダ内のすべてのオブジェクトをリストアップ
         objects_to_delete = s3_client.list_objects(Bucket=bucket_name, Prefix=prefix)
-        print(prefix)
-        print(objects_to_delete)
 
         # 削除対象がある場合、それらを削除
         if "Contents" in objects_to_delete:
@@ -72,7 +70,6 @@ def s3_delete_folder(bucket_name, prefix):
                 ]
             }
             result=s3_client.delete_objects(Bucket=bucket_name, Delete=delete_keys)
-            print(delete_keys,result)
             
     except Exception as e:
         print(f"フォルダ削除エラー: {e}")
