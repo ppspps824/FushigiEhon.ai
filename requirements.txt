@@ -12,4 +12,4 @@ requests
 streamlit_antd_components 
 streamlit_shadcn_ui
 streamlit_modal
-img2pdf
+stability-sdk

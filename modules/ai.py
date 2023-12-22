@@ -9,7 +9,6 @@ import requests
 import streamlit as st
 from PIL import Image
 
-
 def post_text_api(prompt):
     response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
@@ -59,6 +58,31 @@ def create_tales(
     else:
         st.info("文章の生成に失敗しました。")
         st.stop()
+
+
+# def post_image_api(prompt, size):
+
+#     from stability_sdk import client
+#     import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
+
+#     # Our Host URL should not be prepended with "https" nor should it have a trailing slash.
+#     os.environ["STABILITY_HOST"] = "grpc.stability.ai:443"
+
+#     stability_api = client.StabilityInference(
+#         key=st.secrets["STABILITY_KEY"],
+#         host="grpc.stability.ai:443",
+#         verbose=True,  # Print debug messages.
+#     )
+#     answers = stability_api.generate(prompt=prompt)
+#     for resp in answers:
+#         for artifact in resp.artifacts:
+#             if artifact.type == generation.ARTIFACT_IMAGE:
+#                 img = Image.open(io.BytesIO(artifact.binary))
+
+#                 image = img.resize(size)
+#                 buffer = io.BytesIO()
+#                 image.save(buffer, format="JPEG", quality=50)
+#                 return buffer.getvalue()
 
 
 def post_image_api(prompt, size):
