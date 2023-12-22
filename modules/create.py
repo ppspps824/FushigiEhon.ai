@@ -2,7 +2,7 @@ import datetime
 import json
 import random
 import time
-
+from streamlit_modal import Modal
 import const
 import pytz
 import streamlit as st
@@ -376,11 +376,11 @@ def create_one_image(num, tale):
 
 def delete_book(title):
     if title:
-        with st.spinner("えほんを削除中..."):
-            bucket_name = "story-user-data"
-            s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
+        bucket_name = "story-user-data"
+        s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
+        st.toast(f"{title}を削除しました")
     else:
-        st.info("タイトルを入力してください")
+        st.toast("タイトルを入力してください")
 
 
 def save_book(book_content, title):
@@ -411,9 +411,9 @@ def save_book(book_content, title):
                 s3_upload(bucket_name, image, image_path)
                 s3_upload(bucket_name, audio, audio_path)
 
-            st.info("保存しました。")
+            st.toast("保存しました。")
     else:
-        st.info("タイトルを入力してください")
+        st.toast("タイトルを入力してください")
 
 
 def modify():
@@ -547,14 +547,31 @@ def create():
     if mode == "おまかせでつくる":
         if st.button("ランダム生成"):
             create_random_book_info()
-        if st.button("キャラクターを追加"):
-            st.session_state.tales["characters"]["others"].append(
-                {"name": "", "appearance": ""}
+        with st.container(border=True):
+            st.caption("キャラクター")
+            if st.button("追加"):
+                st.session_state.tales["characters"]["others"].append(
+                    {"name": "", "appearance": ""}
+                )
+                st.rerun()
+            chara_col = st.columns([0.3,0.1,1])
+            charactor_options = [
+                info["name"] for info in st.session_state.tales["characters"]["others"]
+            ]
+            select_charactor = chara_col[0].selectbox(
+                " ",
+                options=charactor_options,
+                label_visibility="collapsed",
             )
-            st.rerun()
+
+            if chara_col[1].button("削除"):
+                ix = charactor_options.index(select_charactor)
+                st.session_state.tales["characters"]["others"].pop(ix)
+                st.rerun()
+
         with st.form(" ", border=True):
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
-            with st.expander("基本設定"):
+            with st.expander("基本設定", expanded=True):
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     st.session_state.tales["number_of_pages"] = st.number_input(
@@ -603,7 +620,7 @@ def create():
                     height=185,
                     placeholder=const.RAMDOM_PLACEHOLDER,
                 )
-            with st.expander("キャラクター"):
+            with st.expander("キャラクター", expanded=True):
                 chara_col1, chara_col2 = st.columns(2)
                 with chara_col1:
                     st.session_state.tales["characters"]["lead"][

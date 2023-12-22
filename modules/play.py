@@ -7,7 +7,7 @@ import reveal_slides as rs
 import streamlit as st
 from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
-
+import img2pdf
 
 def create_text_img(text, height, width, font_size):
     im = Image.new(
@@ -34,7 +34,6 @@ def pil_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
     return img_str
-
 
 def play():
     select_book, captions = image_select_menu(
@@ -73,7 +72,7 @@ def play():
         content_markdown += const.TITLE_MARKDOWN.replace(
             "%%image_placeholder%%", pil_to_base64(title_dst)
         )
-
+        result_images=[]
         for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
             page_text_image = create_text_img(tale, 512, 512, font_size=32)
             page_image = Image.open(io.BytesIO(image))
@@ -88,6 +87,8 @@ def play():
             else:
                 dst.paste(page_text_image, (0, 0))
                 dst.paste(page_image, (page_text_image.width, 0))
+            
+            result_images.append(dst)
 
             content_markdown += const.PAGE_MARKDOWN.replace(
                 "%%image_placeholder%%", pil_to_base64(dst)
@@ -103,4 +104,14 @@ def play():
                 "height": 450,
             },
             display_only=True,
+        )
+
+        pdf_bytes = io.BytesIO()
+        title_dst.save(pdf_bytes, format='PDF', save_all=True, append_images=result_images)
+
+        st.download_button(
+            label="Download data as PDF",
+            data=pdf_bytes.getvalue(),
+            file_name=f'{title}.pdf',
+            mime='application/pdf',
         )
