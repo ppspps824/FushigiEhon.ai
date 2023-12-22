@@ -7,7 +7,6 @@ import reveal_slides as rs
 import streamlit as st
 from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
-import img2pdf
 
 def create_text_img(text, height, width, font_size):
     im = Image.new(
