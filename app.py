@@ -18,7 +18,7 @@ def main():
         openai.api_key = st.secrets["OPEN_AI_KEY"]
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.png")
-    header_cols[2].caption(f"logged in {st.session_state.user_email}")
+    header_cols[2].caption(f"logged in {st.session_state.user_email.replace("@gmail.com","")}")
     selected = option_menu(
         None,
         ["よむ", "つくる"],
