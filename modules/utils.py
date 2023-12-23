@@ -5,6 +5,19 @@ from modules.s3 import s3_download
 from PIL import Image
 from streamlit_image_select import image_select
 
+# オーバーレイを表示
+def show_overlay():
+    st.markdown('<div class="overlay" style="display:block"></div>', unsafe_allow_html=True)
+
+# オーバーレイを非表示
+def hide_overlay():
+    st.markdown("""
+    <style>
+    .spinner, .overlay {
+        display: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 @st.cache_data
 def get_images(titles):

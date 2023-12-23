@@ -24,6 +24,17 @@ HIDE_ST_STYLE = """
                     position: absolute;/*←絶対位置*/
                     bottom: 0; /*下に固定*/
                 }
+                .overlay {
+                    position: fixed;
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    background-color: rgba(0,0,0,0.5);
+                    z-index: 99;
+                    cursor: not-allowed;
+                    display: none;  /* 初期状態では非表示 */
+                }
 				        .appview-container .main .block-container{
                             padding-top: 1rem;
                             padding-right: 3rem;
@@ -87,7 +98,7 @@ TALES_PROMPT = """
 %%number_of_pages_placeholder%%
 
 ## 1ページの文字数
-%%characters_per_page_group_placeholder%%
+40
 
 ## 利用する文字種類の制限
 %%character_set_placeholder%%
@@ -106,7 +117,6 @@ TALES_PROMPT = """
 {
   "title": "ももたろう",
   "number_of_pages":4,
-  "characters_per_page":60,
   "age_group":"1～2歳",
   "character_set":"ひらがなのみ",
   "description": "おおきなももからうまれたすてきなおとこのこ、ももたろうのぼうけんをかいています。ももたろうは、おじいさんとおばあさんとしあわせにくらしていましたが、あるひ、むらのひとたちをたすけるために、おおきなぼうけんにでかけることにしますよ。ももたろうは、いぬ、さる、きじというともだちをつくりながら、わくわくどきどきのたびをすすめます。",
@@ -149,7 +159,7 @@ ONE_TALE_PROMPT = """
 %%number_of_pages_placeholder%%
 
 ## 1ページの文字数
-%%characters_per_page_group_placeholder%%
+40
 
 ## 利用する文字種類の制限
 %%character_set_placeholder%%
@@ -274,7 +284,6 @@ TITLE_SET = [
     {
         "title": "ふしぎなほしのたび",
         "number_of_pages": 5,
-        "characters_per_page": 100,
         "age_group": "3～5歳",
         "character_set": "ひらがなとカタカナ",
         "description": "あるよる、ちいさな少女と彼女のぬいぐるみが、ふしぎな星空の旅に出ます。少女は、夢と冒険に満ちたこの旅で、いろいろな星々や宇宙の不思議を体験します。",
@@ -306,7 +315,6 @@ TITLE_SET = [
     {
         "title": "かぜのまほうのぼうけん",
         "number_of_pages": 6,
-        "characters_per_page": 80,
         "age_group": "6～10歳",
         "character_set": "制限なし",
         "description": "この物語は、風の魔法を使える少年と彼の友達が、村を救うための冒険に出る物語です。少年は自分の力と友情の大切さを学びながら、様々な困難に立ち向かいます。",
@@ -343,7 +351,6 @@ TITLE_SET = [
     {
         "title": "くものうえのひみつきち",
         "number_of_pages": 7,
-        "characters_per_page": 90,
         "age_group": "11歳～",
         "character_set": "制限なし",
         "description": "アキラとリコは、不思議な雲を見つけ、それに導かれて空中の隠れた秘密基地を探検する冒険に出ます。彼らはネビュラという神秘的な生き物と出会い、この空中世界の不思議を学びます。",
@@ -377,7 +384,6 @@ TITLE_SET = [
     {
         "title": "月夜の魔法の庭",
         "number_of_pages": 8,
-        "characters_per_page": 70,
         "age_group": "3～5歳",
         "character_set": "ひらがなのみ",
         "description": "ユイはおばあちゃんから聞いた不思議な庭を訪れます。月夜に輝くこの庭で、ユイは魔法の花とツキノウサギ、そして賢いフクロウのソフィアと出会います。",
@@ -412,7 +418,6 @@ TITLE_SET = [
     {
         "title": "ひかりのしまのなぞ",
         "number_of_pages": 10,
-        "characters_per_page": 80,
         "age_group": "6～10歳",
         "character_set": "制限なし",
         "description": "タイチとエマは謎に満ちた光の島を探検します。彼らは古代の秘密と宝を求めて未知の島を冒険し、数々の試練に直面します。",
@@ -449,7 +454,6 @@ TITLE_SET = [
     {
         "title": "くうかんのともだち",
         "number_of_pages": 9,
-        "characters_per_page": 90,
         "age_group": "1～2歳",
         "character_set": "ひらがなのみ",
         "description": "ケンタは空を眺めるのが大好きな男の子です。ある日、彼は不思議な生き物ふわりに出会い、ともに空の世界を冒険します。",
@@ -485,7 +489,6 @@ TITLE_SET = [
     {
         "title": "まほうのぼうしのひみつ",
         "number_of_pages": 12,
-        "characters_per_page": 75,
         "age_group": "11歳～",
         "character_set": "制限なし",
         "description": "ノリコは古いおもちゃ屋で話す魔法の帽子、ミスター・ハットを見つけます。彼女はハットとともに魔法の冒険を繰り広げ、その過程で自己発見と成長を遂げます。",
@@ -524,7 +527,6 @@ TITLE_SET = [
     {
         "title": "しろいうさぎとゆめの森",
         "number_of_pages": 15,
-        "characters_per_page": 85,
         "age_group": "3～5歳",
         "character_set": "ひらがなのみ",
         "description": "サキは森でしろいうさぎと出会い、一緒に不思議なゆめの森を探検します。彼女は森の中で様々な動物たちと出会い、魔法の鏡を通じて新しい友だちを作ります。",

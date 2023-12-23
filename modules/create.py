@@ -18,7 +18,7 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
-from modules.utils import image_select_menu
+from modules.utils import image_select_menu,show_overlay,hide_overlay
 
 
 def view_edit(mode):
@@ -70,6 +70,7 @@ def view_edit(mode):
                 key="alert_dialog_book",
             ):
                 delete_book(st.session_state.tales["title"])
+                st.rerun()
 
         with st.container(border=True):
             if num == 1:
@@ -101,6 +102,7 @@ def view_edit(mode):
                         if st.button("あらすじ、テーマ・メッセージを生成する"):
                             tales_text = "\n".join(st.session_state.tales["content"])
                             with st.spinner("生成中...(あらすじ)"):
+                                show_overlay()
                                 st.session_state.tales["description"] = post_text_api(
                                     const.DESCRIPTION_PROMPT.replace(
                                         "%%tales_placeholder%%", tales_text
@@ -122,6 +124,7 @@ def view_edit(mode):
                                     )
                                 )
                                 modify()
+                                hide_overlay()
                                 st.rerun()
 
                         if st.button("テキスト以外を一括で生成する"):
@@ -148,10 +151,12 @@ def view_edit(mode):
                                 .replace("%%characters_placeholder%%", characters)
                             )
                             with st.spinner("生成中...(表紙)"):
+                                show_overlay()
                                 st.session_state.images["title"] = post_image_api(
                                     prompt, size=(512, 512)
                                 )
                             modify()
+                            hide_overlay()
                             st.rerun()
 
                         if st.button("イラストを補正する"):
@@ -298,6 +303,7 @@ def view_edit(mode):
 
 def create_one_tale(num):
     with st.spinner("生成中...(内容)"):
+        show_overlay()
         prompt = (
             const.ONE_TALE_PROMPT.replace(
                 "%%title_placeholder%%", st.session_state.tales["title"]
@@ -319,15 +325,11 @@ def create_one_tale(num):
                 str(num),
             )
             .replace(
-                "%%characters_per_page_placeholder%%",
-                str(st.session_state.tales["characters_per_page"]),
-            )
-            .replace(
                 "%%character_set_placeholder%%",
                 st.session_state.tales["character_set"],
             )
             .replace(
-                "%%age_placeholder%%",
+                "%%age_group_placeholder%%",
                 st.session_state.tales["age_group"],
             )
             .replace(
@@ -339,22 +341,27 @@ def create_one_tale(num):
                 "\n".join(st.session_state.tales["content"][num + 1 :]),
             )
         )
+        print(prompt)
         generated_tale = post_text_api(prompt)
         if num < len(st.session_state.tales["content"]):
             st.session_state.tales["content"][num] = generated_tale
         else:
             st.session_state.tales["content"].append(generated_tale)
         modify()
+        hide_overlay()
 
 
 def create_one_audio(num, tale):
     with st.spinner("生成中...(音声)"):
+        show_overlay()
         st.session_state.audios[num] = post_audio_api(tale)
     modify()
+    hide_overlay()
 
 
 def create_one_image(num, tale):
     with st.spinner("生成中...(イラスト)"):
+        show_overlay()
         st.session_state.images["content"][num] = post_image_api(
             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
             .replace("%%title_placeholder%%", st.session_state.tales["title"])
@@ -372,6 +379,7 @@ def create_one_image(num, tale):
             (512, 512),
         )
     modify()
+    hide_overlay()
 
 
 def delete_book(title):
@@ -386,6 +394,7 @@ def delete_book(title):
 def save_book(book_content, title):
     if title:
         with st.spinner("えほんを保存中..."):
+            show_overlay()
             bucket_name = "story-user-data"
             user_id = st.session_state.user_id
             base_path = f"{user_id}/book_info/{title}/"
@@ -414,6 +423,8 @@ def save_book(book_content, title):
             st.toast("保存しました。")
     else:
         st.toast("タイトルを入力してください")
+    
+    hide_overlay()
 
 
 def modify():
@@ -572,7 +583,7 @@ def create():
         with st.form(" ", border=True):
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
             with st.expander("基本設定", expanded=True):
-                col1, col2, col3, col4 = st.columns(4)
+                col1, col2, col3 = st.columns(3)
                 with col1:
                     st.session_state.tales["number_of_pages"] = st.number_input(
                         "ページ数",
@@ -581,13 +592,6 @@ def create():
                         value=st.session_state.tales["number_of_pages"],
                     )
                 with col2:
-                    st.session_state.tales["characters_per_page"] = st.number_input(
-                        "ページごとの文字数",
-                        min_value=10,
-                        max_value=100,
-                        value=st.session_state.tales["characters_per_page"],
-                    )
-                with col3:
                     st.session_state.tales["character_set"] = st.selectbox(
                         "使用文字",
                         options=const.CHARACTER_SET,
@@ -595,7 +599,7 @@ def create():
                             st.session_state.tales["character_set"]
                         ),
                     )
-                with col4:
+                with col3:
                     st.session_state.tales["age_group"] = st.selectbox(
                         "対象年齢",
                         options=const.AGE_GROUP,
