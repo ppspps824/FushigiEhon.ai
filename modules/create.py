@@ -134,9 +134,9 @@ def view_edit(mode):
                 col1, col2, col3 = st.columns([2, 2, 1])
                 with col1:
                     try:
-                        st.image(st.session_state.images["title"], width=450)
+                        st.image(st.session_state.images["title"],use_column_width="auto")
                     except:
-                        st.image("assets/noimage.png", width=450)
+                        st.image("assets/noimage.png",use_column_width="auto")
 
                     title_upload_file = st.file_uploader(
                         "画像をアップロード",
@@ -248,9 +248,9 @@ def view_edit(mode):
                 col1, col2, col3 = st.columns([2, 2, 1])
                 with col1:
                     try:
-                        st.image(image, width=450)
+                        st.image(image,use_column_width="auto")
                     except:
-                        st.image("assets/noimage.png", width=450)
+                        st.image("assets/noimage.png",use_column_width="auto")
                     page_upload_file = st.file_uploader(
                         "画像をアップロード",
                         type=["png", "jpg"],
@@ -740,9 +740,9 @@ def create():
 
                 st.write(book_content["tales"]["title"])
                 try:
-                    st.image(book_content["images"]["title"], width=450)
+                    st.image(book_content["images"]["title"],use_column_width="auto")
                 except:
-                    st.image("assets/noimage.png", width=450)
+                    st.image("assets/noimage.png",use_column_width="auto")
                 st.write(book_content["tales"]["description"])
 
             else:
