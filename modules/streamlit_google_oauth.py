@@ -28,6 +28,21 @@ async def get_email(client, token):
 def google_oauth2_required(func):
     def wrapper(*args, **kwargs):
         title_cols = st.columns([1, 3, 1])
+        st.markdown(
+            """
+        <style>
+        .centered {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stButton>button {
+            display: inline-flex; 
+        }
+        </style>
+        """,
+            unsafe_allow_html=True,
+        )
         client_id = st.secrets["GOOGLE_CLIENT_ID"]
         client_secret = st.secrets["GOOGLE_CLIENT_SECRET"]
         redirect_uri = st.secrets["REDIRECT_URI"]
@@ -45,19 +60,28 @@ def google_oauth2_required(func):
                 code = st.experimental_get_query_params()["code"]
             except:
                 with title_cols[1]:
+                    st.markdown('<div class="centered">', unsafe_allow_html=True)
                     st.image("assets/title.png")
-                sac.buttons(
-                    [
-                        sac.ButtonsItem(
-                            label="Googleでログイン",
-                            icon="google",
-                            href=authorization_url,
-                        ),
-                    ],
-                    format_func="title",
-                    align="center",
-                    size="large",
-                )
+                    st.write("")
+                    sac.buttons(
+                        [
+                            sac.ButtonsItem(
+                                label="Googleでログイン",
+                                icon="google",
+                                href=authorization_url,
+                            ),
+                        ],
+                        format_func="title",
+                        align="center",
+                        size="large",
+                    )
+                    st.write("")
+                    st.markdown('</div>', unsafe_allow_html=True)
+                st.markdown("""
+                            <footer>
+                            <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
+                            </footer>
+                            """, unsafe_allow_html=True)
             else:
                 # Verify token is correct:
                 try:
@@ -68,7 +92,9 @@ def google_oauth2_required(func):
                     )
                 except:
                     with title_cols[1]:
+                        st.markdown('<div class="centered">', unsafe_allow_html=True)
                         st.image("assets/title.png")
+                        st.write("")
                         sac.buttons(
                             [
                                 sac.ButtonsItem(
@@ -81,12 +107,16 @@ def google_oauth2_required(func):
                             align="center",
                             size="large",
                         )
+                        st.write("")
+                        st.markdown('</div>', unsafe_allow_html=True)
                 else:
                     # Check if token has expired:
                     if token.is_expired():
                         if token.is_expired():
                             with title_cols[1]:
+                                st.markdown('<div class="centered">', unsafe_allow_html=True)
                                 st.image("assets/title.png")
+                                st.write("")
                                 sac.buttons(
                                     [
                                         sac.ButtonsItem(
@@ -99,6 +129,8 @@ def google_oauth2_required(func):
                                     align="center",
                                     size="large",
                                 )
+                                st.write("")
+                                st.markdown('</div>', unsafe_allow_html=True)
                     else:
                         st.session_state["token"] = token
                         user_id, user_email = asyncio.run(

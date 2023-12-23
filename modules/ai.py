@@ -61,28 +61,45 @@ def create_tales(
 
 
 # def post_image_api(prompt, size):
+#     import base64
+#     import requests
 
-#     from stability_sdk import client
-#     import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
+#     engine_id = "stable-diffusion-v1-6"
+#     api_host = 'https://api.stability.ai'
+#     api_key = st.secrets["STABILITY_API_KEY"]
 
-#     # Our Host URL should not be prepended with "https" nor should it have a trailing slash.
-#     os.environ["STABILITY_HOST"] = "grpc.stability.ai:443"
+#     if api_key is None:
+#         raise Exception("Missing Stability API key.")
 
-#     stability_api = client.StabilityInference(
-#         key=st.secrets["STABILITY_KEY"],
-#         host="grpc.stability.ai:443",
-#         verbose=True,  # Print debug messages.
+#     response = requests.post(
+#         f"{api_host}/v1/generation/{engine_id}/text-to-image",
+#         headers={
+#             "Content-Type": "application/json",
+#             "Accept": "application/json",
+#             "Authorization": f"Bearer {api_key}"
+#         },
+#         json={
+#             "text_prompts": [
+#                 {
+#                     "text": prompt
+#                 }
+#             ],
+#             "cfg_scale": 7,
+#             "height": 512,
+#             "width": 512,
+#             "samples": 1,
+#             "steps": 30,
+#         },
 #     )
-#     answers = stability_api.generate(prompt=prompt)
-#     for resp in answers:
-#         for artifact in resp.artifacts:
-#             if artifact.type == generation.ARTIFACT_IMAGE:
-#                 img = Image.open(io.BytesIO(artifact.binary))
 
-#                 image = img.resize(size)
-#                 buffer = io.BytesIO()
-#                 image.save(buffer, format="JPEG", quality=50)
-#                 return buffer.getvalue()
+#     if response.status_code != 200:
+#         raise Exception("Non-200 response: " + str(response.text))
+
+#     data = response.json()
+#     img_data = data["artifacts"][0]["base64"].encode()
+#     content = base64.b64decode(img_data)
+
+#     return content
 
 
 def post_image_api(prompt, size):

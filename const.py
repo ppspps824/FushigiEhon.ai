@@ -1,6 +1,6 @@
 HIDE_ST_STYLE = """
                 <style>
-div[data-testid="stToolbar"] {
+                div[data-testid="stToolbar"] {
                 visibility: hidden;
                 height: 0%;
                 position: fixed;
@@ -18,9 +18,11 @@ div[data-testid="stToolbar"] {
                 visibility: hidden;
                 height: 0%;
                 }
-                footer {
-                visibility: hidden;
-                height: 0%;
+                footer{
+                    width: 100%;
+                    text-align: center;
+                    position: absolute;/*←絶対位置*/
+                    bottom: 0; /*下に固定*/
                 }
 				        .appview-container .main .block-container{
                             padding-top: 1rem;
@@ -54,6 +56,8 @@ div[data-testid="stToolbar"] {
                         }
                 </style>
                 """
+
+
 
 CHARACTORS_PER_PAGE = 40
 CHARACTER_SET = ["ひらがなのみ", "ひらがなとカタカナ", "制限なし"]
