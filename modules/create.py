@@ -1,8 +1,6 @@
 import datetime
 import json
 import random
-import time
-from streamlit_modal import Modal
 import const
 import pytz
 import streamlit as st
@@ -183,6 +181,16 @@ def view_edit(mode):
                                 modify()
                                 hide_overlay()
                                 st.rerun()
+
+                        if st.button(
+                            "次のページを生成する",
+                            help="次のページの文章、イラスト、音声をAIによって生成します。",
+                        ):
+                            adding_page(0)
+                            create_one_tale(0)
+                            create_one_image(0, st.session_state.tales["content"][0])
+                            create_one_audio(0, st.session_state.tales["content"][0])
+                            st.rerun()
 
                         if st.button("テキスト以外を一括で生成する"):
                             book_content = create_all(ignore_tale=True)
