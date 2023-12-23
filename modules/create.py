@@ -72,6 +72,63 @@ def view_edit(mode):
                 delete_book(st.session_state.tales["title"])
                 st.rerun()
 
+        with st.expander("キャラクター", expanded=True):
+            chara_col1, chara_col2 = st.columns(2)
+            with chara_col1:
+                st.session_state.tales["characters"]["lead"][
+                    "name"
+                ] = st.text_input(
+                    "主人公の名前",
+                    placeholder=const.RAMDOM_PLACEHOLDER,
+                    value=st.session_state.tales["characters"]["lead"]["name"],
+                )
+                st.session_state.tales["characters"]["lead"][
+                    "appearance"
+                ] = st.text_area(
+                    "主人公の見た目",
+                    placeholder=const.RAMDOM_PLACEHOLDER,
+                    value=st.session_state.tales["characters"]["lead"][
+                        "appearance"
+                    ],
+                )
+                if st.button("キャラクターを追加"):
+                    st.session_state.tales["characters"]["others"].append(
+                        {"name": "", "appearance": ""}
+                    )
+                    st.rerun()
+
+
+            with chara_col2:
+                chara_num_list = range(
+                    len(st.session_state.tales["characters"]["others"])
+                )
+                chara_tabs = st.tabs([str(num + 1) for num in chara_num_list])
+                for chara_num in chara_num_list:
+                    with chara_tabs[chara_num]:
+                        st.session_state.tales["characters"]["others"][chara_num][
+                            "name"
+                        ] = st.text_input(
+                            "名前",
+                            placeholder=const.RAMDOM_PLACEHOLDER,
+                            value=st.session_state.tales["characters"]["others"][
+                                chara_num
+                            ]["name"],
+                            key=f"chara_name{chara_num}",
+                        )
+                        st.session_state.tales["characters"]["others"][chara_num][
+                            "appearance"
+                        ] = st.text_area(
+                            "見た目",
+                            placeholder=const.RAMDOM_PLACEHOLDER,
+                            value=st.session_state.tales["characters"]["others"][
+                                chara_num
+                            ]["appearance"],
+                            key=f"chara_appearance{chara_num}",
+                        )
+                if st.button("削除"):
+                    st.session_state.tales["characters"]["others"].pop(chara_num)
+                    st.rerun()
+
         with st.container(border=True):
             if num == 1:
                 col1, col2, col3 = st.columns([2, 2, 1])
@@ -341,7 +398,6 @@ def create_one_tale(num):
                 "\n".join(st.session_state.tales["content"][num + 1 :]),
             )
         )
-        print(prompt)
         generated_tale = post_text_api(prompt)
         if num < len(st.session_state.tales["content"]):
             st.session_state.tales["content"][num] = generated_tale
@@ -693,8 +749,8 @@ def create():
                 st.info("タイトルかあらすじを内容を入力してください。")
 
     elif mode == "いちからつくる":
-        if st.session_state.not_modify:
-            clear_session_state()
+        # if st.session_state.not_modify:
+        #     clear_session_state()
         view_edit(mode)
     else:
         select_book, captions = image_select_menu(

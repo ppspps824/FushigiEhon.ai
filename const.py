@@ -70,7 +70,7 @@ HIDE_ST_STYLE = """
 
 
 
-CHARACTORS_PER_PAGE = 40
+CHARACTORS_PER_PAGE = 20
 CHARACTER_SET = ["ひらがなのみ", "ひらがなとカタカナ", "制限なし"]
 AGE_GROUP = ["1～2歳", "3～5歳", "6～10歳", "11歳～"]
 MAX_PAGE_NUM = 20
