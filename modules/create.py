@@ -472,6 +472,7 @@ def save_book(book_content, title):
                 s3_upload(bucket_name, image, image_path)
                 s3_upload(bucket_name, audio, audio_path)
 
+
             st.toast("保存しました。")
     else:
         st.toast("タイトルを入力してください")

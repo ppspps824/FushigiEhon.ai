@@ -17,7 +17,6 @@ s3_client = boto3.client(
     region_name=st.secrets["region_name"],
 )
 
-
 def get_all_book_titles(bucket_name, user_id):
     """指定されたユーザーのすべてのえほんのタイトルを取得"""
     try:
