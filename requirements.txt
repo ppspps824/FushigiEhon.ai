@@ -3,13 +3,10 @@ Pillow
 openai
 boto3
 streamlit-option-menu
-streamlit-reveal-slides
 streamlit-image-select
-streamlit-cognito-auth
-streamlit-audiorec
 streamlit_drawable_canvas
 requests
 streamlit_antd_components 
 streamlit_shadcn_ui
-streamlit_modal
 httpx-oauth
+moviepy
