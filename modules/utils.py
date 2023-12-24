@@ -19,7 +19,6 @@ def hide_overlay():
     </style>
     """, unsafe_allow_html=True)
 
-@st.cache_data
 def get_images(titles):
     try:
         all_image = {
