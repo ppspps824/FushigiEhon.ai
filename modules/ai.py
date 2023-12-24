@@ -8,7 +8,8 @@ import openai
 import requests
 import streamlit as st
 from PIL import Image
-from modules.utils import show_overlay,hide_overlay
+from modules.utils import show_overlay, hide_overlay
+
 
 def post_text_api(prompt):
     response = openai.chat.completions.create(
@@ -42,7 +43,6 @@ def create_tales(
         .replace("%%age_placeholder%%", age)
     )
     with st.spinner("生成中...(テキスト)"):
-        show_overlay()
         for _ in range(3):
             try:
                 content_text = post_text_api(content)
@@ -56,16 +56,15 @@ def create_tales(
 
     if tales:
         st.write(tales)
-        hide_overlay()
+
         return tales
     else:
         st.info("文章の生成に失敗しました。")
-        hide_overlay()
+
         st.stop()
 
 
 def post_image_api(prompt, size):
-    show_overlay()
     image_url = ""
     if st.session_state.image_model == "dall-e-3":
         gen_size = "1024x1024"
@@ -86,7 +85,7 @@ def post_image_api(prompt, size):
         except Exception as e:
             print(e.args)
             st.error("イラストの生成に失敗しました。")
-            hide_overlay()
+
             st.stop()
 
     if image_url:
@@ -99,17 +98,14 @@ def post_image_api(prompt, size):
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG", quality=50)
 
-        hide_overlay()
         return buffer.getvalue()
     else:
         st.error("イラストの生成に失敗しました。")
-        hide_overlay()
+
         st.stop()
-    
 
 
 def create_images(tales):
-    show_overlay()
     images = {"title": "", "content": []}
 
     title = tales["title"]
@@ -149,18 +145,17 @@ def create_images(tales):
                 print(e.args)
                 st.error("イラストの生成に失敗しました。")
                 st.stop()
-    hide_overlay()
+
     return images
 
 
 def create_audios(tales):
-    show_overlay()
     audios = []
     pages = len(tales["content"])
     for num, tale in enumerate(tales["content"]):
         with st.spinner(f"生成中...(音声 {num+1}/{pages})"):
             audios.append(post_audio_api(tale))
-    hide_overlay()
+
     return audios
 
 
@@ -175,7 +170,6 @@ def post_audio_api(tale):
 
 
 def image_upgrade(image, title, description, theme, characters, tale):
-    show_overlay()
     if image:
         base_prompt = """
         あなたの役割は入力された画像と説明を理解し、より詳細な画像を生成するためのプロンプトテキストを生成することです。
@@ -215,5 +209,5 @@ def image_upgrade(image, title, description, theme, characters, tale):
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
             result = post_image_api(prompt, size=(1024, 1024))
-        hide_overlay()
+
         return result

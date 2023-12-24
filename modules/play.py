@@ -8,22 +8,37 @@ import streamlit as st
 from modules.s3 import get_all_book_titles, get_book_data
 from modules.utils import image_select_menu
 
-def create_text_img(text, height, width, font_size):
-    im = Image.new(
-        "RGB", (height, width), (255, 255, 255)
-    )  # 下地となるイメージオブジェクトの生成
-    draw = ImageDraw.Draw(im)  # drawオブジェクトを生成
-    font = ImageFont.truetype("assets/ZenMaruGothic-Bold.ttf", font_size)
-    # テキストのサイズを取得
 
-    wrap_list = textwrap.wrap(text, 14)  # テキストを16文字で改行しリストwrap_listに代入
-    line_counter = 0  # 行数のカウンター
-    for line in wrap_list:  # wrap_listから1行づつ取り出しline に代入
-        y = line_counter * 70  # y座標をline_counterに応じて下げる
-        draw.multiline_text(
-            (35, y), line, fill=(0, 0, 0), font=font
-        )  # 1行分の文字列を画像に描画
-        line_counter = line_counter + 1  # 行数のカウンターに1
+def create_text_img(text, width, height, font_size, margin=20):
+    # Create image object with white background
+    im = Image.new("RGB", (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(im)
+
+    # Load a font that supports Japanese
+    font = ImageFont.truetype("assets/ZenMaruGothic-Bold.ttf", font_size)
+
+     # Calculate wrap width considering margins
+    wrap_width = (width - 2 * margin) // font_size
+
+    # Prepare list to hold wrapped text
+    wrap_list = []
+    for i in range(0, len(text), wrap_width):
+        wrap_list.append(text[i:i+wrap_width])
+
+    # Calculate the y position start for vertical centering considering margins
+    total_height = (font_size + 2) * len(wrap_list)  # +2 for line spacing
+    y_start = max(margin, (height - total_height) // 2)
+
+    # Draw the text on the image
+    y = y_start
+    for line in wrap_list:
+        # Calculate x position for horizontal centering considering margins
+        line_width = draw.textlength(line, font=font)
+        x = max(margin, (width - line_width) // 2)
+
+        draw.text((x, y), line, fill=(0,0,0), font=font)
+        y += font_size + 2  # Move down to next line
+
     return im
 
 
@@ -33,6 +48,7 @@ def pil_to_base64(image):
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
     return img_str
+
 
 def play():
     select_book, captions = image_select_menu(
@@ -63,7 +79,7 @@ def play():
             )
             title_dst.paste(title_image, (0, 0))
             title_dst.paste(
-                title_text_img, (title_image.width, int(title_image.height / 3))
+                title_text_img, (title_image.width, 0)
             )
         else:
             title_dst = Image.open(io.BytesIO(title_image_bytes))
@@ -71,7 +87,7 @@ def play():
         content_markdown += const.TITLE_MARKDOWN.replace(
             "%%image_placeholder%%", pil_to_base64(title_dst)
         )
-        result_images=[]
+        result_images = []
         for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
             page_text_image = create_text_img(tale, 512, 512, font_size=32)
             page_image = Image.open(io.BytesIO(image))
@@ -86,7 +102,7 @@ def play():
             else:
                 dst.paste(page_text_image, (0, 0))
                 dst.paste(page_image, (page_text_image.width, 0))
-            
+
             result_images.append(dst)
 
             content_markdown += const.PAGE_MARKDOWN.replace(
@@ -106,11 +122,13 @@ def play():
         )
 
         pdf_bytes = io.BytesIO()
-        title_dst.save(pdf_bytes, format='PDF', save_all=True, append_images=result_images)
+        title_dst.save(
+            pdf_bytes, format="PDF", save_all=True, append_images=result_images
+        )
 
         st.download_button(
             label="Download data as PDF",
             data=pdf_bytes.getvalue(),
-            file_name=f'{title}.pdf',
-            mime='application/pdf',
+            file_name=f"{title}.pdf",
+            mime="application/pdf",
         )

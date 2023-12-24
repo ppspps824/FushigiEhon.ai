@@ -16,7 +16,7 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
-from modules.utils import image_select_menu,show_overlay,hide_overlay
+from modules.utils import image_select_menu, show_overlay, hide_overlay
 
 
 def view_edit(mode):
@@ -73,9 +73,7 @@ def view_edit(mode):
         with st.expander("キャラクター", expanded=True):
             chara_col1, chara_col2 = st.columns(2)
             with chara_col1:
-                st.session_state.tales["characters"]["lead"][
-                    "name"
-                ] = st.text_input(
+                st.session_state.tales["characters"]["lead"]["name"] = st.text_input(
                     "主人公の名前",
                     placeholder=const.RAMDOM_PLACEHOLDER,
                     value=st.session_state.tales["characters"]["lead"]["name"],
@@ -85,16 +83,13 @@ def view_edit(mode):
                 ] = st.text_area(
                     "主人公の見た目",
                     placeholder=const.RAMDOM_PLACEHOLDER,
-                    value=st.session_state.tales["characters"]["lead"][
-                        "appearance"
-                    ],
+                    value=st.session_state.tales["characters"]["lead"]["appearance"],
                 )
                 if st.button("キャラクターを追加"):
                     st.session_state.tales["characters"]["others"].append(
                         {"name": "", "appearance": ""}
                     )
                     st.rerun()
-
 
             with chara_col2:
                 chara_num_list = range(
@@ -132,9 +127,11 @@ def view_edit(mode):
                 col1, col2, col3 = st.columns([2, 2, 1])
                 with col1:
                     try:
-                        st.image(st.session_state.images["title"],use_column_width="auto")
+                        st.image(
+                            st.session_state.images["title"], use_column_width="auto"
+                        )
                     except:
-                        st.image("assets/noimage.png",use_column_width="auto")
+                        st.image("assets/noimage.png", use_column_width="auto")
 
                     title_upload_file = st.file_uploader(
                         "画像をアップロード",
@@ -157,7 +154,6 @@ def view_edit(mode):
                         if st.button("あらすじ、テーマ・メッセージを生成する"):
                             tales_text = "\n".join(st.session_state.tales["content"])
                             with st.spinner("生成中...(あらすじ)"):
-                                show_overlay()
                                 st.session_state.tales["description"] = post_text_api(
                                     const.DESCRIPTION_PROMPT.replace(
                                         "%%tales_placeholder%%", tales_text
@@ -179,7 +175,7 @@ def view_edit(mode):
                                     )
                                 )
                                 modify()
-                                hide_overlay()
+
                                 st.rerun()
 
                         if st.button(
@@ -216,12 +212,11 @@ def view_edit(mode):
                                 .replace("%%characters_placeholder%%", characters)
                             )
                             with st.spinner("生成中...(表紙)"):
-                                show_overlay()
                                 st.session_state.images["title"] = post_image_api(
                                     prompt, size=(512, 512)
                                 )
                             modify()
-                            hide_overlay()
+
                             st.rerun()
 
                         if st.button("イラストを補正する"):
@@ -256,9 +251,9 @@ def view_edit(mode):
                 col1, col2, col3 = st.columns([2, 2, 1])
                 with col1:
                     try:
-                        st.image(image,use_column_width="auto")
+                        st.image(image, use_column_width="auto")
                     except:
-                        st.image("assets/noimage.png",use_column_width="auto")
+                        st.image("assets/noimage.png", use_column_width="auto")
                     page_upload_file = st.file_uploader(
                         "画像をアップロード",
                         type=["png", "jpg"],
@@ -368,7 +363,6 @@ def view_edit(mode):
 
 def create_one_tale(num):
     with st.spinner("生成中...(内容)"):
-        show_overlay()
         prompt = (
             const.ONE_TALE_PROMPT.replace(
                 "%%title_placeholder%%", st.session_state.tales["title"]
@@ -412,20 +406,16 @@ def create_one_tale(num):
         else:
             st.session_state.tales["content"].append(generated_tale)
         modify()
-        hide_overlay()
 
 
 def create_one_audio(num, tale):
     with st.spinner("生成中...(音声)"):
-        show_overlay()
         st.session_state.audios[num] = post_audio_api(tale)
     modify()
-    hide_overlay()
 
 
 def create_one_image(num, tale):
     with st.spinner("生成中...(イラスト)"):
-        show_overlay()
         st.session_state.images["content"][num] = post_image_api(
             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
             .replace("%%title_placeholder%%", st.session_state.tales["title"])
@@ -443,7 +433,6 @@ def create_one_image(num, tale):
             (512, 512),
         )
     modify()
-    hide_overlay()
 
 
 def delete_book(title):
@@ -458,7 +447,6 @@ def delete_book(title):
 def save_book(book_content, title):
     if title:
         with st.spinner("えほんを保存中..."):
-            show_overlay()
             bucket_name = "story-user-data"
             user_id = st.session_state.user_id
             base_path = f"{user_id}/book_info/{title}/"
@@ -487,8 +475,6 @@ def save_book(book_content, title):
             st.toast("保存しました。")
     else:
         st.toast("タイトルを入力してください")
-    
-    hide_overlay()
 
 
 def modify():
@@ -629,7 +615,7 @@ def create():
                     {"name": "", "appearance": ""}
                 )
                 st.rerun()
-            chara_col = st.columns([0.3,0.1,1])
+            chara_col = st.columns([0.3, 0.1, 1])
             charactor_options = [
                 info["name"] for info in st.session_state.tales["characters"]["others"]
             ]
@@ -748,9 +734,9 @@ def create():
 
                 st.write(book_content["tales"]["title"])
                 try:
-                    st.image(book_content["images"]["title"],use_column_width="auto")
+                    st.image(book_content["images"]["title"], use_column_width="auto")
                 except:
-                    st.image("assets/noimage.png",use_column_width="auto")
+                    st.image("assets/noimage.png", use_column_width="auto")
                 st.write(book_content["tales"]["description"])
 
             else:
