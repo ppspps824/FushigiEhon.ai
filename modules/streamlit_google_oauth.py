@@ -3,7 +3,6 @@ import os
 
 import streamlit as st
 from httpx_oauth.clients.google import GoogleOAuth2
-import streamlit_antd_components as sac
 
 
 async def write_authorization_url(client, redirect_uri):
@@ -23,6 +22,21 @@ async def write_access_token(client, redirect_uri, code):
 async def get_email(client, token):
     user_id, user_email = await client.get_id_email(token)
     return user_id, user_email
+
+
+def oauth_button(google_auth_url):
+    button_html = f"""
+<div style="display: flex; justify-content: center; margin: 20px;">
+    <a href="{google_auth_url}" target="_self" style="text-decoration: none;">
+        <div style="height: 50px; width: 240px; background-color: #004a55; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;font-size:20px">
+            Googleでログイン
+        </div>
+    </a>
+</div>
+    """
+
+    # Streamlitアプリにボタンを埋め込む
+    st.markdown(button_html, unsafe_allow_html=True)
 
 
 def google_oauth2_required(func):
@@ -60,28 +74,19 @@ def google_oauth2_required(func):
                 code = st.experimental_get_query_params()["code"]
             except:
                 with title_cols[1]:
-                    st.markdown('<div class="centered">', unsafe_allow_html=True)
                     st.image("assets/title.png")
-                    st.write("")
-                    sac.buttons(
-                        [
-                            sac.ButtonsItem(
-                                label="Googleでログイン",
-                                icon="google",
-                                href=authorization_url,
-                            ),
-                        ],
-                        format_func="title",
-                        align="center",
-                        size="large",
-                    )
-                    st.write("")
-                    st.markdown('</div>', unsafe_allow_html=True)
-                st.markdown("""
+                oauth_button(authorization_url)
+                st.write("")
+                st.write("")
+                st.write("")
+                st.markdown(
+                    """
                             <footer>
                             <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
                             </footer>
-                            """, unsafe_allow_html=True)
+                            """,
+                    unsafe_allow_html=True,
+                )
             else:
                 # Verify token is correct:
                 try:
@@ -92,55 +97,37 @@ def google_oauth2_required(func):
                     )
                 except:
                     with title_cols[1]:
-                        st.markdown('<div class="centered">', unsafe_allow_html=True)
                         st.image("assets/title.png")
-                        st.write("")
-                        sac.buttons(
-                            [
-                                sac.ButtonsItem(
-                                    label="Googleでログイン",
-                                    icon="google",
-                                    href=authorization_url,
-                                ),
-                            ],
-                            format_func="title",
-                            align="center",
-                            size="large",
-                        )
-                        st.write("")
-                        st.markdown('</div>', unsafe_allow_html=True)
-                    st.markdown("""
+                    oauth_button(authorization_url)
+                    st.write("")
+                    st.write("")
+                    st.write("")
+                    st.markdown(
+                        """
                         <footer>
                         <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
                         </footer>
-                        """, unsafe_allow_html=True)
+                        """,
+                        unsafe_allow_html=True,
+                    )
                 else:
                     # Check if token has expired:
                     if token.is_expired():
                         if token.is_expired():
                             with title_cols[1]:
-                                st.markdown('<div class="centered">', unsafe_allow_html=True)
                                 st.image("assets/title.png")
-                                st.write("")
-                                sac.buttons(
-                                    [
-                                        sac.ButtonsItem(
-                                            label="Googleでログイン",
-                                            icon="google",
-                                            href=authorization_url,
-                                        ),
-                                    ],
-                                    format_func="title",
-                                    align="center",
-                                    size="large",
-                                )
-                                st.write("")
-                                st.markdown('</div>', unsafe_allow_html=True)
-                            st.markdown("""
+                            oauth_button(authorization_url)
+                            st.write("")
+                            st.write("")
+                            st.write("")
+                            st.markdown(
+                                """
                         <footer>
                         <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
                         </footer>
-                        """, unsafe_allow_html=True)
+                        """,
+                                unsafe_allow_html=True,
+                            )
                     else:
                         st.session_state["token"] = token
                         user_id, user_email = asyncio.run(
