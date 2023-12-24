@@ -109,6 +109,11 @@ def google_oauth2_required(func):
                         )
                         st.write("")
                         st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown("""
+                        <footer>
+                        <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
+                        </footer>
+                        """, unsafe_allow_html=True)
                 else:
                     # Check if token has expired:
                     if token.is_expired():
@@ -131,6 +136,11 @@ def google_oauth2_required(func):
                                 )
                                 st.write("")
                                 st.markdown('</div>', unsafe_allow_html=True)
+                            st.markdown("""
+                        <footer>
+                        <p><small>© 2023 ふしぎえほん.ai All Rights Reserved.</small></p>
+                        </footer>
+                        """, unsafe_allow_html=True)
                     else:
                         st.session_state["token"] = token
                         user_id, user_email = asyncio.run(
