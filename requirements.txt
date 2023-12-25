@@ -9,3 +9,4 @@ streamlit_antd_components
 streamlit_shadcn_ui
 httpx-oauth
 moviepy
+streamlit-supabase-auth
