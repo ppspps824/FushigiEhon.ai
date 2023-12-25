@@ -43,7 +43,8 @@ def create_tales(
         .replace("%%character_set_placeholder%%", character_set)
         .replace("%%age_placeholder%%", age)
     )
-
+    st.markdown('<div class="overlay">', unsafe_allow_html=True)
+    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
             try:
@@ -55,6 +56,7 @@ def create_tales(
                 print(e.args)
                 print(f"生成された内容：{content_text}")
                 continue
+    st.markdown("</div>", unsafe_allow_html=True)
 
     if tales:
         st.write(tales)
@@ -116,16 +118,20 @@ def create_images(tales):
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
+    st.markdown('<div class="overlay">', unsafe_allow_html=True)
+    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(表紙)"):
         images["title"] = post_image_api(prompt, size=(512, 512))
+    st.markdown("</div>", unsafe_allow_html=True)
     try:
         st.image(images["title"], width=512)
     except Exception as e:
         print(e.args)
         st.error("イラストの生成に失敗しました。")
 
-    pages = len(tales["content"])
-    for num, tale in enumerate(tales["content"]):
+    for tale in tales["content"]:
+        st.markdown('<div class="overlay">', unsafe_allow_html=True)
+        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner(f"生成中...(イラスト {num+1}/{pages})"):
             prompt = (
                 const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
@@ -141,16 +147,18 @@ def create_images(tales):
             except Exception as e:
                 print(e.args)
                 st.error("イラストの生成に失敗しました。")
-
+        st.markdown("</div>", unsafe_allow_html=True)
     return images
 
 
 def create_audios(tales):
     audios = []
-    pages = len(tales["content"])
-    for num, tale in enumerate(tales["content"]):
+    for tale in tales["content"]:
+        st.markdown('<div class="overlay">', unsafe_allow_html=True)
+        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner(f"生成中...(音声 {num+1}/{pages})"):
             audios.append(post_audio_api(tale))
+        st.markdown("</div>", unsafe_allow_html=True)
 
     return audios
 
@@ -190,6 +198,8 @@ def image_upgrade(image, title, description, theme, characters, tale):
             ],
             "max_tokens": 300,
         }
+        st.markdown('<div class="overlay">', unsafe_allow_html=True)
+        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner("イラストを補正中..."):
             response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -206,10 +216,13 @@ def image_upgrade(image, title, description, theme, characters, tale):
             )
             result = post_image_api(prompt, size=(1024, 1024))
 
+        st.markdown("</div>", unsafe_allow_html=True)
         return result
 
 
 def create_one_tale(num):
+    st.markdown('<div class="overlay">', unsafe_allow_html=True)
+    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(内容)"):
         prompt = (
             const.ONE_TALE_PROMPT.replace(
@@ -257,14 +270,20 @@ def create_one_tale(num):
             st.session_state.tales["content"][num] = generated_tale
         else:
             st.session_state.tales["content"].append(generated_tale)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def create_one_audio(num, tale):
+    st.markdown('<div class="overlay">', unsafe_allow_html=True)
+    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(音声)"):
         st.session_state.audios[num] = post_audio_api(tale)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def create_one_image(num, tale):
+    st.markdown('<div class="overlay">', unsafe_allow_html=True)
+    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(イラスト)"):
         st.session_state.images["content"][num] = post_image_api(
             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
@@ -282,3 +301,4 @@ def create_one_image(num, tale):
             ),
             (512, 512),
         )
+    st.markdown("</div>", unsafe_allow_html=True)

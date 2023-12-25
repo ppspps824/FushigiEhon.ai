@@ -20,6 +20,8 @@ from modules.ai import (
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
 from modules.utils import hide_overlay, image_select_menu, show_overlay
 
+# from streamlit_lottie import st_lottie_spinner
+
 
 def view_edit():
     st.write("---")
@@ -160,6 +162,8 @@ def view_edit():
                         if st.button("あらすじ、テーマ・メッセージを生成する"):
                             show_overlay()
                             tales_text = "\n".join(st.session_state.tales["content"])
+                            st.markdown('<div class="overlay">', unsafe_allow_html=True)
+                            # with st_lottie_spinner(const.LOTTIE):
                             with st.spinner("生成中...(あらすじ)"):
                                 st.session_state.tales["description"] = post_text_api(
                                     const.DESCRIPTION_PROMPT.replace(
@@ -183,8 +187,8 @@ def view_edit():
                                 )
                                 modify()
                                 hide_overlay()
-
-                                st.rerun()
+                            st.markdown("</div>", unsafe_allow_html=True)
+                            st.rerun()
 
                         if st.button(
                             "次のページを生成する",
@@ -217,10 +221,13 @@ def view_edit():
                                 )
                                 .replace("%%characters_placeholder%%", characters)
                             )
+                            st.markdown('<div class="overlay">', unsafe_allow_html=True)
+                            # with st_lottie_spinner(const.LOTTIE):
                             with st.spinner("生成中...(表紙)"):
                                 st.session_state.images["title"] = post_image_api(
                                     prompt, size=(512, 512)
                                 )
+                            st.markdown("</div>", unsafe_allow_html=True)
                             modify()
                             hide_overlay()
 
@@ -434,6 +441,8 @@ def delete_book(title):
 
 def save_book(book_content, title):
     if title:
+        st.markdown('<div class="overlay">', unsafe_allow_html=True)
+        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
             user_id = st.session_state.user_id
@@ -461,6 +470,7 @@ def save_book(book_content, title):
                 s3_upload(bucket_name, audio, audio_path)
 
             st.toast("保存しました。")
+        st.markdown("</div>", unsafe_allow_html=True)
     else:
         st.toast("タイトルを入力してください")
 

@@ -19,6 +19,7 @@ def show_overlay():
     st.markdown(
         '<div class="overlay" style="display:block"></div>', unsafe_allow_html=True
     )
+    pass
 
 
 # オーバーレイを非表示
@@ -33,6 +34,7 @@ def hide_overlay():
     """,
         unsafe_allow_html=True,
     )
+    pass
 
 
 def get_images(titles):

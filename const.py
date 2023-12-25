@@ -33,7 +33,9 @@ HIDE_ST_STYLE = """
                     background-color: rgba(0,0,0,0.5);
                     z-index: 99;
                     cursor: not-allowed;
-                    display: none;  /* 初期状態では非表示 */
+                    display: flex; /* Flexboxを使用して中央配置 */
+                    justify-content: center; /* 水平中央 */
+                    align-items: center; /* 垂直中央 */
                 }
 				        .appview-container .main .block-container{
                             padding-top: 1rem;
@@ -284,3 +286,5 @@ END_ROLE = """
 # おしまい
 
 """
+
+LOTTIE = "https://lottie.host/fc04f21d-abcf-4e8c-840a-548301d00539/2wqct1sOBx.json"
