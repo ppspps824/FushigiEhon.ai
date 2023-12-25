@@ -63,7 +63,7 @@ def get_images(titles):
 
 def create_text_img(text, width, height, font_size, margin=20):
     # Create image object with white background
-    im = Image.new("RGB", (width, height), (255, 255, 255))
+    im = Image.new("RGB", (width, height), "#fafafa")
     draw = ImageDraw.Draw(im)
 
     # Load a font that supports Japanese
@@ -107,12 +107,12 @@ def create_movie_and_pdf(book_info):
         if title_image_bytes:
             title_image = Image.open(io.BytesIO(title_image_bytes))
         else:
-            title_image = Image.new("RGB", (512, 512), (255, 255, 255))
+            title_image = Image.new("RGB", (512, 512), "#fafafa")
 
         title_dst = Image.new(
             "RGB",
             (title_image.width + title_text_img.width, title_image.height),
-            (255, 255, 255),
+            "#fafafa",
         )
         title_dst.paste(title_image, (0, 0))
         title_dst.paste(title_text_img, (title_image.width, 0))
@@ -128,7 +128,7 @@ def create_movie_and_pdf(book_info):
         end_dst = Image.new(
             "RGB",
             (1024, 512),
-            (255, 255, 255),
+            "#fafafa",
         )
         end_dst.paste(
             end_image, (0 + end_image.width // 2, 256 - end_image.height // 2)
@@ -143,7 +143,7 @@ def create_movie_and_pdf(book_info):
             if image:
                 page_image = Image.open(io.BytesIO(image))
             else:
-                page_image = Image.new("RGB", (512, 512), (255, 255, 255))
+                page_image = Image.new("RGB", (512, 512), "#fafafa")
 
             page_image = page_image.resize((512, 512))
             dst = Image.new(

@@ -68,7 +68,6 @@ def view_edit(mode):
                 key="alert_dialog_book",
             ):
                 delete_book(st.session_state.tales["title"])
-                st.rerun()
 
         with st.expander("キャラクター", expanded=True):
             chara_col1, chara_col2 = st.columns(2)
@@ -440,6 +439,7 @@ def delete_book(title):
         bucket_name = "story-user-data"
         s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
         st.toast(f"{title}を削除しました")
+        st.rerun()
     else:
         st.toast("タイトルを入力してください")
 
