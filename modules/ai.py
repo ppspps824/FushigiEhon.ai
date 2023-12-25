@@ -44,7 +44,6 @@ def create_tales(
         .replace("%%age_placeholder%%", age)
     )
 
-    print(content)
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
             try:
