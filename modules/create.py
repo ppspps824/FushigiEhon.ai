@@ -1,6 +1,7 @@
 import datetime
 import json
 import random
+
 import const
 import pytz
 import streamlit as st
@@ -16,7 +17,7 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
-from modules.utils import image_select_menu, show_overlay, hide_overlay
+from modules.utils import image_select_menu
 
 
 def view_edit(mode):
@@ -472,7 +473,6 @@ def save_book(book_content, title):
                 s3_upload(bucket_name, image, image_path)
                 s3_upload(bucket_name, audio, audio_path)
 
-
             st.toast("保存しました。")
     else:
         st.toast("タイトルを入力してください")
@@ -748,6 +748,14 @@ def create():
         #     clear_session_state()
         view_edit(mode)
     else:
+        if ui.alert_dialog(
+            show=True,
+            title="イラスト生成",
+            description="イラストの生成に失敗しました。",
+            confirm_label="OK",
+            key="alert_dialog_image",
+        ):
+            st.toast("hello ")
         select_book, captions = image_select_menu(
             get_all_book_titles(
                 "story-user-data",

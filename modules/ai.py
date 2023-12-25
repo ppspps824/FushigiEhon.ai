@@ -7,8 +7,8 @@ import const
 import openai
 import requests
 import streamlit as st
+import streamlit_shadcn_ui as ui
 from PIL import Image
-from modules.utils import show_overlay, hide_overlay
 
 
 def post_text_api(prompt):
@@ -84,9 +84,14 @@ def post_image_api(prompt, size):
             break
         except Exception as e:
             print(e.args)
-            st.error("イラストの生成に失敗しました。")
-
-            st.stop()
+            if ui.alert_dialog(
+                show=True,
+                title="イラスト生成",
+                description="イラストの生成に失敗しました。",
+                confirm_label="OK",
+                key="alert_dialog_image",
+            ):
+                st.rerun()
 
     if image_url:
         with urllib.request.urlopen(image_url) as web_file:

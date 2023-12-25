@@ -1,5 +1,4 @@
 import asyncio
-import os
 
 import streamlit as st
 from httpx_oauth.clients.google import GoogleOAuth2

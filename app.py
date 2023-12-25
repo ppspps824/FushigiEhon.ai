@@ -3,11 +3,9 @@ import openai
 import streamlit as st
 from modules.create import create
 from modules.play import play
-from modules.settings import settings
+from modules.streamlit_google_oauth import google_oauth2_required
 from PIL import Image
 from streamlit_option_menu import option_menu
-from modules.streamlit_google_oauth import google_oauth2_required
-import os
 
 
 @google_oauth2_required
@@ -18,7 +16,9 @@ def main():
         openai.api_key = st.secrets["OPEN_AI_KEY"]
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.png")
-    header_cols[2].caption(f'logged in {st.session_state.user_email.replace("@gmail.com","")}')
+    header_cols[2].caption(
+        f'logged in {st.session_state.user_email.replace("@gmail.com","")}'
+    )
     selected = option_menu(
         None,
         ["よむ", "つくる"],
@@ -44,8 +44,7 @@ def main():
         create()
     elif selected == "よむ":
         play()
-    elif selected == "せってい":
-        settings()
+
 
 if "login" not in st.session_state:
     st.session_state.client = None
