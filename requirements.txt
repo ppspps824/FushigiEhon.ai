@@ -4,9 +4,9 @@ openai
 boto3
 streamlit-option-menu
 streamlit-image-select
-streamlit_drawable_canvas
 requests
 streamlit_antd_components 
 streamlit_shadcn_ui
 httpx-oauth
 moviepy
+streamlit-lottie

@@ -9,9 +9,11 @@ import streamlit_shadcn_ui as ui
 from modules.ai import (
     create_audios,
     create_images,
+    create_one_audio,
+    create_one_image,
+    create_one_tale,
     create_tales,
     image_upgrade,
-    post_audio_api,
     post_image_api,
     post_text_api,
 )
@@ -194,17 +196,10 @@ def view_edit():
                             create_one_image(0, st.session_state.tales["content"][0])
                             create_one_audio(0, st.session_state.tales["content"][0])
                             hide_overlay()
-                            st.rerun()
-
-                        if st.button("テキスト以外を一括で生成する"):
-                            show_overlay()
-                            book_content = create_all(ignore_tale=True)
-                            save_book(book_content, st.session_state.tales["title"])
                             modify()
-                            hide_overlay()
                             st.rerun()
 
-                        if st.button("イラストを生成する"):
+                        if st.button("表紙を生成する"):
                             show_overlay()
                             title = st.session_state.tales["title"]
                             description = st.session_state.tales["description"]
@@ -231,7 +226,7 @@ def view_edit():
 
                             st.rerun()
 
-                        if st.button("イラストを補正する"):
+                        if st.button("表紙を補正する"):
                             show_overlay()
                             st.session_state.images["title"] = image_upgrade(
                                 st.session_state.images["title"],
@@ -245,10 +240,49 @@ def view_edit():
                             hide_overlay()
                             st.rerun()
 
-                        if st.button("イラストを削除する"):
+                        if st.button("表紙を削除する"):
                             st.session_state.images["title"] = ""
                             modify()
                             st.rerun()
+                        with st.container(border=True):
+                            st.caption("全ページ一括処理")
+                            if st.button("テキスト以外を一括で生成する"):
+                                show_overlay()
+                                book_content = create_all(ignore_tale=True)
+                                save_book(book_content, st.session_state.tales["title"])
+                                modify()
+                                hide_overlay()
+                                st.rerun()
+                            if st.button("イラストを一括で補正する"):
+                                show_overlay()
+                                st.session_state.images["title"] = image_upgrade(
+                                    st.session_state.images["title"],
+                                    st.session_state.tales["title"],
+                                    st.session_state.tales["description"],
+                                    st.session_state.tales["theme"],
+                                    json.dumps(st.session_state.tales["characters"]),
+                                    json.dumps(st.session_state.tales["content"]),
+                                )
+
+                                for num, image in enumerate(
+                                    st.session_state.images["content"]
+                                ):
+                                    st.session_state.images["content"][
+                                        num
+                                    ] = image_upgrade(
+                                        image,
+                                        st.session_state.tales["title"],
+                                        st.session_state.tales["description"],
+                                        st.session_state.tales["theme"],
+                                        json.dumps(
+                                            st.session_state.tales["characters"]
+                                        ),
+                                        json.dumps(st.session_state.tales["content"]),
+                                    )
+
+                                modify()
+                                hide_overlay()
+                                st.rerun()
                 with col3:
                     if st.button(
                         "次のページを追加する",
@@ -308,6 +342,7 @@ def view_edit():
                             create_one_tale(page_count + 1)
                             create_one_image(page_count + 1, tale)
                             create_one_audio(page_count + 1, tale)
+                            modify()
                             hide_overlay()
                             st.rerun()
                         if st.button(
@@ -316,6 +351,7 @@ def view_edit():
                         ):
                             show_overlay()
                             create_one_tale(page_count)
+                            modify()
                             hide_overlay()
                             st.rerun()
 
@@ -325,6 +361,7 @@ def view_edit():
                         ):
                             show_overlay()
                             create_one_audio(page_count, tale)
+                            modify()
                             hide_overlay()
                             st.rerun()
 
@@ -334,6 +371,7 @@ def view_edit():
                         ):
                             show_overlay()
                             create_one_image(page_count, tale)
+                            modify()
                             hide_overlay()
                             st.rerun()
                         if st.button(
@@ -383,80 +421,6 @@ def view_edit():
                         key="alert_dialog_page",
                     ):
                         delete_page(page_count)
-
-
-def create_one_tale(num):
-    with st.spinner("生成中...(内容)"):
-        prompt = (
-            const.ONE_TALE_PROMPT.replace(
-                "%%title_placeholder%%", st.session_state.tales["title"]
-            )
-            .replace(
-                "%%description_placeholder%%",
-                st.session_state.tales["description"],
-            )
-            .replace(
-                "%%theme_placeholder%%",
-                st.session_state.tales["theme"],
-            )
-            .replace(
-                "%%characters_placeholder%%",
-                json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
-            )
-            .replace(
-                "%%number_of_pages_placeholder%%",
-                str(num),
-            )
-            .replace(
-                "%%character_set_placeholder%%",
-                st.session_state.tales["character_set"],
-            )
-            .replace(
-                "%%age_group_placeholder%%",
-                st.session_state.tales["age_group"],
-            )
-            .replace(
-                "%%pre_pages_info_placeholder%%",
-                "\n".join(st.session_state.tales["content"][:num]),
-            )
-            .replace(
-                "%%post_pages_info_placeholder%%",
-                "\n".join(st.session_state.tales["content"][num + 1 :]),
-            )
-        )
-        generated_tale = post_text_api(prompt)
-        if num < len(st.session_state.tales["content"]):
-            st.session_state.tales["content"][num] = generated_tale
-        else:
-            st.session_state.tales["content"].append(generated_tale)
-        modify()
-
-
-def create_one_audio(num, tale):
-    with st.spinner("生成中...(音声)"):
-        st.session_state.audios[num] = post_audio_api(tale)
-    modify()
-
-
-def create_one_image(num, tale):
-    with st.spinner("生成中...(イラスト)"):
-        st.session_state.images["content"][num] = post_image_api(
-            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
-            .replace("%%title_placeholder%%", st.session_state.tales["title"])
-            .replace(
-                "%%description_placeholder%%", st.session_state.tales["description"]
-            )
-            .replace(
-                "%%theme_placeholder%%",
-                st.session_state.tales["theme"],
-            )
-            .replace(
-                "%%characters_placeholder%%",
-                json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
-            ),
-            (512, 512),
-        )
-    modify()
 
 
 def delete_book(title):
@@ -540,6 +504,7 @@ def adding_and_create_page(num):
     create_one_tale(num)
     create_one_image(num, st.session_state.tales["content"][num])
     create_one_audio(num, st.session_state.tales["content"][num])
+    modify()
     st.rerun()
 
 
@@ -548,6 +513,7 @@ def clear_session_state():
         "title": "",
         "number_of_pages": 3,
         "characters_per_page": const.CHARACTORS_PER_PAGE,
+        "sentence_structure": "バランス",
         "age_group": "1～2歳",
         "character_set": "ひらがなのみ",
         "description": "",
@@ -580,10 +546,11 @@ def create_all(only_tale=False, ignore_tale=False):
             st.session_state.tales["description"],
             json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
             st.session_state.tales["theme"],
-            str(st.session_state.tales["number_of_pages"]),
+            str(st.session_state.tales["age_group"]),
             str(st.session_state.tales["characters_per_page"]),
             st.session_state.tales["character_set"],
             st.session_state.tales["age_group"],
+            st.session_state.tales["sentence_structure"],
         )
 
     if only_tale:
@@ -620,7 +587,7 @@ def create():
         with st.container(border=True):
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
             with st.expander("基本設定", expanded=True):
-                col1, col2, col3 = st.columns(3)
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
                     st.session_state.tales["number_of_pages"] = st.number_input(
                         "ページ数",
@@ -629,6 +596,14 @@ def create():
                         value=st.session_state.tales["number_of_pages"],
                     )
                 with col2:
+                    st.session_state.tales["sentence_structure"] = st.selectbox(
+                        "文章の構成",
+                        options=const.SENTENCE_STRUCTURE_SET,
+                        index=const.SENTENCE_STRUCTURE_SET.index(
+                            st.session_state.tales["sentence_structure"]
+                        ),
+                    )
+                with col3:
                     st.session_state.tales["character_set"] = st.selectbox(
                         "使用文字",
                         options=const.CHARACTER_SET,
@@ -636,7 +611,7 @@ def create():
                             st.session_state.tales["character_set"]
                         ),
                     )
-                with col3:
+                with col4:
                     st.session_state.tales["age_group"] = st.selectbox(
                         "対象年齢",
                         options=const.AGE_GROUP,
@@ -720,8 +695,8 @@ def create():
             only_tale = st.toggle("テキストだけ作成する")
 
         if st.button("生成開始"):
-            show_overlay()
             if st.session_state.tales["title"] or st.session_state.tales["description"]:
+                show_overlay()
                 book_content = create_all(only_tale=only_tale)
 
                 save_book(book_content, st.session_state.tales["title"])
@@ -736,7 +711,7 @@ def create():
                 st.write(book_content["tales"]["description"])
 
             else:
-                st.info("タイトルかあらすじを内容を入力してください。")
+                st.toast("タイトルかあらすじを内容を入力してください。")
 
     elif mode == "いちからつくる":
         # if st.session_state.not_modify:

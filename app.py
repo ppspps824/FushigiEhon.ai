@@ -60,6 +60,7 @@ if "login" not in st.session_state:
         "title": "",
         "number_of_pages": 3,
         "characters_per_page": const.CHARACTORS_PER_PAGE,
+        "sentence_structure": "バランス",
         "age_group": "1～2歳",
         "character_set": "ひらがなのみ",
         "description": "",

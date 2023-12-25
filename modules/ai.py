@@ -25,10 +25,11 @@ def create_tales(
     description,
     characters,
     theme,
-    number_of_pages,
+    age_group,
     characters_per_page,
     character_set,
     age,
+    sentence_structure,
 ):
     tales = ""
     content = (
@@ -36,11 +37,14 @@ def create_tales(
         .replace("%%description_placeholder%%", description)
         .replace("%%characters_placeholder%%", characters)
         .replace("%%theme_placeholder%%", theme)
-        .replace("%%number_of_pages_placeholder%%", number_of_pages)
+        .replace("%%age_group_placeholder%%", age_group)
+        .replace("%%sentence_structure_placeholder%%", sentence_structure)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%character_set_placeholder%%", character_set)
         .replace("%%age_placeholder%%", age)
     )
+
+    print(content)
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
             try:
@@ -204,3 +208,78 @@ def image_upgrade(image, title, description, theme, characters, tale):
             result = post_image_api(prompt, size=(1024, 1024))
 
         return result
+
+
+def create_one_tale(num):
+    with st.spinner("生成中...(内容)"):
+        prompt = (
+            const.ONE_TALE_PROMPT.replace(
+                "%%title_placeholder%%", st.session_state.tales["title"]
+            )
+            .replace(
+                "%%description_placeholder%%",
+                st.session_state.tales["description"],
+            )
+            .replace(
+                "%%theme_placeholder%%",
+                st.session_state.tales["theme"],
+            )
+            .replace(
+                "%%sentence_structure_placeholder%%",
+                st.session_state.tales["sentence_structure"],
+            )
+            .replace(
+                "%%characters_placeholder%%",
+                json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
+            )
+            .replace(
+                "%%number_of_pages_placeholder%%",
+                str(num),
+            )
+            .replace(
+                "%%character_set_placeholder%%",
+                st.session_state.tales["character_set"],
+            )
+            .replace(
+                "%%age_group_placeholder%%",
+                st.session_state.tales["age_group"],
+            )
+            .replace(
+                "%%pre_pages_info_placeholder%%",
+                "\n".join(st.session_state.tales["content"][:num]),
+            )
+            .replace(
+                "%%post_pages_info_placeholder%%",
+                "\n".join(st.session_state.tales["content"][num + 1 :]),
+            )
+        )
+        generated_tale = post_text_api(prompt)
+        if num < len(st.session_state.tales["content"]):
+            st.session_state.tales["content"][num] = generated_tale
+        else:
+            st.session_state.tales["content"].append(generated_tale)
+
+
+def create_one_audio(num, tale):
+    with st.spinner("生成中...(音声)"):
+        st.session_state.audios[num] = post_audio_api(tale)
+
+
+def create_one_image(num, tale):
+    with st.spinner("生成中...(イラスト)"):
+        st.session_state.images["content"][num] = post_image_api(
+            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
+            .replace("%%title_placeholder%%", st.session_state.tales["title"])
+            .replace(
+                "%%description_placeholder%%", st.session_state.tales["description"]
+            )
+            .replace(
+                "%%theme_placeholder%%",
+                st.session_state.tales["theme"],
+            )
+            .replace(
+                "%%characters_placeholder%%",
+                json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
+            ),
+            (512, 512),
+        )
