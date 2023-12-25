@@ -16,10 +16,10 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
-from modules.utils import image_select_menu
+from modules.utils import hide_overlay, image_select_menu, show_overlay
 
 
-def view_edit(mode):
+def view_edit():
     st.write("---")
     content_place = st.container()
     total_page = len(st.session_state.tales["content"]) + 1
@@ -54,7 +54,11 @@ def view_edit(mode):
                     "images": st.session_state.images,
                     "audios": st.session_state.audios,
                 }
+                show_overlay()
                 save_book(book_content, st.session_state.tales["title"])
+                modify()
+                hide_overlay()
+                st.rerun()
 
             book_trigger_btn = ui.button(
                 text="えほんを削除する", key="book_trigger_btn"
@@ -68,6 +72,7 @@ def view_edit(mode):
                 key="alert_dialog_book",
             ):
                 delete_book(st.session_state.tales["title"])
+                modify()
 
         with st.expander("キャラクター", expanded=True):
             chara_col1, chara_col2 = st.columns(2)
@@ -151,6 +156,7 @@ def view_edit(mode):
                         st.write("AI機能")
 
                         if st.button("あらすじ、テーマ・メッセージを生成する"):
+                            show_overlay()
                             tales_text = "\n".join(st.session_state.tales["content"])
                             with st.spinner("生成中...(あらすじ)"):
                                 st.session_state.tales["description"] = post_text_api(
@@ -174,6 +180,7 @@ def view_edit(mode):
                                     )
                                 )
                                 modify()
+                                hide_overlay()
 
                                 st.rerun()
 
@@ -181,19 +188,24 @@ def view_edit(mode):
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
                         ):
+                            show_overlay()
                             adding_page(0)
                             create_one_tale(0)
                             create_one_image(0, st.session_state.tales["content"][0])
                             create_one_audio(0, st.session_state.tales["content"][0])
+                            hide_overlay()
                             st.rerun()
 
                         if st.button("テキスト以外を一括で生成する"):
+                            show_overlay()
                             book_content = create_all(ignore_tale=True)
                             save_book(book_content, st.session_state.tales["title"])
                             modify()
+                            hide_overlay()
                             st.rerun()
 
                         if st.button("イラストを生成する"):
+                            show_overlay()
                             title = st.session_state.tales["title"]
                             description = st.session_state.tales["description"]
                             characters = json.dumps(
@@ -215,10 +227,12 @@ def view_edit(mode):
                                     prompt, size=(512, 512)
                                 )
                             modify()
+                            hide_overlay()
 
                             st.rerun()
 
                         if st.button("イラストを補正する"):
+                            show_overlay()
                             st.session_state.images["title"] = image_upgrade(
                                 st.session_state.images["title"],
                                 st.session_state.tales["title"],
@@ -228,6 +242,7 @@ def view_edit(mode):
                                 json.dumps(st.session_state.tales["content"]),
                             )
                             modify()
+                            hide_overlay()
                             st.rerun()
 
                         if st.button("イラストを削除する"):
@@ -288,35 +303,44 @@ def view_edit(mode):
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
                         ):
+                            show_overlay()
                             adding_page(page_count + 1)
                             create_one_tale(page_count + 1)
                             create_one_image(page_count + 1, tale)
                             create_one_audio(page_count + 1, tale)
+                            hide_overlay()
                             st.rerun()
                         if st.button(
                             "内容を生成する",
                             help="このページの文章を、AIによって生成します。",
                         ):
+                            show_overlay()
                             create_one_tale(page_count)
+                            hide_overlay()
                             st.rerun()
 
                         if st.button(
                             "音声を生成する",
                             help="このページの音声を、AIによって生成します。",
                         ):
+                            show_overlay()
                             create_one_audio(page_count, tale)
+                            hide_overlay()
                             st.rerun()
 
                         if st.button(
                             "イラストを生成する",
                             help="このページのイラストを、文章をベースにAIによって生成します。",
                         ):
+                            show_overlay()
                             create_one_image(page_count, tale)
+                            hide_overlay()
                             st.rerun()
                         if st.button(
                             "イラストを補正する",
                             help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。",
                         ):
+                            show_overlay()
                             st.session_state.images["content"][
                                 page_count
                             ] = image_upgrade(
@@ -328,6 +352,7 @@ def view_edit(mode):
                                 st.session_state.tales["content"][page_count],
                             )
                             modify()
+                            hide_overlay()
                             st.rerun()
                         if st.button(
                             "イラストを削除する",
@@ -439,7 +464,6 @@ def delete_book(title):
         bucket_name = "story-user-data"
         s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
         st.toast(f"{title}を削除しました")
-        st.rerun()
     else:
         st.toast("タイトルを入力してください")
 
@@ -696,10 +720,13 @@ def create():
             only_tale = st.toggle("テキストだけ作成する")
 
         if st.button("生成開始"):
+            show_overlay()
             if st.session_state.tales["title"] or st.session_state.tales["description"]:
                 book_content = create_all(only_tale=only_tale)
 
                 save_book(book_content, st.session_state.tales["title"])
+
+                hide_overlay()
 
                 st.write(book_content["tales"]["title"])
                 try:
@@ -714,7 +741,7 @@ def create():
     elif mode == "いちからつくる":
         # if st.session_state.not_modify:
         #     clear_session_state()
-        view_edit(mode)
+        view_edit()
     else:
         select_book, captions = image_select_menu(
             get_all_book_titles(
@@ -724,16 +751,20 @@ def create():
             "つくりなおす",
         )
         if select_book:
+            try:
+                caption = captions[select_book - 1]
+            except:
+                caption = captions[0]
             if (
                 st.session_state.not_modify
-                or st.session_state.tales["title"] != captions[select_book - 1]
+                or st.session_state.tales["title"] != caption
             ):
                 book_info = get_book_data(
                     "story-user-data",
                     st.session_state.user_id,
-                    captions[select_book - 1],
+                    caption,
                 )
                 st.session_state.tales = book_info["tales"]
                 st.session_state.images = book_info["images"]
                 st.session_state.audios = book_info["audios"]
-            view_edit(mode)
+            view_edit()
