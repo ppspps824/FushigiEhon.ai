@@ -74,6 +74,7 @@ def main():
     if not session:
         return
 
+    st.experimental_set_query_params(page=["success"])
     title_place.empty()
 
     st.session_state.is_login = True
