@@ -86,7 +86,6 @@ def post_image_api(prompt, size):
             break
         except Exception as e:
             print(e.args)
-            st.error("イラストの生成に失敗しました。")
             return ""
 
     if image_url:
@@ -101,7 +100,6 @@ def post_image_api(prompt, size):
 
         return buffer.getvalue()
     else:
-        st.error("イラストの生成に失敗しました。")
         return ""
 
 
@@ -123,16 +121,13 @@ def create_images(tales):
     with st.spinner("生成中...(表紙)"):
         images["title"] = post_image_api(prompt, size=(512, 512))
     st.markdown("</div>", unsafe_allow_html=True)
-    try:
-        st.image(images["title"], width=512)
-    except Exception as e:
-        print(e.args)
-        st.error("イラストの生成に失敗しました。")
+    if not images["title"]:
+        st.error("表紙の生成に失敗しました。")
 
-    for tale in tales["content"]:
+    for num, tale in enumerate(tales["content"]):
         st.markdown('<div class="overlay">', unsafe_allow_html=True)
         # with st_lottie_spinner(const.LOTTIE):
-        with st.spinner(f"生成中...(イラスト {num+1}/{pages})"):
+        with st.spinner(f'生成中...(イラスト {num+1}/{len(tales["content"])})'):
             prompt = (
                 const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
                 .replace("%%description_placeholder%%", description)
@@ -142,10 +137,7 @@ def create_images(tales):
             )
             result = post_image_api(prompt, size=(1024, 1024))
             images["content"].append(result)
-            try:
-                st.image(result, width=512)
-            except Exception as e:
-                print(e.args)
+            if not result:
                 st.error("イラストの生成に失敗しました。")
         st.markdown("</div>", unsafe_allow_html=True)
     return images
@@ -153,10 +145,10 @@ def create_images(tales):
 
 def create_audios(tales):
     audios = []
-    for tale in tales["content"]:
+    for num, tale in enumerate(tales["content"]):
         st.markdown('<div class="overlay">', unsafe_allow_html=True)
         # with st_lottie_spinner(const.LOTTIE):
-        with st.spinner(f"生成中...(音声 {num+1}/{pages})"):
+        with st.spinner(f'生成中...(音声) {num+1}/{len(tales["content"])}'):
             audios.append(post_audio_api(tale))
         st.markdown("</div>", unsafe_allow_html=True)
 

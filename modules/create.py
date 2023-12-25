@@ -713,7 +713,6 @@ def create():
 
                 hide_overlay()
 
-                st.write(book_content["tales"]["title"])
                 try:
                     st.image(book_content["images"]["title"], use_column_width="auto")
                 except:
