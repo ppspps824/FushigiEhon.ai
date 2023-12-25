@@ -1,6 +1,5 @@
 import datetime
 import json
-import random
 
 import const
 import pytz
@@ -586,19 +585,6 @@ def create_all(only_tale=False, ignore_tale=False):
     return book_content
 
 
-def create_random_book_info():
-    title_set_ix = random.randint(0, len(const.TITLE_SET) - 1)
-    st.session_state.tales = const.TITLE_SET[title_set_ix]
-    st.session_state.tales["number_of_pages"] = const.TITLE_SET[title_set_ix][
-        "number_of_pages"
-    ]
-    st.session_state.tales["characters_per_page"] = const.CHARACTORS_PER_PAGE
-    st.session_state.tales["character_set"] = const.TITLE_SET[title_set_ix][
-        "character_set"
-    ]
-    st.session_state.tales["age_group"] = const.TITLE_SET[title_set_ix]["age_group"]
-
-
 def create():
     mode = st.selectbox(
         "あたらしくつくる",
@@ -607,31 +593,7 @@ def create():
     )
 
     if mode == "おまかせでつくる":
-        if st.button("ランダム生成"):
-            create_random_book_info()
         with st.container(border=True):
-            st.caption("キャラクター")
-            if st.button("追加"):
-                st.session_state.tales["characters"]["others"].append(
-                    {"name": "", "appearance": ""}
-                )
-                st.rerun()
-            chara_col = st.columns([0.3, 0.1, 1])
-            charactor_options = [
-                info["name"] for info in st.session_state.tales["characters"]["others"]
-            ]
-            select_charactor = chara_col[0].selectbox(
-                " ",
-                options=charactor_options,
-                label_visibility="collapsed",
-            )
-
-            if chara_col[1].button("削除"):
-                ix = charactor_options.index(select_charactor)
-                st.session_state.tales["characters"]["others"].pop(ix)
-                st.rerun()
-
-        with st.form(" ", border=True):
             st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
             with st.expander("基本設定", expanded=True):
                 col1, col2, col3 = st.columns(3)
@@ -694,6 +656,11 @@ def create():
                             "appearance"
                         ],
                     )
+                    if st.button("キャラクターを追加"):
+                        st.session_state.tales["characters"]["others"].append(
+                            {"name": "", "appearance": ""}
+                        )
+                        st.rerun()
 
                 with chara_col2:
                     chara_num_list = range(
@@ -722,12 +689,13 @@ def create():
                                 ]["appearance"],
                                 key=f"chara_appearance{chara_num}",
                             )
+                    if st.button("削除"):
+                        st.session_state.tales["characters"]["others"].pop(chara_num)
+                        st.rerun()
 
             only_tale = st.toggle("テキストだけ作成する")
 
-            submit = st.form_submit_button("生成開始")
-
-        if submit:
+        if st.button("生成開始"):
             if st.session_state.tales["title"] or st.session_state.tales["description"]:
                 book_content = create_all(only_tale=only_tale)
 
@@ -748,14 +716,6 @@ def create():
         #     clear_session_state()
         view_edit(mode)
     else:
-        if ui.alert_dialog(
-            show=True,
-            title="イラスト生成",
-            description="イラストの生成に失敗しました。",
-            confirm_label="OK",
-            key="alert_dialog_image",
-        ):
-            st.toast("hello ")
         select_book, captions = image_select_menu(
             get_all_book_titles(
                 "story-user-data",

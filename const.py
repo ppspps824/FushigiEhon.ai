@@ -105,6 +105,9 @@ TALES_PROMPT = """
 ## 読者の年齢
 %%age_group_placeholder%%
 
+## 文章の構成
+%%sentence_structure_placeholder%%
+
 ## 注意事項
 - 指定された1ページの文字数以下で生成することを必ず守ってください。
 - 起承転結にわけて作成してください。
@@ -164,6 +167,9 @@ ONE_TALE_PROMPT = """
 
 ## 読者の年齢
 %%age_group_placeholder%%
+
+## 文章の構成
+%%sentence_structure_placeholder%%
 
 ## 前の内容
 %%pre_pages_info_placeholder%%

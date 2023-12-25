@@ -1,16 +1,17 @@
 import io
-from PIL import Image, ImageDraw, ImageFont
+import tempfile
+
+import numpy as np
 import streamlit as st
 from modules.s3 import s3_download
-from streamlit_image_select import image_select
-import numpy as np
 from moviepy.editor import (
-    concatenate_videoclips,
     AudioFileClip,
-    ImageClip,
     CompositeAudioClip,
+    ImageClip,
+    concatenate_videoclips,
 )
-import tempfile
+from PIL import Image, ImageDraw, ImageFont
+from streamlit_image_select import image_select
 
 
 # オーバーレイを表示
@@ -93,6 +94,7 @@ def create_text_img(text, width, height, font_size, margin=20):
     return im
 
 
+@st.cache_data(show_spinner=False)
 def create_movie_and_pdf(book_info):
     with st.spinner("読み込み中..."):
         title = book_info["tales"]["title"]
@@ -122,13 +124,15 @@ def create_movie_and_pdf(book_info):
 
         # エンディング画像の準備 (PIL.Image形式)
         end_image = Image.open("assets/header.png")
-        end_image = end_image.resize((end_image.width//3,end_image.height//3))
+        end_image = end_image.resize((end_image.width // 3, end_image.height // 3))
         end_dst = Image.new(
             "RGB",
             (1024, 512),
-            (255,255,255),
+            (255, 255, 255),
         )
-        end_dst.paste(end_image, (0+end_image.width//2, 256-end_image.height//2))
+        end_dst.paste(
+            end_image, (0 + end_image.width // 2, 256 - end_image.height // 2)
+        )
         np_end_image = np.array(end_dst)
         end_image_clip = ImageClip(np_end_image).set_duration(3)
 
@@ -136,7 +140,11 @@ def create_movie_and_pdf(book_info):
         result_images = []
         for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
             page_text_image = create_text_img(tale, 512, 512, font_size=32)
-            page_image = Image.open(io.BytesIO(image))
+            if image:
+                page_image = Image.open(io.BytesIO(image))
+            else:
+                page_image = Image.new("RGB", (512, 512), (255, 255, 255))
+
             page_image = page_image.resize((512, 512))
             dst = Image.new(
                 "RGB", (page_image.width + page_text_image.width, page_image.height)
@@ -147,6 +155,7 @@ def create_movie_and_pdf(book_info):
             else:
                 dst.paste(page_text_image, (0, 0))
                 dst.paste(page_image, (page_text_image.width, 0))
+
             result_images.append(dst)
 
             # PIL Imageをnumpy arrayに変換
@@ -156,20 +165,27 @@ def create_movie_and_pdf(book_info):
             img_clip = ImageClip(np_image)  # fpsは適宜調整してください
 
             # 音声バイトデータからAudioFileClipを作成
-            with tempfile.NamedTemporaryFile(
-                delete=False, suffix=".mp3"
-            ) as temp_audio:  # 適切な拡張子を使用してください
-                temp_audio.write(audio)
-                temp_audio.seek(0)  # ファイルの先頭にシーク
+            if audio:
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".mp3"
+                ) as temp_audio:  # 適切な拡張子を使用してください
+                    temp_audio.write(audio)
+                    temp_audio.seek(0)  # ファイルの先頭にシーク
 
-                # 一時ファイルのパスを使用してAudioFileClipを作成
-                audio_clip = AudioFileClip(temp_audio.name)
+                    # 一時ファイルのパスを使用してAudioFileClipを作成
+                    audio_clip = AudioFileClip(temp_audio.name)
 
+                    # 画像の表示時間を音声の長さに設定
+                    img_clip = img_clip.set_duration(audio_clip.duration + 1)
+
+                    # 画像クリップに音声を設定
+                    img_clip = img_clip.set_audio(audio_clip)
+
+                    # クリップをリストに追加
+                    clips.append(img_clip)
+            else:
                 # 画像の表示時間を音声の長さに設定
-                img_clip = img_clip.set_duration(audio_clip.duration + 1)
-
-                # 画像クリップに音声を設定
-                img_clip = img_clip.set_audio(audio_clip)
+                img_clip = img_clip.set_duration(5)
 
                 # クリップをリストに追加
                 clips.append(img_clip)
@@ -188,11 +204,14 @@ def create_movie_and_pdf(book_info):
         bgm_clip = bgm_clip.volumex(0.05)
         bgm_clip = bgm_clip.audio_fadeout(3)
 
-        # BGMと既存の音声を混ぜる
-        mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
+        if original_audio:
+            # BGMと既存の音声を混ぜる
+            mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
 
-        # 最終的な動画に混合された音声を設定
-        final_clip.audio = mixed_audio
+            # 最終的な動画に混合された音声を設定
+            final_clip.audio = mixed_audio
+        else:
+            final_clip.audio = bgm_clip
 
         # 一時的なビデオファイルを作成するためにtempfileを使用
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
@@ -214,7 +233,7 @@ def create_movie_and_pdf(book_info):
             pdf_bytes, format="PDF", save_all=True, append_images=result_images
         )
 
-    return video_data,pdf_bytes
+    return video_data, pdf_bytes
 
 
 def image_select_menu(titles, label):

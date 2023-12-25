@@ -7,7 +7,6 @@ import const
 import openai
 import requests
 import streamlit as st
-import streamlit_shadcn_ui as ui
 from PIL import Image
 
 
@@ -56,12 +55,10 @@ def create_tales(
 
     if tales:
         st.write(tales)
-
         return tales
     else:
-        st.info("文章の生成に失敗しました。")
-
-        st.stop()
+        st.error("文章の生成に失敗しました。")
+        return ""
 
 
 def post_image_api(prompt, size):
@@ -84,14 +81,8 @@ def post_image_api(prompt, size):
             break
         except Exception as e:
             print(e.args)
-            if ui.alert_dialog(
-                show=True,
-                title="イラスト生成",
-                description="イラストの生成に失敗しました。",
-                confirm_label="OK",
-                key="alert_dialog_image",
-            ):
-                st.rerun()
+            st.error("イラストの生成に失敗しました。")
+            return ""
 
     if image_url:
         with urllib.request.urlopen(image_url) as web_file:
@@ -106,8 +97,7 @@ def post_image_api(prompt, size):
         return buffer.getvalue()
     else:
         st.error("イラストの生成に失敗しました。")
-
-        st.stop()
+        return ""
 
 
 def create_images(tales):
@@ -130,7 +120,6 @@ def create_images(tales):
     except Exception as e:
         print(e.args)
         st.error("イラストの生成に失敗しました。")
-        st.stop()
 
     pages = len(tales["content"])
     for num, tale in enumerate(tales["content"]):
@@ -149,7 +138,6 @@ def create_images(tales):
             except Exception as e:
                 print(e.args)
                 st.error("イラストの生成に失敗しました。")
-                st.stop()
 
     return images
 
