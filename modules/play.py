@@ -41,7 +41,7 @@ def play():
             st.video(video_data)
 
             st.download_button(
-                label="PDFとしてダウンロード",
+                label="PDFをダウンロード",
                 data=pdf_data,
                 file_name=f"{title}.pdf",
                 mime="application/pdf",
