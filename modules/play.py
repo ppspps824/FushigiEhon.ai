@@ -33,37 +33,36 @@ def play():
 
     if selectedImageUrl:
         select_book = imageUrls.index(selectedImageUrl) + 1
-        with st.spinner("よみこみちゅう..."):
-            book_info = get_book_data(
-                "story-user-data",
-                st.session_state.user_id,
-                captions[select_book - 1],
-            )
+        book_info = get_book_data(
+            "story-user-data",
+            st.session_state.user_id,
+            captions[select_book - 1],
+        )
 
-            title = book_info["tales"]["title"]
+        title = book_info["tales"]["title"]
 
-            video_data = s3_download(
-                "story-user-data",
-                f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
-            )
+        video_data = s3_download(
+            "story-user-data",
+            f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
+        )
 
-            pdf_data = s3_download(
-                "story-user-data",
-                f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
-            )
-            st.video(video_data)
+        pdf_data = s3_download(
+            "story-user-data",
+            f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
+        )
+        st.video(video_data)
 
-            # components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
+        # components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
 
-            st.download_button(
-                label="動画を保存",
-                data=video_data,
-                file_name=f"{title}.mp4",
-                mime="video/mp4",
-            )
-            st.download_button(
-                label="PDFを保存",
-                data=pdf_data,
-                file_name=f"{title}.pdf",
-                mime="application/pdf",
-            )
+        st.download_button(
+            label="動画を保存",
+            data=video_data,
+            file_name=f"{title}.mp4",
+            mime="video/mp4",
+        )
+        st.download_button(
+            label="PDFを保存",
+            data=pdf_data,
+            file_name=f"{title}.pdf",
+            mime="application/pdf",
+        )
