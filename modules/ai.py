@@ -146,11 +146,8 @@ def create_images(tales):
 def create_audios(tales):
     audios = []
     for num, tale in enumerate(tales["content"]):
-        st.markdown('<div class="overlay">', unsafe_allow_html=True)
-        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner(f'生成中...(音声) {num+1}/{len(tales["content"])}'):
             audios.append(post_audio_api(tale))
-        st.markdown("</div>", unsafe_allow_html=True)
 
     return audios
 
@@ -162,7 +159,7 @@ def post_audio_api(tale):
         input=tale,
     )
 
-    return io.BytesIO(response.content)
+    return response.content
 
 
 def image_upgrade(image, title, description, theme, characters, tale):
@@ -266,11 +263,8 @@ def create_one_tale(num):
 
 
 def create_one_audio(num, tale):
-    st.markdown('<div class="overlay">', unsafe_allow_html=True)
-    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(音声)"):
         st.session_state.audios[num] = post_audio_api(tale)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def create_one_image(num, tale):
