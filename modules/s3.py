@@ -79,11 +79,17 @@ def s3_delete_folder(bucket_name, prefix):
         print(f"フォルダ削除エラー: {e}")
 
 
-def get_book_data(bucket_name, user_id, title):
+def get_book_data(bucket_name, user_id, title, is_guest):
     with st.spinner("よみこみちゅう..."):
-        base_path = base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
-            "%%title%%", title
-        )
+        if is_guest:
+            base_path = base_path = const.BASE_PATH.replace(
+                "%%user_id%%", "guest"
+            ).replace("%%title%%", title)
+        else:
+            base_path = base_path = const.BASE_PATH.replace(
+                "%%user_id%%", user_id
+            ).replace("%%title%%", title)
+
         book_content = {
             "create_date": "",
             "tales": {},
@@ -93,7 +99,8 @@ def get_book_data(bucket_name, user_id, title):
 
         # tales.jsonの取得
         tales_path = base_path + "tales.json"
-        book_content["tales"] = json.loads(s3_download(bucket_name, tales_path))
+        result_json = s3_download(bucket_name, tales_path)
+        book_content["tales"] = json.loads(result_json)
 
         # タイトル画像の取得
         title_image_path = base_path + "images/title.jpeg"

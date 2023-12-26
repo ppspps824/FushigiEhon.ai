@@ -31,7 +31,7 @@ def play():
         ),
         "guest",
     )
-    images += guest_images
+
     captions += guest_captions
 
     imageCarouselComponent = components.declare_component(
@@ -40,7 +40,16 @@ def play():
     imageUrls = [
         f"data:image/png;base64,{base64.b64encode(image).decode()}" for image in images
     ]
+    guest_imageUrls = [
+        f"data:image/png;base64,{base64.b64encode(image).decode()}"
+        for image in guest_images
+    ]
+
+    imageUrls += guest_imageUrls
+
     selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
+
+    is_guest = selectedImageUrl in guest_imageUrls
 
     if selectedImageUrl:
         select_book = imageUrls.index(selectedImageUrl) + 1
@@ -48,32 +57,39 @@ def play():
             "story-user-data",
             st.session_state.user_id,
             captions[select_book - 1],
+            is_guest=is_guest,
         )
 
         title = book_info["tales"]["title"]
 
         video_data = s3_download(
             "story-user-data",
-            f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
+            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.mp4'
+            if is_guest
+            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
         )
 
         pdf_data = s3_download(
             "story-user-data",
-            f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
+            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.pdf'
+            if is_guest
+            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
         )
-        st.video(video_data)
+        if video_data:
+            st.video(video_data)
+            st.download_button(
+                label="動画を保存",
+                data=video_data,
+                file_name=f"{title}.mp4",
+                mime="video/mp4",
+            )
+        else:
+            st.error("データの読み込みに失敗しました。")
 
-        # components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
-
-        st.download_button(
-            label="動画を保存",
-            data=video_data,
-            file_name=f"{title}.mp4",
-            mime="video/mp4",
-        )
-        st.download_button(
-            label="PDFを保存",
-            data=pdf_data,
-            file_name=f"{title}.pdf",
-            mime="application/pdf",
-        )
+        if pdf_data:
+            st.download_button(
+                label="PDFを保存",
+                data=pdf_data,
+                file_name=f"{title}.pdf",
+                mime="application/pdf",
+            )
