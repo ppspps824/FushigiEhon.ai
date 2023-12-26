@@ -25,6 +25,7 @@ from modules.utils import (
     get_images,
     hide_overlay,
     show_overlay,
+    add_caption_transparent
 )
 
 # from streamlit_lottie import st_lottie_spinner
@@ -780,6 +781,9 @@ def create():
             imageCarouselComponent = components.declare_component(
                 "image-carousel-component", path="frontend/public"
             )
+
+            images = [add_caption_transparent(image,caption) for image,caption in zip(images,captions)]
+            
             imageUrls = [
                 f"data:image/png;base64,{base64.b64encode(image).decode()}"
                 for image in images

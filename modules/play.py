@@ -1,11 +1,10 @@
 import base64
 import io
-
 import const
 import streamlit as st
 import streamlit.components.v1 as components
 from modules.s3 import get_all_book_titles, get_book_data, s3_download
-from modules.utils import get_images
+from modules.utils import get_images,add_caption_transparent
 
 
 def pil_to_base64(image):
@@ -15,7 +14,7 @@ def pil_to_base64(image):
 
     return img_str
 
-
+    
 def play():
     images, captions = get_images(
         get_all_book_titles(
@@ -32,11 +31,15 @@ def play():
         "guest",
     )
 
-    captions += guest_captions
-
     imageCarouselComponent = components.declare_component(
         "image-carousel-component", path="frontend/public"
     )
+
+    images = [add_caption_transparent(image,caption) for image,caption in zip(images,captions)]
+    guest_images = [add_caption_transparent(image,caption) for image,caption in zip(guest_images,guest_captions)]
+
+    captions+=guest_captions
+
     imageUrls = [
         f"data:image/png;base64,{base64.b64encode(image).decode()}" for image in images
     ]
