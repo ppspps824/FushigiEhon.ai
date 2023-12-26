@@ -800,6 +800,7 @@ def create():
                         "story-user-data",
                         st.session_state.user_id,
                         caption,
+
                     )
                     st.session_state.tales = book_info["tales"]
                     st.session_state.images = book_info["images"]

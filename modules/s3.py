@@ -79,7 +79,7 @@ def s3_delete_folder(bucket_name, prefix):
         print(f"フォルダ削除エラー: {e}")
 
 
-def get_book_data(bucket_name, user_id, title, is_guest):
+def get_book_data(bucket_name, user_id, title, is_guest=False):
     with st.spinner("よみこみちゅう..."):
         if is_guest:
             base_path = base_path = const.BASE_PATH.replace(
