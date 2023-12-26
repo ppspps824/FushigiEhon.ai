@@ -55,6 +55,7 @@ def s3_download(bucket_name, key):
     except Exception as e:
         print("ダウンロードエラー", bucket_name, key)
         print(e)
+        st.cache_data.clear()
         return None
 
 
@@ -78,27 +79,30 @@ def s3_delete_folder(bucket_name, prefix):
 
 
 def get_book_data(bucket_name, user_id, title):
-    base_path = f"{user_id}/book_info/{title}/"
-    book_content = {
-        "create_date": "",
-        "tales": {},
-        "images": {"title": "", "content": []},
-        "audios": [],
-    }
+    with st.spinner("よみこみちゅう..."):
+        base_path = f"{user_id}/book_info/{title}/"
+        book_content = {
+            "create_date": "",
+            "tales": {},
+            "images": {"title": "", "content": []},
+            "audios": [],
+        }
 
-    # tales.jsonの取得
-    tales_path = base_path + "tales.json"
-    book_content["tales"] = json.loads(s3_download(bucket_name, tales_path))
+        # tales.jsonの取得
+        tales_path = base_path + "tales.json"
+        book_content["tales"] = json.loads(s3_download(bucket_name, tales_path))
 
-    # タイトル画像の取得
-    title_image_path = base_path + "images/title.jpeg"
-    book_content["images"]["title"] = s3_download(bucket_name, title_image_path)
+        # タイトル画像の取得
+        title_image_path = base_path + "images/title.jpeg"
+        book_content["images"]["title"] = s3_download(bucket_name, title_image_path)
 
-    # ページ毎の画像とオーディオの取得
-    for ix in range(len(book_content["tales"]["content"])):
-        image_path = base_path + f"images/image_{ix}.jpeg"
-        audio_path = base_path + f"audios/audio_{ix}.mp3"
-        book_content["images"]["content"].append(s3_download(bucket_name, image_path))
-        book_content["audios"].append(s3_download(bucket_name, audio_path))
+        # ページ毎の画像とオーディオの取得
+        for ix in range(len(book_content["tales"]["content"])):
+            image_path = base_path + f"images/image_{ix}.jpeg"
+            audio_path = base_path + f"audios/audio_{ix}.mp3"
+            book_content["images"]["content"].append(
+                s3_download(bucket_name, image_path)
+            )
+            book_content["audios"].append(s3_download(bucket_name, audio_path))
 
     return book_content
