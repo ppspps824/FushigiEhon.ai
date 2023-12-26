@@ -172,7 +172,7 @@ def create_movie_and_pdf(book_info):
         # 音声バイトデータからAudioFileClipを作成
         if audio:
             with tempfile.NamedTemporaryFile(
-                delete=False, suffix=".mp3"
+                delete=True, suffix=".mp3"
             ) as temp_audio:  # 適切な拡張子を使用してください
                 temp_audio.write(audio)
                 temp_audio.seek(0)  # ファイルの先頭にシーク
@@ -222,7 +222,7 @@ def create_movie_and_pdf(book_info):
         final_clip.audio = bgm_clip
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
+    with tempfile.NamedTemporaryFile(delete=True, suffix=".mp4") as temp_video:
         final_clip.write_videofile(
             temp_video.name,  # write_videofileに一時ファイル名を提供
             fps=24,
