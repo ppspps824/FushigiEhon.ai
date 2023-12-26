@@ -103,145 +103,140 @@ def create_text_img(text, width, height, font_size, margin=20):
 
 # @st.cache_data(show_spinner=False)
 def create_movie_and_pdf(book_info):
-    with st.spinner("動画とPDFを作成中..."):
-        title = book_info["tales"]["title"]
-        title_image_bytes = book_info["images"]["title"]
-        tales = book_info["tales"]["content"]
-        images = book_info["images"]["content"]
-        audios = book_info["audios"]
+    title = book_info["tales"]["title"]
+    title_image_bytes = book_info["images"]["title"]
+    tales = book_info["tales"]["content"]
+    images = book_info["images"]["content"]
+    audios = book_info["audios"]
 
-        title_text_img = create_text_img(title, 512, 512, font_size=42)
-        if title_image_bytes:
-            title_image = Image.open(io.BytesIO(title_image_bytes))
-            title_image = title_image.resize((512, 512))
+    title_text_img = create_text_img(title, 512, 512, font_size=42)
+    if title_image_bytes:
+        title_image = Image.open(io.BytesIO(title_image_bytes))
+        title_image = title_image.resize((512, 512))
+    else:
+        title_image = Image.new("RGB", (512, 512), "#fafafa")
+
+    title_dst = Image.new(
+        "RGB",
+        (title_image.width + title_text_img.width, title_image.height),
+        "#fafafa",
+    )
+    title_dst.paste(title_image, (0, 0))
+    title_dst.paste(title_text_img, (title_image.width, 0))
+
+    np_title_image = np.array(title_dst)
+
+    # タイトル画像の準備 (PIL.Image形式)
+    title_image_clip = ImageClip(np_title_image).set_duration(3)
+
+    # エンディング画像の準備 (PIL.Image形式)
+    end_image = Image.open("assets/header.png")
+    end_image = end_image.resize((end_image.width // 3, end_image.height // 3))
+    end_dst = Image.new(
+        "RGB",
+        (1024, 512),
+        "#fafafa",
+    )
+    end_dst.paste(end_image, (0 + end_image.width // 2, 256 - end_image.height // 2))
+    np_end_image = np.array(end_dst)
+    end_image_clip = ImageClip(np_end_image).set_duration(3)
+
+    clips = []
+    result_images = []
+    for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
+        page_text_image = create_text_img(tale, 512, 512, font_size=32)
+        if image:
+            page_image = Image.open(io.BytesIO(image))
         else:
-            title_image = Image.new("RGB", (512, 512), "#fafafa")
+            page_image = Image.new("RGB", (512, 512), "#fafafa")
 
-        title_dst = Image.new(
-            "RGB",
-            (title_image.width + title_text_img.width, title_image.height),
-            "#fafafa",
+        page_image = page_image.resize((512, 512))
+        dst = Image.new(
+            "RGB", (page_image.width + page_text_image.width, page_image.height)
         )
-        title_dst.paste(title_image, (0, 0))
-        title_dst.paste(title_text_img, (title_image.width, 0))
+        if num % 2 == 1:
+            dst.paste(page_image, (0, 0))
+            dst.paste(page_text_image, (page_image.width, 0))
+        else:
+            dst.paste(page_text_image, (0, 0))
+            dst.paste(page_image, (page_text_image.width, 0))
 
-        np_title_image = np.array(title_dst)
+        result_images.append(dst)
 
-        # タイトル画像の準備 (PIL.Image形式)
-        title_image_clip = ImageClip(np_title_image).set_duration(3)
+        # PIL Imageをnumpy arrayに変換
+        np_image = np.array(dst)
 
-        # エンディング画像の準備 (PIL.Image形式)
-        end_image = Image.open("assets/header.png")
-        end_image = end_image.resize((end_image.width // 3, end_image.height // 3))
-        end_dst = Image.new(
-            "RGB",
-            (1024, 512),
-            "#fafafa",
-        )
-        end_dst.paste(
-            end_image, (0 + end_image.width // 2, 256 - end_image.height // 2)
-        )
-        np_end_image = np.array(end_dst)
-        end_image_clip = ImageClip(np_end_image).set_duration(3)
+        # 画像クリップを作成
+        img_clip = ImageClip(np_image)  # fpsは適宜調整してください
 
-        clips = []
-        result_images = []
-        for num, (tale, image, audio) in enumerate(zip(tales, images, audios)):
-            page_text_image = create_text_img(tale, 512, 512, font_size=32)
-            if image:
-                page_image = Image.open(io.BytesIO(image))
-            else:
-                page_image = Image.new("RGB", (512, 512), "#fafafa")
+        # 音声バイトデータからAudioFileClipを作成
+        if audio:
+            with tempfile.NamedTemporaryFile(
+                delete=False, suffix=".mp3"
+            ) as temp_audio:  # 適切な拡張子を使用してください
+                temp_audio.write(audio)
+                temp_audio.seek(0)  # ファイルの先頭にシーク
 
-            page_image = page_image.resize((512, 512))
-            dst = Image.new(
-                "RGB", (page_image.width + page_text_image.width, page_image.height)
-            )
-            if num % 2 == 1:
-                dst.paste(page_image, (0, 0))
-                dst.paste(page_text_image, (page_image.width, 0))
-            else:
-                dst.paste(page_text_image, (0, 0))
-                dst.paste(page_image, (page_text_image.width, 0))
+                # 一時ファイルのパスを使用してAudioFileClipを作成
+                audio_clip = AudioFileClip(temp_audio.name)
 
-            result_images.append(dst)
-
-            # PIL Imageをnumpy arrayに変換
-            np_image = np.array(dst)
-
-            # 画像クリップを作成
-            img_clip = ImageClip(np_image)  # fpsは適宜調整してください
-
-            # 音声バイトデータからAudioFileClipを作成
-            if audio:
-                with tempfile.NamedTemporaryFile(
-                    delete=False, suffix=".mp3"
-                ) as temp_audio:  # 適切な拡張子を使用してください
-                    temp_audio.write(audio)
-                    temp_audio.seek(0)  # ファイルの先頭にシーク
-
-                    # 一時ファイルのパスを使用してAudioFileClipを作成
-                    audio_clip = AudioFileClip(temp_audio.name)
-
-                    # 画像の表示時間を音声の長さに設定
-                    img_clip = img_clip.set_duration(audio_clip.duration + 1)
-
-                    # 画像クリップに音声を設定
-                    img_clip = img_clip.set_audio(audio_clip)
-
-                    # クリップをリストに追加
-                    clips.append(img_clip)
-            else:
                 # 画像の表示時間を音声の長さに設定
-                img_clip = img_clip.set_duration(5)
+                img_clip = img_clip.set_duration(audio_clip.duration + 1)
+
+                # 画像クリップに音声を設定
+                img_clip = img_clip.set_audio(audio_clip)
 
                 # クリップをリストに追加
                 clips.append(img_clip)
-
-        bgm_clip = AudioFileClip("assets/お昼のうた.mp3")
-
-        # すべてのクリップを結合
-        final_clip = concatenate_videoclips(
-            [title_image_clip] + clips + [end_image_clip], method="compose"
-        )
-
-        original_audio = final_clip.audio
-
-        # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
-        bgm_clip = bgm_clip.set_duration(final_clip.duration)
-        bgm_clip = bgm_clip.volumex(0.05)
-        bgm_clip = bgm_clip.audio_fadeout(3)
-
-        if original_audio:
-            # BGMと既存の音声を混ぜる
-            mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
-
-            # 最終的な動画に混合された音声を設定
-            final_clip.audio = mixed_audio
         else:
-            final_clip.audio = bgm_clip
+            # 画像の表示時間を音声の長さに設定
+            img_clip = img_clip.set_duration(5)
 
-        # 一時的なビデオファイルを作成するためにtempfileを使用
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
-            final_clip.write_videofile(
-                temp_video.name,  # write_videofileに一時ファイル名を提供
-                fps=24,
-                codec="libx264",
-                audio_codec="aac",
-                temp_audiofile="temp-audio.m4a",
-                remove_temp=True,
-            )
+            # クリップをリストに追加
+            clips.append(img_clip)
 
-            # ファイルからビデオを読み込んで表示
-            temp_video.seek(0)
-            video_data = temp_video.read()
+    bgm_clip = AudioFileClip("assets/お昼のうた.mp3")
 
-        pdf_io = io.BytesIO()
-        title_image.save(
-            pdf_io, format="PDF", save_all=True, append_images=result_images
+    # すべてのクリップを結合
+    final_clip = concatenate_videoclips(
+        [title_image_clip] + clips + [end_image_clip], method="compose"
+    )
+
+    original_audio = final_clip.audio
+
+    # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
+    bgm_clip = bgm_clip.set_duration(final_clip.duration)
+    bgm_clip = bgm_clip.volumex(0.05)
+    bgm_clip = bgm_clip.audio_fadeout(3)
+
+    if original_audio:
+        # BGMと既存の音声を混ぜる
+        mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
+
+        # 最終的な動画に混合された音声を設定
+        final_clip.audio = mixed_audio
+    else:
+        final_clip.audio = bgm_clip
+
+    # 一時的なビデオファイルを作成するためにtempfileを使用
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as temp_video:
+        final_clip.write_videofile(
+            temp_video.name,  # write_videofileに一時ファイル名を提供
+            fps=24,
+            codec="libx264",
+            audio_codec="aac",
+            temp_audiofile="temp-audio.m4a",
+            remove_temp=True,
         )
 
-        pdf_data = pdf_io.getvalue()
+        # ファイルからビデオを読み込んで表示
+        temp_video.seek(0)
+        video_data = temp_video.read()
+
+    pdf_io = io.BytesIO()
+    title_image.save(pdf_io, format="PDF", save_all=True, append_images=result_images)
+
+    pdf_data = pdf_io.getvalue()
 
     return video_data, pdf_data
 
