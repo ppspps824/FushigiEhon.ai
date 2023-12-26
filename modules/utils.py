@@ -145,7 +145,7 @@ def create_movie_and_pdf(book_info,bgm):
         (1024, 512),
         "#fafafa",
     )
-    end_dst.paste(end_image, (0 + end_image.width // 2, 256 - end_image.height // 2))
+    end_dst.paste(end_image, (0 + end_image.width // 3, 256 - end_image.height // 3))
     np_end_image = np.array(end_dst)
     end_image_clip = ImageClip(np_end_image).set_duration(3)
 
