@@ -57,10 +57,18 @@ def get_images(titles):
             image = Image.open(io.BytesIO(data))
             # 画像のリサイズ
             resized_image = image.resize((256, 256))
-            images.append(resized_image)
+
+            img_bytes = io.BytesIO()
+            resized_image.save(img_bytes, format="PNG")
+            img_bytes = img_bytes.getvalue()
+
+            images.append(img_bytes)
         else:
             images.append("assets/noimage.png")
-    return images, all_image
+
+    captions = list(all_image.keys())
+
+    return images, captions
 
 
 def create_text_img(text, width, height, font_size, margin=20):
@@ -244,25 +252,21 @@ def create_movie_and_pdf(book_info):
     return video_data, pdf_data
 
 
-def image_select_menu(titles, label):
-    images, all_image = get_images(titles)
-    captions = list(all_image.keys())
-
+def image_select_menu(images, captions):
     if images:
         select_book = (
             image_select(
-                label=label,
+                label=None,
                 images=images,
-                captions=titles,
+                captions=captions,
                 return_value="index",
                 index=-1,
                 use_container_width=False,
-                key=label,
             )
             + 1
         )
 
-        return select_book, captions
+        return select_book
     else:
         st.info(
             "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"

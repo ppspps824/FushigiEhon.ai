@@ -3,8 +3,9 @@ import io
 
 import const
 import streamlit as st
+import streamlit.components.v1 as components
 from modules.s3 import get_all_book_titles, get_book_data, s3_download
-from modules.utils import image_select_menu
+from modules.utils import get_images
 
 
 def pil_to_base64(image):
@@ -16,15 +17,22 @@ def pil_to_base64(image):
 
 
 def play():
-    select_book, captions = image_select_menu(
+    images, captions = get_images(
         get_all_book_titles(
             "story-user-data",
             const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
-        ),
-        "",
+        )
     )
+    imageCarouselComponent = components.declare_component(
+        "image-carousel-component", path="frontend/public"
+    )
+    imageUrls = [
+        f"data:image/png;base64,{base64.b64encode(image).decode()}" for image in images
+    ]
+    selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
 
-    if select_book:
+    if selectedImageUrl:
+        select_book = imageUrls.index(selectedImageUrl) + 1
         with st.spinner("よみこみちゅう..."):
             book_info = get_book_data(
                 "story-user-data",

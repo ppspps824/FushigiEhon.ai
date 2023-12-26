@@ -1,9 +1,11 @@
+import base64
 import datetime
 import json
 
 import const
 import pytz
 import streamlit as st
+import streamlit.components.v1 as components
 import streamlit_antd_components as sac
 import streamlit_shadcn_ui as ui
 from modules.ai import (
@@ -20,8 +22,8 @@ from modules.ai import (
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
 from modules.utils import (
     create_movie_and_pdf,
+    get_images,
     hide_overlay,
-    image_select_menu,
     show_overlay,
 )
 
@@ -105,9 +107,15 @@ def view_edit():
                     st.rerun()
 
             with chara_col2:
+                if not st.session_state.tales["characters"].get("others"):
+                    st.session_state.tales["characters"]["others"] = [
+                        {"name": "", "appearance": ""}
+                    ]
+
                 chara_num_list = range(
                     len(st.session_state.tales["characters"]["others"])
                 )
+
                 chara_tabs = st.tabs([str(num + 1) for num in chara_num_list])
                 for chara_num in chara_num_list:
                     with chara_tabs[chara_num]:
@@ -748,14 +756,23 @@ def create():
     elif mode == "いちからつくる":
         view_edit()
     else:
-        select_book, captions = image_select_menu(
+        images, captions = get_images(
             get_all_book_titles(
                 "story-user-data",
                 const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
-            ),
-            "つくりなおす",
+            )
         )
-        if select_book:
+        imageCarouselComponent = components.declare_component(
+            "image-carousel-component", path="frontend/public"
+        )
+        imageUrls = [
+            f"data:image/png;base64,{base64.b64encode(image).decode()}"
+            for image in images
+        ]
+        selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
+
+        if selectedImageUrl:
+            select_book = imageUrls.index(selectedImageUrl) + 1
             try:
                 caption = captions[select_book - 1]
             except:
