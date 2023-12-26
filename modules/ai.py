@@ -26,9 +26,9 @@ def create_tales(
     characters,
     theme,
     age_group,
+    number_of_pages,
     characters_per_page,
     character_set,
-    age,
     sentence_structure,
 ):
     tales = ""
@@ -39,9 +39,9 @@ def create_tales(
         .replace("%%theme_placeholder%%", theme)
         .replace("%%age_group_placeholder%%", age_group)
         .replace("%%sentence_structure_placeholder%%", sentence_structure)
+        .replace("%%number_of_pages_placeholder%%", number_of_pages)
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%character_set_placeholder%%", character_set)
-        .replace("%%age_placeholder%%", age)
     )
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
@@ -226,7 +226,7 @@ def create_one_tale(num):
             )
             .replace(
                 "%%number_of_pages_placeholder%%",
-                str(num),
+                st.session_state.tales["number_of_pages"],
             )
             .replace(
                 "%%character_set_placeholder%%",

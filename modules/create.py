@@ -570,15 +570,17 @@ def create_all(only_tale=False, ignore_tale=False):
         pass
     else:
         st.session_state.tales = create_tales(
-            st.session_state.tales["title"],
-            st.session_state.tales["description"],
-            json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
-            st.session_state.tales["theme"],
-            str(st.session_state.tales["age_group"]),
-            str(st.session_state.tales["characters_per_page"]),
-            st.session_state.tales["character_set"],
-            st.session_state.tales["age_group"],
-            st.session_state.tales["sentence_structure"],
+            title=st.session_state.tales["title"],
+            description=st.session_state.tales["description"],
+            characters=json.dumps(
+                st.session_state.tales["characters"], ensure_ascii=False
+            ),
+            theme=st.session_state.tales["theme"],
+            number_of_pages=str(st.session_state.tales["number_of_pages"]),
+            age_group=str(st.session_state.tales["age_group"]),
+            characters_per_page=str(st.session_state.tales["characters_per_page"]),
+            character_set=st.session_state.tales["character_set"],
+            sentence_structure=st.session_state.tales["sentence_structure"],
         )
 
     if only_tale:
