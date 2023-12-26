@@ -41,13 +41,7 @@ def play():
             st.video(video_data)
 
             st.download_button(
-                label="Download data as mp4",
-                data=video_data,
-                file_name=f"{title}.mp4",
-                mime="video/mp4",
-            )
-            st.download_button(
-                label="Download data as PDF",
+                label="PDFとしてダウンロード",
                 data=pdf_data,
                 file_name=f"{title}.pdf",
                 mime="application/pdf",
