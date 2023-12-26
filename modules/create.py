@@ -25,7 +25,7 @@ from modules.utils import (
     get_images,
     hide_overlay,
     show_overlay,
-    add_caption_transparent
+    add_caption_transparent,
 )
 
 # from streamlit_lottie import st_lottie_spinner
@@ -271,6 +271,17 @@ def view_edit():
                                 show_overlay()
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
+                                modify()
+                                hide_overlay()
+                                st.rerun()
+
+                            if st.button("音声を一括で生成する"):
+                                show_overlay()
+                                for num, tale in enumerate(
+                                    st.session_state.tales["content"]
+                                ):
+                                    create_one_audio(num, tale)
+
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -760,7 +771,10 @@ def create():
                 "image-carousel-component", path="frontend/public"
             )
 
-            images = [add_caption_transparent(image,caption) for image,caption in zip(images,captions)]
+            images = [
+                add_caption_transparent(image, caption)
+                for image, caption in zip(images, captions)
+            ]
 
             imageUrls = [
                 f"data:image/png;base64,{base64.b64encode(image).decode()}"
@@ -782,7 +796,6 @@ def create():
                         "story-user-data",
                         st.session_state.user_id,
                         caption,
-
                     )
                     st.session_state.tales = book_info["tales"]
                     st.session_state.images = book_info["images"]
