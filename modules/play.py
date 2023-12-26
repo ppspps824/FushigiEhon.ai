@@ -3,7 +3,6 @@ import io
 
 import const
 import streamlit as st
-import streamlit.components.v1 as components
 from modules.s3 import get_all_book_titles, get_book_data, s3_download
 from modules.utils import image_select_menu
 
@@ -46,7 +45,7 @@ def play():
             )
             st.video(video_data)
 
-            components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
+            # components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
 
             st.download_button(
                 label="動画を保存",
