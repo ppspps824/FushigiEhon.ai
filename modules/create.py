@@ -438,7 +438,10 @@ def view_edit():
 def delete_book(title):
     if title:
         bucket_name = "story-user-data"
-        s3_delete_folder(bucket_name, f"{st.session_state.user_id}/book_info/{title}")
+        s3_delete_folder(
+            bucket_name,
+            const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
+        )
         st.toast(f"{title}を削除しました")
     else:
         st.toast("タイトルを入力してください")

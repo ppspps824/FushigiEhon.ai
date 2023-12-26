@@ -73,6 +73,7 @@ def s3_delete_folder(bucket_name, prefix):
                 ]
             }
             result = s3_client.delete_objects(Bucket=bucket_name, Delete=delete_keys)
+            print(result)
 
     except Exception as e:
         print(f"フォルダ削除エラー: {e}")
