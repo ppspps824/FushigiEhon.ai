@@ -28,8 +28,8 @@ def play():
         get_all_book_titles(
             "story-user-data",
             const.TITLE_BASE_PATH.replace("%%user_id%%", "guest"),
-            "guest",
-        )
+        ),
+        "guest",
     )
     images += guest_images
     captions += guest_captions

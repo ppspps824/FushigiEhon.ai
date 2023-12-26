@@ -774,8 +774,8 @@ def create():
                     const.TITLE_BASE_PATH.replace(
                         "%%user_id%%", st.session_state.user_id
                     ),
-                    st.session_state.user_id,
-                )
+                ),
+                st.session_state.user_id,
             )
             imageCarouselComponent = components.declare_component(
                 "image-carousel-component", path="frontend/public"
