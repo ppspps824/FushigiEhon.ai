@@ -615,178 +615,192 @@ def create_all(only_tale=False, ignore_tale=False):
 
 
 def create():
-    mode = st.selectbox(
-        "あたらしくつくる",
-        options=["", "おまかせでつくる", "いちからつくる"],
-        on_change=clear_session_state,
-    )
-
-    if mode == "おまかせでつくる":
-        with st.container(border=True):
-            st.session_state.tales["title"] = st.text_input(
-                "タイトル",
-                value=st.session_state.tales["title"],
-                placeholder=const.RAMDOM_PLACEHOLDER,
-            )
-            with st.expander("こだわり設定"):
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.session_state.tales["number_of_pages"] = st.number_input(
-                        "ページ数",
-                        min_value=3,
-                        max_value=const.MAX_PAGE_NUM,
-                        value=st.session_state.tales["number_of_pages"],
-                    )
-                with col2:
-                    st.session_state.tales["sentence_structure"] = st.selectbox(
-                        "文章の構成",
-                        options=const.SENTENCE_STRUCTURE_SET,
-                        index=const.SENTENCE_STRUCTURE_SET.index(
-                            st.session_state.tales["sentence_structure"]
-                        ),
-                    )
-                with col3:
-                    st.session_state.tales["character_set"] = st.selectbox(
-                        "使用文字",
-                        options=const.CHARACTER_SET,
-                        index=const.CHARACTER_SET.index(
-                            st.session_state.tales["character_set"]
-                        ),
-                    )
-                with col4:
-                    st.session_state.tales["age_group"] = st.selectbox(
-                        "対象年齢",
-                        options=const.AGE_GROUP,
-                        index=const.AGE_GROUP.index(
-                            st.session_state.tales["age_group"]
-                        ),
-                    )
-                title_col1, title_col2 = st.columns([2, 4])
-                st.session_state.tales["theme"] = title_col1.text_area(
-                    "テーマ・メッセージ",
-                    value=st.session_state.tales["theme"],
-                    placeholder=const.RAMDOM_PLACEHOLDER,
-                )
-                st.session_state.tales["description"] = title_col2.text_area(
-                    "設定やあらすじ",
-                    value=st.session_state.tales["description"],
-                    placeholder=const.RAMDOM_PLACEHOLDER,
-                )
-                with st.container(border=True):
-                    st.caption("キャラクター")
-                    chara_col1, chara_col2 = st.columns(2)
-                    with chara_col1:
-                        st.session_state.tales["characters"]["lead"][
-                            "name"
-                        ] = st.text_input(
-                            "主人公の名前",
-                            placeholder=const.RAMDOM_PLACEHOLDER,
-                            value=st.session_state.tales["characters"]["lead"]["name"],
-                        )
-                        st.session_state.tales["characters"]["lead"][
-                            "appearance"
-                        ] = st.text_area(
-                            "主人公の見た目",
-                            placeholder=const.RAMDOM_PLACEHOLDER,
-                            value=st.session_state.tales["characters"]["lead"][
-                                "appearance"
-                            ],
-                        )
-                        if st.button("キャラクターを追加"):
-                            st.session_state.tales["characters"]["others"].append(
-                                {"name": "", "appearance": ""}
-                            )
-                            st.rerun()
-
-                    with chara_col2:
-                        chara_num_list = range(
-                            len(st.session_state.tales["characters"]["others"])
-                        )
-                        chara_tabs = st.tabs([str(num + 1) for num in chara_num_list])
-                        for chara_num in chara_num_list:
-                            with chara_tabs[chara_num]:
-                                st.session_state.tales["characters"]["others"][
-                                    chara_num
-                                ]["name"] = st.text_input(
-                                    "名前",
-                                    placeholder=const.RAMDOM_PLACEHOLDER,
-                                    value=st.session_state.tales["characters"][
-                                        "others"
-                                    ][chara_num]["name"],
-                                    key=f"chara_name{chara_num}",
-                                )
-                                st.session_state.tales["characters"]["others"][
-                                    chara_num
-                                ]["appearance"] = st.text_area(
-                                    "見た目",
-                                    placeholder=const.RAMDOM_PLACEHOLDER,
-                                    value=st.session_state.tales["characters"][
-                                        "others"
-                                    ][chara_num]["appearance"],
-                                    key=f"chara_appearance{chara_num}",
-                                )
-                        if st.button("削除"):
-                            st.session_state.tales["characters"]["others"].pop(
-                                chara_num
-                            )
-                            st.rerun()
-
-            only_tale = st.toggle("テキストだけ作成する")
-
-            submit = st.button("生成開始")
-
-        if submit:
-            if st.session_state.tales["title"] or st.session_state.tales["description"]:
-                show_overlay()
-                book_content = create_all(only_tale=only_tale)
-
-                save_book(book_content, st.session_state.tales["title"])
-
-                hide_overlay()
-
-                try:
-                    st.image(book_content["images"]["title"], use_column_width="auto")
-                except:
-                    st.image("assets/noimage.png", use_column_width="auto")
-                st.write(book_content["tales"]["description"])
-
-            else:
-                st.toast("タイトルかあらすじを内容を入力してください。")
-
-    elif mode == "いちからつくる":
-        view_edit()
+    if st.session_state.is_guest:
+        st.info("ログイン後にご利用いただけます。")
     else:
-        images, captions = get_images(
-            get_all_book_titles(
-                "story-user-data",
-                const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
-            )
+        mode = st.selectbox(
+            "あたらしくつくる",
+            options=["", "おまかせでつくる", "いちからつくる"],
+            on_change=clear_session_state,
         )
-        imageCarouselComponent = components.declare_component(
-            "image-carousel-component", path="frontend/public"
-        )
-        imageUrls = [
-            f"data:image/png;base64,{base64.b64encode(image).decode()}"
-            for image in images
-        ]
-        selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
 
-        if selectedImageUrl:
-            select_book = imageUrls.index(selectedImageUrl) + 1
-            try:
-                caption = captions[select_book - 1]
-            except:
-                caption = captions[0]
-            if (
-                st.session_state.not_modify
-                or st.session_state.tales["title"] != caption
-            ):
-                book_info = get_book_data(
-                    "story-user-data",
-                    st.session_state.user_id,
-                    caption,
+        if mode == "おまかせでつくる":
+            with st.container(border=True):
+                st.session_state.tales["title"] = st.text_input(
+                    "タイトル",
+                    value=st.session_state.tales["title"],
+                    placeholder=const.RAMDOM_PLACEHOLDER,
                 )
-                st.session_state.tales = book_info["tales"]
-                st.session_state.images = book_info["images"]
-                st.session_state.audios = book_info["audios"]
+                with st.expander("こだわり設定"):
+                    col1, col2, col3, col4 = st.columns(4)
+                    with col1:
+                        st.session_state.tales["number_of_pages"] = st.number_input(
+                            "ページ数",
+                            min_value=3,
+                            max_value=const.MAX_PAGE_NUM,
+                            value=st.session_state.tales["number_of_pages"],
+                        )
+                    with col2:
+                        st.session_state.tales["sentence_structure"] = st.selectbox(
+                            "文章の構成",
+                            options=const.SENTENCE_STRUCTURE_SET,
+                            index=const.SENTENCE_STRUCTURE_SET.index(
+                                st.session_state.tales["sentence_structure"]
+                            ),
+                        )
+                    with col3:
+                        st.session_state.tales["character_set"] = st.selectbox(
+                            "使用文字",
+                            options=const.CHARACTER_SET,
+                            index=const.CHARACTER_SET.index(
+                                st.session_state.tales["character_set"]
+                            ),
+                        )
+                    with col4:
+                        st.session_state.tales["age_group"] = st.selectbox(
+                            "対象年齢",
+                            options=const.AGE_GROUP,
+                            index=const.AGE_GROUP.index(
+                                st.session_state.tales["age_group"]
+                            ),
+                        )
+                    title_col1, title_col2 = st.columns([2, 4])
+                    st.session_state.tales["theme"] = title_col1.text_area(
+                        "テーマ・メッセージ",
+                        value=st.session_state.tales["theme"],
+                        placeholder=const.RAMDOM_PLACEHOLDER,
+                    )
+                    st.session_state.tales["description"] = title_col2.text_area(
+                        "設定やあらすじ",
+                        value=st.session_state.tales["description"],
+                        placeholder=const.RAMDOM_PLACEHOLDER,
+                    )
+                    with st.container(border=True):
+                        st.caption("キャラクター")
+                        chara_col1, chara_col2 = st.columns(2)
+                        with chara_col1:
+                            st.session_state.tales["characters"]["lead"][
+                                "name"
+                            ] = st.text_input(
+                                "主人公の名前",
+                                placeholder=const.RAMDOM_PLACEHOLDER,
+                                value=st.session_state.tales["characters"]["lead"][
+                                    "name"
+                                ],
+                            )
+                            st.session_state.tales["characters"]["lead"][
+                                "appearance"
+                            ] = st.text_area(
+                                "主人公の見た目",
+                                placeholder=const.RAMDOM_PLACEHOLDER,
+                                value=st.session_state.tales["characters"]["lead"][
+                                    "appearance"
+                                ],
+                            )
+                            if st.button("キャラクターを追加"):
+                                st.session_state.tales["characters"]["others"].append(
+                                    {"name": "", "appearance": ""}
+                                )
+                                st.rerun()
+
+                        with chara_col2:
+                            chara_num_list = range(
+                                len(st.session_state.tales["characters"]["others"])
+                            )
+                            chara_tabs = st.tabs(
+                                [str(num + 1) for num in chara_num_list]
+                            )
+                            for chara_num in chara_num_list:
+                                with chara_tabs[chara_num]:
+                                    st.session_state.tales["characters"]["others"][
+                                        chara_num
+                                    ]["name"] = st.text_input(
+                                        "名前",
+                                        placeholder=const.RAMDOM_PLACEHOLDER,
+                                        value=st.session_state.tales["characters"][
+                                            "others"
+                                        ][chara_num]["name"],
+                                        key=f"chara_name{chara_num}",
+                                    )
+                                    st.session_state.tales["characters"]["others"][
+                                        chara_num
+                                    ]["appearance"] = st.text_area(
+                                        "見た目",
+                                        placeholder=const.RAMDOM_PLACEHOLDER,
+                                        value=st.session_state.tales["characters"][
+                                            "others"
+                                        ][chara_num]["appearance"],
+                                        key=f"chara_appearance{chara_num}",
+                                    )
+                            if st.button("削除"):
+                                st.session_state.tales["characters"]["others"].pop(
+                                    chara_num
+                                )
+                                st.rerun()
+
+                only_tale = st.toggle("テキストだけ作成する")
+
+                submit = st.button("生成開始")
+
+            if submit:
+                if (
+                    st.session_state.tales["title"]
+                    or st.session_state.tales["description"]
+                ):
+                    show_overlay()
+                    book_content = create_all(only_tale=only_tale)
+
+                    save_book(book_content, st.session_state.tales["title"])
+
+                    hide_overlay()
+
+                    try:
+                        st.image(
+                            book_content["images"]["title"], use_column_width="auto"
+                        )
+                    except:
+                        st.image("assets/noimage.png", use_column_width="auto")
+                    st.write(book_content["tales"]["description"])
+
+                else:
+                    st.toast("タイトルかあらすじを内容を入力してください。")
+
+        elif mode == "いちからつくる":
             view_edit()
+        else:
+            images, captions = get_images(
+                get_all_book_titles(
+                    "story-user-data",
+                    const.TITLE_BASE_PATH.replace(
+                        "%%user_id%%", st.session_state.user_id
+                    ),
+                )
+            )
+            imageCarouselComponent = components.declare_component(
+                "image-carousel-component", path="frontend/public"
+            )
+            imageUrls = [
+                f"data:image/png;base64,{base64.b64encode(image).decode()}"
+                for image in images
+            ]
+            selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
+
+            if selectedImageUrl:
+                select_book = imageUrls.index(selectedImageUrl) + 1
+                try:
+                    caption = captions[select_book - 1]
+                except:
+                    caption = captions[0]
+                if (
+                    st.session_state.not_modify
+                    or st.session_state.tales["title"] != caption
+                ):
+                    book_info = get_book_data(
+                        "story-user-data",
+                        st.session_state.user_id,
+                        caption,
+                    )
+                    st.session_state.tales = book_info["tales"]
+                    st.session_state.images = book_info["images"]
+                    st.session_state.audios = book_info["audios"]
+                view_edit()

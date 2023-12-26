@@ -8,9 +8,14 @@ from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form
 
 
+def guest_login():
+    st.session_state.is_guest = True
+
+
 def main():
-    if "login" not in st.session_state:
+    if "is_login" not in st.session_state:
         st.session_state.is_login = False
+        st.session_state.is_guest = False
         st.session_state.user_id = ""
         st.session_state.email = ""
         st.session_state.disable_audio = False
@@ -47,7 +52,11 @@ def main():
         st.session_state.text_model = "gpt-4-1106-preview"
         st.session_state.image_model = "dall-e-3"
 
-    layout = "wide" if st.session_state.is_login else "centered"
+    layout = (
+        "wide"
+        if any([st.session_state.is_login, st.session_state.is_guest])
+        else "centered"
+    )
 
     st.set_page_config(
         page_title="ふしぎえほん.ai",
@@ -66,20 +75,32 @@ def main():
         with title_cols[1]:
             st.image("assets/title.png")
 
-    session = login_form(
-        url=st.secrets["SUPABASE_URL"],
-        apiKey=st.secrets["SUPABASE_API_KEY"],
-        providers=["google", "twitter"],
-    )
-    if not session:
+    session = ""
+    if not st.session_state.is_guest:
+        session = login_form(
+            url=st.secrets["SUPABASE_URL"],
+            apiKey=st.secrets["SUPABASE_API_KEY"],
+            providers=["google", "twitter"],
+        )
+
+    guest_place = st.empty()
+    guest_place.button("ゲストログイン", on_click=guest_login, type="primary")
+
+    if all([not session, not st.session_state.is_guest]):
         return
 
     st.experimental_set_query_params(page=["success"])
     title_place.empty()
+    guest_place.empty()
 
     st.session_state.is_login = True
-    st.session_state.user_id = session["user"]["id"]
-    st.session_state.email = session["user"]["email"]
+
+    if st.session_state.is_guest:
+        st.session_state.user_id = "guest"
+        st.session_state.email = "ゲスト"
+    else:
+        st.session_state.user_id = session["user"]["id"]
+        st.session_state.email = session["user"]["email"]
 
     openai.api_key = st.secrets["OPEN_AI_KEY"]
 
