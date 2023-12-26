@@ -45,7 +45,13 @@ def play():
             components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
 
             st.download_button(
-                label="PDFをダウンロード",
+                label="動画を保存",
+                data=video_data,
+                file_name=f"{title}.mp4",
+                mime="video/mp4",
+            )
+            st.download_button(
+                label="PDFを保存",
                 data=pdf_data,
                 file_name=f"{title}.pdf",
                 mime="application/pdf",

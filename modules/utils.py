@@ -237,7 +237,7 @@ def create_movie_and_pdf(book_info):
         video_data = temp_video.read()
 
     pdf_io = io.BytesIO()
-    title_image.save(pdf_io, format="PDF", save_all=True, append_images=result_images)
+    title_dst.save(pdf_io, format="PDF", save_all=True, append_images=result_images)
 
     pdf_data = pdf_io.getvalue()
 
