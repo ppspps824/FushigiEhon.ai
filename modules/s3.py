@@ -45,6 +45,7 @@ def s3_upload(bucket_name, file_data, key):
         print(f"アップロードエラー: {e.args}")
 
 
+@st.cache_data
 def s3_download(bucket_name, key):
     """S3バケットからファイルをダウンロード"""
     # print(bucket_name, key)

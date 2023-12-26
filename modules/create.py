@@ -446,8 +446,6 @@ def delete_book(title):
 
 def save_book(book_content, title):
     if title:
-        st.markdown('<div class="overlay">', unsafe_allow_html=True)
-        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
             user_id = st.session_state.user_id
@@ -482,7 +480,8 @@ def save_book(book_content, title):
             s3_upload(bucket_name, pdf_data, pdf_path)
 
             st.toast("保存しました。")
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.cache_data.clear()
+
     else:
         st.toast("タイトルを入力してください")
 
