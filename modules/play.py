@@ -18,7 +18,10 @@ def pil_to_base64(image):
 
 def play():
     select_book, captions = image_select_menu(
-        get_all_book_titles("story-user-data", st.session_state.user_id),
+        get_all_book_titles(
+            "story-user-data",
+            const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
+        ),
         "",
     )
 

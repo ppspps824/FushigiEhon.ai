@@ -24,7 +24,7 @@ def get_all_book_titles(bucket_name, user_id):
     try:
         # 指定されたユーザーのbook_infoフォルダ内のオブジェクトをリストアップ
         response = s3_client.list_objects_v2(
-            Bucket=bucket_name, Prefix=f"{user_id}/book_info/", Delimiter="/"
+            Bucket=bucket_name, Prefix=user_id, Delimiter="/"
         )
         titles = []
 

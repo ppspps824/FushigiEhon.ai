@@ -1,4 +1,5 @@
 BASE_PATH = "users/%%user_id%%/book_info/%%title%%/"
+TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
 
 HIDE_ST_STYLE = """
                 <style>

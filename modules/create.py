@@ -743,7 +743,7 @@ def create():
         select_book, captions = image_select_menu(
             get_all_book_titles(
                 "story-user-data",
-                st.session_state.user_id,
+                const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
             ),
             "つくりなおす",
         )
