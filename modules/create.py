@@ -440,7 +440,9 @@ def delete_book(title):
         bucket_name = "story-user-data"
         s3_delete_folder(
             bucket_name,
-            const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
+            const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace(
+                "%%title%%", title
+            ),
         )
         st.toast(f"{title}を削除しました")
     else:
