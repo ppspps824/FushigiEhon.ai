@@ -1,5 +1,13 @@
+import glob
+import os
+
 BASE_PATH = "users/%%user_id%%/book_info/%%title%%/"
 TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
+BGM_LIST = [
+    os.path.splitext(os.path.basename(path))[0]
+    for path in glob.glob("assets/*")
+    if "mp3" in path
+]
 
 HIDE_ST_STYLE = """
                 <style>

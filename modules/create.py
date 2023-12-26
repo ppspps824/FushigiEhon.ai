@@ -54,38 +54,6 @@ def view_edit():
         st.session_state.tales["description"] = title_col2.text_area(
             "あらすじ", value=st.session_state.tales["description"], height=185
         )
-        with title_col3:
-            st.write("")
-            st.write("")
-            if st.button("えほんを保存する", help="変更した内容でえほんを保存します。"):
-                create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
-                create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-
-                book_content = {
-                    "create_date": create_date_yyyymdd,
-                    "tales": st.session_state.tales,
-                    "images": st.session_state.images,
-                    "audios": st.session_state.audios,
-                }
-                show_overlay()
-                save_book(book_content, st.session_state.tales["title"])
-                modify()
-                hide_overlay()
-                st.rerun()
-
-            book_trigger_btn = ui.button(
-                text="えほんを削除する", key="book_trigger_btn"
-            )
-            if ui.alert_dialog(
-                show=book_trigger_btn,
-                title="えほんを削除する",
-                description="本当に削除しますか",
-                confirm_label="はい",
-                cancel_label="いいえ",
-                key="alert_dialog_book",
-            ):
-                delete_book(st.session_state.tales["title"])
-                modify()
 
         with st.expander("キャラクター", expanded=True):
             chara_col1, chara_col2 = st.columns(2)
@@ -144,6 +112,43 @@ def view_edit():
                 if st.button("削除"):
                     st.session_state.tales["characters"]["others"].pop(chara_num)
                     st.rerun()
+        
+        bgm=st.selectbox("BGM",options=const.BGM_LIST)
+        if bgm:
+            st.audio(f"assets/{bgm}.mp3")
+            
+        with title_col3:
+            st.write("")
+            st.write("")
+            if st.button("えほんを保存する", help="変更した内容でえほんを保存します。"):
+                create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
+                create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
+
+                book_content = {
+                    "create_date": create_date_yyyymdd,
+                    "tales": st.session_state.tales,
+                    "images": st.session_state.images,
+                    "audios": st.session_state.audios,
+                }
+                show_overlay()
+                save_book(book_content, st.session_state.tales["title"],bgm)
+                modify()
+                hide_overlay()
+                st.rerun()
+
+            book_trigger_btn = ui.button(
+                text="えほんを削除する", key="book_trigger_btn"
+            )
+            if ui.alert_dialog(
+                show=book_trigger_btn,
+                title="えほんを削除する",
+                description="本当に削除しますか",
+                confirm_label="はい",
+                cancel_label="いいえ",
+                key="alert_dialog_book",
+            ):
+                delete_book(st.session_state.tales["title"])
+                modify()
 
         with st.container(border=True):
             if num == 1:
@@ -533,7 +538,7 @@ def delete_book(title):
         st.toast("タイトルを入力してください")
 
 
-def save_book(book_content, title):
+def save_book(book_content, title,bgm="こもれびの道"):
     if title:
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
@@ -566,7 +571,7 @@ def save_book(book_content, title):
             # 動画とPDFの生成
             video_path = base_path + f"{title}.mp4"
             pdf_path = base_path + f"{title}.pdf"
-            video_data, pdf_data = create_movie_and_pdf(book_content)
+            video_data, pdf_data = create_movie_and_pdf(book_content,bgm)
             s3_upload(bucket_name, video_data, video_path)
             s3_upload(bucket_name, pdf_data, pdf_path)
 
@@ -791,6 +796,9 @@ def create():
                                     chara_num
                                 )
                                 st.rerun()
+                    bgm=st.selectbox("BGM",options=const.BGM_LIST)
+                    if bgm:
+                        st.audio(f"assets/{bgm}.mp3")
 
                 only_tale = st.toggle("テキストだけ作成する")
 
@@ -804,7 +812,7 @@ def create():
                     show_overlay()
                     book_content = create_all(only_tale=only_tale)
 
-                    save_book(book_content, st.session_state.tales["title"])
+                    save_book(book_content, st.session_state.tales["title"],bgm)
 
                     hide_overlay()
 

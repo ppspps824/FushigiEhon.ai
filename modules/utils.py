@@ -110,7 +110,7 @@ def create_text_img(text, width, height, font_size, margin=20):
 
 
 @st.cache_data(show_spinner=False)
-def create_movie_and_pdf(book_info):
+def create_movie_and_pdf(book_info,bgm):
     title = book_info["tales"]["title"]
     title_image_bytes = book_info["images"]["title"]
     tales = book_info["tales"]["content"]
@@ -203,7 +203,7 @@ def create_movie_and_pdf(book_info):
             # クリップをリストに追加
             clips.append(img_clip)
 
-    bgm_clip = AudioFileClip("assets/お昼のうた.mp3")
+    bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
 
     # すべてのクリップを結合
     final_clip = concatenate_videoclips(
