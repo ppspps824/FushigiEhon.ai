@@ -71,15 +71,15 @@ HIDE_ST_STYLE = """
                 """
 
 POST_HTML = """
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-<a class="twitter-share-button"
-  href="https://twitter.com/intent/tweet"
-  data-size="large"
-  data-text="%%title_placeholder%%"
-  data-url="https://fushigiehonai.streamlit.app/"
-  data-hashtags="絵本作成,AI,ふしぎえほん.ai"
-Xでシェア
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw"
+    class="twitter-share-button"
+    data-size="large"
+    data-text="%%title_placeholder%%"
+    data-url="https://fushigiehonai.streamlit.app/"
+    data-hashtags="絵本作成,AI,ふしぎえほん"
+    >Tweet
 </a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 """
 
 CHARACTORS_PER_PAGE = 20

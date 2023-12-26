@@ -16,9 +16,9 @@ from streamlit_image_select import image_select
 
 # オーバーレイを表示
 def show_overlay():
-    st.markdown(
-        '<div class="overlay" style="display:block"></div>', unsafe_allow_html=True
-    )
+    # st.markdown(
+    #     '<div class="overlay" style="display:block"></div>', unsafe_allow_html=True
+    # )
     pass
 
 
@@ -203,6 +203,9 @@ def create_movie_and_pdf(book_info):
     )
 
     original_audio = final_clip.audio
+
+    # BGMの長さが足りないときはループする。
+    bgm_clip = bgm_clip.audio_loop(duration=final_clip.duration)
 
     # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
     bgm_clip = bgm_clip.set_duration(final_clip.duration)
