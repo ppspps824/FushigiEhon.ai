@@ -37,11 +37,13 @@ def play():
 
             video_data = s3_download(
                 "story-user-data",
-                f"{st.session_state.user_id}/book_info/{title}/{title}.mp4",
+                f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
             )
+
             pdf_data = s3_download(
                 "story-user-data",
-                f"{st.session_state.user_id}/book_info/{title}/{title}.pdf",
+                f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
+            )
             )
             st.video(video_data)
 
