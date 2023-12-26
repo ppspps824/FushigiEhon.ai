@@ -178,8 +178,6 @@ def image_upgrade(image, title, description, theme, characters, tale):
             ],
             "max_tokens": 300,
         }
-        st.markdown('<div class="overlay">', unsafe_allow_html=True)
-        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner("イラストを補正中..."):
             response = requests.post(
                 "https://api.openai.com/v1/chat/completions",
@@ -195,14 +193,10 @@ def image_upgrade(image, title, description, theme, characters, tale):
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
             result = post_image_api(prompt, size=(1024, 1024))
-
-        st.markdown("</div>", unsafe_allow_html=True)
         return result
 
 
 def create_one_tale(num):
-    st.markdown('<div class="overlay">', unsafe_allow_html=True)
-    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(内容)"):
         prompt = (
             const.ONE_TALE_PROMPT.replace(
@@ -250,7 +244,6 @@ def create_one_tale(num):
             st.session_state.tales["content"][num] = generated_tale
         else:
             st.session_state.tales["content"].append(generated_tale)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 def create_one_audio(num, tale):
@@ -259,8 +252,6 @@ def create_one_audio(num, tale):
 
 
 def create_one_image(num, tale):
-    st.markdown('<div class="overlay">', unsafe_allow_html=True)
-    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(イラスト)"):
         st.session_state.images["content"][num] = post_image_api(
             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
@@ -278,4 +269,3 @@ def create_one_image(num, tale):
             ),
             (512, 512),
         )
-    st.markdown("</div>", unsafe_allow_html=True)
