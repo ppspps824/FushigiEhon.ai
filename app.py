@@ -69,7 +69,7 @@ def main():
     session = login_form(
         url=st.secrets["SUPABASE_URL"],
         apiKey=st.secrets["SUPABASE_API_KEY"],
-        providers=["google"],
+        providers=["google", "twitter"],
     )
     if not session:
         return

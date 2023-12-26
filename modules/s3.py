@@ -2,6 +2,7 @@ import json
 import os
 
 import boto3
+import const
 import streamlit as st
 
 # AWSクレデンシャルを環境変数から取得
@@ -45,10 +46,9 @@ def s3_upload(bucket_name, file_data, key):
         print(f"アップロードエラー: {e.args}")
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def s3_download(bucket_name, key):
     """S3バケットからファイルをダウンロード"""
-    # print(bucket_name, key)
     try:
         file = s3_client.get_object(Bucket=bucket_name, Key=key)
         return file["Body"].read()
@@ -80,7 +80,9 @@ def s3_delete_folder(bucket_name, prefix):
 
 def get_book_data(bucket_name, user_id, title):
     with st.spinner("よみこみちゅう..."):
-        base_path = f"{user_id}/book_info/{title}/"
+        base_path = base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
+            "%%title%%", title
+        )
         book_content = {
             "create_date": "",
             "tales": {},

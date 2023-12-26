@@ -1,6 +1,7 @@
 import io
 import tempfile
 
+import const
 import numpy as np
 import streamlit as st
 from modules.s3 import s3_download
@@ -42,7 +43,7 @@ def get_images(titles):
         all_image = {
             title: s3_download(
                 "story-user-data",
-                f"{st.session_state.user_id}/book_info/{title}/images/title.jpeg",
+                f"{const.BASE_PATH.replace('%%user_id%%', st.session_state.user_id).replace('%%title%%', title)}/images/{title}.jpeg",
             )
             for title in titles
         }

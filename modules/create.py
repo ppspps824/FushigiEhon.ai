@@ -449,7 +449,9 @@ def save_book(book_content, title):
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
             user_id = st.session_state.user_id
-            base_path = f"{user_id}/book_info/{title}/"
+            base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
+                "%%title%%", title
+            )
 
             # タイトル画像の保存
             title_image_path = base_path + "images/title.jpeg"

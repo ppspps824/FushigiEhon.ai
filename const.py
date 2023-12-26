@@ -1,3 +1,5 @@
+BASE_PATH = "users/%%user_id%%/book_info/%%title%%/"
+
 HIDE_ST_STYLE = """
                 <style>
                 div[data-testid="stToolbar"] {
