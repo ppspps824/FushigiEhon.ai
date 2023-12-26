@@ -615,7 +615,6 @@ def create():
 
     if mode == "おまかせでつくる":
         with st.container(border=True):
-            st.write("リクエスト内容　※指定した内容で生成されないことがあります。")
             st.session_state.tales["title"] = st.text_input(
                 "タイトル",
                 value=st.session_state.tales["title"],
@@ -726,7 +725,9 @@ def create():
 
             only_tale = st.toggle("テキストだけ作成する")
 
-        if st.button("生成開始"):
+            submit = st.button("生成開始")
+
+        if submit:
             if st.session_state.tales["title"] or st.session_state.tales["description"]:
                 show_overlay()
                 book_content = create_all(only_tale=only_tale)

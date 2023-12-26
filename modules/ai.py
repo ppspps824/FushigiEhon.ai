@@ -56,7 +56,7 @@ def create_tales(
                 continue
 
     if tales:
-        st.write(tales)
+        # st.write(tales)
         return tales
     else:
         st.error("文章の生成に失敗しました。")
