@@ -43,8 +43,6 @@ def create_tales(
         .replace("%%character_set_placeholder%%", character_set)
         .replace("%%age_placeholder%%", age)
     )
-    st.markdown('<div class="overlay">', unsafe_allow_html=True)
-    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(テキスト)"):
         for _ in range(3):
             try:
@@ -56,7 +54,6 @@ def create_tales(
                 print(e.args)
                 print(f"生成された内容：{content_text}")
                 continue
-    st.markdown("</div>", unsafe_allow_html=True)
 
     if tales:
         st.write(tales)
@@ -111,22 +108,17 @@ def create_images(tales):
     theme = tales["theme"]
     characters = json.dumps(tales["characters"], ensure_ascii=False)
     prompt = (
-        const.DESCRIPTION_IMAGE_PROMPT.replace("rint%%title_placeholder%%", title)
+        const.DESCRIPTION_IMAGE_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    st.markdown('<div class="overlay">', unsafe_allow_html=True)
-    # with st_lottie_spinner(const.LOTTIE):
     with st.spinner("生成中...(表紙)"):
         images["title"] = post_image_api(prompt, size=(512, 512))
-    st.markdown("</div>", unsafe_allow_html=True)
     if not images["title"]:
         st.error("表紙の生成に失敗しました。")
 
     for num, tale in enumerate(tales["content"]):
-        st.markdown('<div class="overlay">', unsafe_allow_html=True)
-        # with st_lottie_spinner(const.LOTTIE):
         with st.spinner(f'生成中...(イラスト {num+1}/{len(tales["content"])})'):
             prompt = (
                 const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
@@ -139,7 +131,6 @@ def create_images(tales):
             images["content"].append(result)
             if not result:
                 st.error("イラストの生成に失敗しました。")
-        st.markdown("</div>", unsafe_allow_html=True)
     return images
 
 
