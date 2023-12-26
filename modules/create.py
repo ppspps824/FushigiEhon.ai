@@ -625,7 +625,7 @@ def create():
         )
 
         if mode == "おまかせでつくる":
-            with st.container(border=True):
+            with st.form("auto_form", border=True):
                 st.session_state.tales["title"] = st.text_input(
                     "タイトル",
                     value=st.session_state.tales["title"],
@@ -740,7 +740,7 @@ def create():
 
                 only_tale = st.toggle("テキストだけ作成する")
 
-                submit = st.button("生成開始")
+                submit = st.form_submit_button("生成開始")
 
             if submit:
                 if (
