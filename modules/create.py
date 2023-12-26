@@ -1,7 +1,8 @@
 import base64
 import datetime
 import json
-
+from PIL import Image
+import io
 import const
 import pytz
 import streamlit as st
@@ -281,12 +282,30 @@ def view_edit():
                                 st.rerun()
                             if st.button("イラストを一括で生成する"):
                                 show_overlay()
+                                st.session_state.images["title"] = post_image_api(
+                                    st.session_state.images["title"],
+                                    st.session_state.tales["title"],
+                                    st.session_state.tales["description"],
+                                    st.session_state.tales["theme"],
+                                    json.dumps(st.session_state.tales["characters"]),
+                                    json.dumps(st.session_state.tales["content"]),
+                                )
+
                                 for num, image in enumerate(
                                     st.session_state.images["content"]
                                 ):
                                     st.session_state.images["content"][
                                         num
-                                    ] = create_one_image(num, st.session_state.tales["content"][num])
+                                    ] = post_image_api(
+                                        image,
+                                        st.session_state.tales["title"],
+                                        st.session_state.tales["description"],
+                                        st.session_state.tales["theme"],
+                                        json.dumps(
+                                            st.session_state.tales["characters"]
+                                        ),
+                                        json.dumps(st.session_state.tales["content"]),
+                                    )
 
                                 modify()
                                 hide_overlay()
@@ -294,6 +313,15 @@ def view_edit():
 
                             if st.button("イラストを一括で補正する"):
                                 show_overlay()
+                                st.session_state.images["title"] = image_upgrade(
+                                    st.session_state.images["title"],
+                                    st.session_state.tales["title"],
+                                    st.session_state.tales["description"],
+                                    st.session_state.tales["theme"],
+                                    json.dumps(st.session_state.tales["characters"]),
+                                    json.dumps(st.session_state.tales["content"]),
+                                )
+
                                 for num, image in enumerate(
                                     st.session_state.images["content"]
                                 ):
@@ -313,6 +341,44 @@ def view_edit():
                                 modify()
                                 hide_overlay()
                                 st.rerun()
+                            with st.expander("画像を一括でアップロード"):
+                                image_files = st.file_uploader(
+                                    "",
+                                    label_visibility="collapsed",
+                                    accept_multiple_files=True,
+                                    type=["png", "jpg"],
+                                )
+                                if image_files:
+                                    st.image(image_files)
+
+                                    if st.button("取り込み", key="all_image_upload"):
+                                        show_overlay()
+                                        with st.spinner("取り込み中..."):
+                                            adding_num = len(image_files) - len(
+                                                st.session_state.images["content"]
+                                            )
+                                            if adding_num > 0:
+                                                [
+                                                    adding_page(num)
+                                                    for num in range(
+                                                        len(st.session_state.images["content"])
+                                                        + adding_num
+                                                    )
+                                                ]
+                                            for num, image in enumerate(image_files):
+                                                image = Image.open(io.BytesIO(image.getvalue()))
+                                                image = image.resize((512,512))
+                                                # 空のバイトストリームを作成
+                                                bytes_io = io.BytesIO()
+                                                image.save(bytes_io, format='PNG') 
+                                                bytes_data = bytes_io.getvalue()
+                                                st.session_state.images["content"][
+                                                    num
+                                                ] = bytes_data
+
+                                            modify()
+                                            hide_overlay()
+                                            st.rerun()
                 with col3:
                     if st.button(
                         "次のページを追加する",
