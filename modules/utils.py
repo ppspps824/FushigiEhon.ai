@@ -38,12 +38,12 @@ def hide_overlay():
     pass
 
 
-def get_images(titles):
+def get_images(titles, user_id):
     try:
         all_image = {
             title: s3_download(
                 "story-user-data",
-                f"{const.BASE_PATH.replace('%%user_id%%', st.session_state.user_id).replace('%%title%%', title)}images/title.jpeg",
+                f"{const.BASE_PATH.replace('%%user_id%%', user_id).replace('%%title%%', title)}images/title.jpeg",
             )
             for title in titles
         }
