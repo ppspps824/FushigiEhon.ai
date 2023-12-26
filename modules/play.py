@@ -23,6 +23,16 @@ def play():
             const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
         )
     )
+    guest_images, guest_captions = get_images(
+        get_all_book_titles(
+            "story-user-data",
+            const.TITLE_BASE_PATH.replace("%%user_id%%", "guest"),
+        )
+    )
+
+    images += guest_images
+    captions += guest_captions
+
     imageCarouselComponent = components.declare_component(
         "image-carousel-component", path="frontend/public"
     )
