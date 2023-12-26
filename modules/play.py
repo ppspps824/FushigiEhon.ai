@@ -21,33 +21,34 @@ def play():
     )
 
     if select_book:
-        book_info = get_book_data(
-            "story-user-data",
-            st.session_state.user_id,
-            captions[select_book - 1],
-        )
+        with st.spinner("よみこみちゅう..."):
+            book_info = get_book_data(
+                "story-user-data",
+                st.session_state.user_id,
+                captions[select_book - 1],
+            )
 
-        title = book_info["tales"]["title"]
+            title = book_info["tales"]["title"]
 
-        video_data = s3_download(
-            "story-user-data",
-            f"{st.session_state.user_id}/book_info/{title}/{title}.mp4",
-        )
-        pdf_data = s3_download(
-            "story-user-data",
-            f"{st.session_state.user_id}/book_info/{title}/{title}.pdf",
-        )
-        st.video(video_data)
+            video_data = s3_download(
+                "story-user-data",
+                f"{st.session_state.user_id}/book_info/{title}/{title}.mp4",
+            )
+            pdf_data = s3_download(
+                "story-user-data",
+                f"{st.session_state.user_id}/book_info/{title}/{title}.pdf",
+            )
+            st.video(video_data)
 
-        st.download_button(
-            label="Download data as mp4",
-            data=video_data,
-            file_name=f"{title}.mp4",
-            mime="video/mp4",
-        )
-        st.download_button(
-            label="Download data as PDF",
-            data=pdf_data,
-            file_name=f"{title}.pdf",
-            mime="application/pdf",
-        )
+            st.download_button(
+                label="Download data as mp4",
+                data=video_data,
+                file_name=f"{title}.mp4",
+                mime="video/mp4",
+            )
+            st.download_button(
+                label="Download data as PDF",
+                data=pdf_data,
+                file_name=f"{title}.pdf",
+                mime="application/pdf",
+            )
