@@ -626,10 +626,9 @@ def create():
         )
 
         if mode == "おまかせでつくる":
-            with st.form("auto_form", border=True):
+            with st.container(border=True):
                 st.session_state.tales["title"] = st.text_input(
                     "タイトル",
-                    value=st.session_state.tales["title"],
                     placeholder=const.RAMDOM_PLACEHOLDER,
                 )
                 with st.expander("こだわり設定"):
@@ -639,7 +638,6 @@ def create():
                             "ページ数",
                             min_value=3,
                             max_value=const.MAX_PAGE_NUM,
-                            value=st.session_state.tales["number_of_pages"],
                         )
                     with col2:
                         st.session_state.tales["sentence_structure"] = st.selectbox(
@@ -653,27 +651,19 @@ def create():
                         st.session_state.tales["character_set"] = st.selectbox(
                             "使用文字",
                             options=const.CHARACTER_SET,
-                            index=const.CHARACTER_SET.index(
-                                st.session_state.tales["character_set"]
-                            ),
                         )
                     with col4:
                         st.session_state.tales["age_group"] = st.selectbox(
                             "対象年齢",
                             options=const.AGE_GROUP,
-                            index=const.AGE_GROUP.index(
-                                st.session_state.tales["age_group"]
-                            ),
                         )
                     title_col1, title_col2 = st.columns([2, 4])
                     st.session_state.tales["theme"] = title_col1.text_area(
                         "テーマ・メッセージ",
-                        value=st.session_state.tales["theme"],
                         placeholder=const.RAMDOM_PLACEHOLDER,
                     )
                     st.session_state.tales["description"] = title_col2.text_area(
                         "設定やあらすじ",
-                        value=st.session_state.tales["description"],
                         placeholder=const.RAMDOM_PLACEHOLDER,
                     )
                     with st.container(border=True):
@@ -685,18 +675,12 @@ def create():
                             ] = st.text_input(
                                 "主人公の名前",
                                 placeholder=const.RAMDOM_PLACEHOLDER,
-                                value=st.session_state.tales["characters"]["lead"][
-                                    "name"
-                                ],
                             )
                             st.session_state.tales["characters"]["lead"][
                                 "appearance"
                             ] = st.text_area(
                                 "主人公の見た目",
                                 placeholder=const.RAMDOM_PLACEHOLDER,
-                                value=st.session_state.tales["characters"]["lead"][
-                                    "appearance"
-                                ],
                             )
                             if st.button("キャラクターを追加"):
                                 st.session_state.tales["characters"]["others"].append(
@@ -718,9 +702,6 @@ def create():
                                     ]["name"] = st.text_input(
                                         "名前",
                                         placeholder=const.RAMDOM_PLACEHOLDER,
-                                        value=st.session_state.tales["characters"][
-                                            "others"
-                                        ][chara_num]["name"],
                                         key=f"chara_name{chara_num}",
                                     )
                                     st.session_state.tales["characters"]["others"][
@@ -728,9 +709,6 @@ def create():
                                     ]["appearance"] = st.text_area(
                                         "見た目",
                                         placeholder=const.RAMDOM_PLACEHOLDER,
-                                        value=st.session_state.tales["characters"][
-                                            "others"
-                                        ][chara_num]["appearance"],
                                         key=f"chara_appearance{chara_num}",
                                     )
                             if st.button("削除"):
@@ -741,7 +719,7 @@ def create():
 
                 only_tale = st.toggle("テキストだけ作成する")
 
-                submit = st.form_submit_button("生成開始")
+                submit = st.button("生成開始")
 
             if submit:
                 if (
@@ -783,7 +761,7 @@ def create():
             )
 
             images = [add_caption_transparent(image,caption) for image,caption in zip(images,captions)]
-            
+
             imageUrls = [
                 f"data:image/png;base64,{base64.b64encode(image).decode()}"
                 for image in images
