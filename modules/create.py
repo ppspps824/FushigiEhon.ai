@@ -18,7 +18,12 @@ from modules.ai import (
     post_text_api,
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
-from modules.utils import hide_overlay, image_select_menu, show_overlay
+from modules.utils import (
+    create_movie_and_pdf,
+    hide_overlay,
+    image_select_menu,
+    show_overlay,
+)
 
 # from streamlit_lottie import st_lottie_spinner
 
@@ -468,6 +473,13 @@ def save_book(book_content, title):
                 audio_path = base_path + f"audios/audio_{ix}.mp3"
                 s3_upload(bucket_name, image, image_path)
                 s3_upload(bucket_name, audio, audio_path)
+
+            # 動画とPDFの生成
+            video_path = base_path + f"{title}.mp4"
+            pdf_path = base_path + f"{title}.pdf"
+            video_data, pdf_data = create_movie_and_pdf(book_content)
+            s3_upload(bucket_name, video_data, video_path)
+            s3_upload(bucket_name, pdf_data, pdf_path)
 
             st.toast("保存しました。")
         st.markdown("</div>", unsafe_allow_html=True)

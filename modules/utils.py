@@ -64,6 +64,8 @@ def get_images(titles):
 
 
 def create_text_img(text, width, height, font_size, margin=20):
+    text = text.replace("\n", "。")
+    text = text.replace("。。", "。")
     # Create image object with white background
     im = Image.new("RGB", (width, height), "#fafafa")
     draw = ImageDraw.Draw(im)
@@ -80,25 +82,28 @@ def create_text_img(text, width, height, font_size, margin=20):
         wrap_list.append(text[i : i + wrap_width])
 
     # Calculate the y position start for vertical centering considering margins
-    total_height = (font_size + 2) * len(wrap_list)  # +2 for line spacing
+    total_height = font_size * len(wrap_list)  # Adjust line spacing as needed
     y_start = max(margin, (height - total_height) // 2)
 
     # Draw the text on the image
     y = y_start
     for line in wrap_list:
-        # Calculate x position for horizontal centering considering margins
-        line_width = draw.textlength(line, font=font)
-        x = max(margin, (width - line_width) // 2)
+        # Use draw.textbbox to calculate the bounding box of the line
+        bbox = draw.textbbox((0, y), line, font=font)
+        line_width = bbox[2] - bbox[0]
+        x = max(
+            margin, (width - line_width) // 2
+        )  # Calculate x position for horizontal centering
 
         draw.text((x, y), line, fill=(0, 0, 0), font=font)
-        y += font_size + 2  # Move down to next line
+        y += font_size  # Adjust for Japanese text spacing
 
     return im
 
 
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def create_movie_and_pdf(book_info):
-    with st.spinner("読み込み中..."):
+    with st.spinner("動画とPDFを作成中..."):
         title = book_info["tales"]["title"]
         title_image_bytes = book_info["images"]["title"]
         tales = book_info["tales"]["content"]
@@ -108,6 +113,7 @@ def create_movie_and_pdf(book_info):
         title_text_img = create_text_img(title, 512, 512, font_size=42)
         if title_image_bytes:
             title_image = Image.open(io.BytesIO(title_image_bytes))
+            title_image = title_image.resize((512, 512))
         else:
             title_image = Image.new("RGB", (512, 512), "#fafafa")
 
@@ -230,12 +236,14 @@ def create_movie_and_pdf(book_info):
             temp_video.seek(0)
             video_data = temp_video.read()
 
-        pdf_bytes = io.BytesIO()
+        pdf_io = io.BytesIO()
         title_image.save(
-            pdf_bytes, format="PDF", save_all=True, append_images=result_images
+            pdf_io, format="PDF", save_all=True, append_images=result_images
         )
 
-    return video_data, pdf_bytes
+        pdf_data = pdf_io.getvalue()
+
+    return video_data, pdf_data
 
 
 def image_select_menu(titles, label):

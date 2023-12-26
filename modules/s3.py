@@ -17,6 +17,7 @@ s3_client = boto3.client(
     region_name=st.secrets["region_name"],
 )
 
+
 def get_all_book_titles(bucket_name, user_id):
     """指定されたユーザーのすべてのえほんのタイトルを取得"""
     try:
@@ -50,8 +51,9 @@ def s3_download(bucket_name, key):
     try:
         file = s3_client.get_object(Bucket=bucket_name, Key=key)
         return file["Body"].read()
-    except Exception:
-        # print(f"ダウンロードエラー: {e}")
+    except Exception as e:
+        print("ダウンロードエラー", bucket_name, key)
+        print(e)
         return None
 
 
@@ -68,8 +70,8 @@ def s3_delete_folder(bucket_name, prefix):
                     {"Key": obj["Key"]} for obj in objects_to_delete["Contents"]
                 ]
             }
-            result=s3_client.delete_objects(Bucket=bucket_name, Delete=delete_keys)
-            
+            result = s3_client.delete_objects(Bucket=bucket_name, Delete=delete_keys)
+
     except Exception as e:
         print(f"フォルダ削除エラー: {e}")
 
