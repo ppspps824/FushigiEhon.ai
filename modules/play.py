@@ -44,7 +44,6 @@ def play():
                 "story-user-data",
                 f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
             )
-            )
             st.video(video_data)
 
             components.html(const.POST_HTML.replace("%%title_placeholder%%", title))
