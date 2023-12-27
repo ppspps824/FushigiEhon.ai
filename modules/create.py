@@ -537,7 +537,7 @@ def view_edit():
 
     if st.session_state.is_guest:
         if st.session_state.tales["title"]:
-            if st.button("動画とPDFを生成する"):
+            if st.button("動画を生成する"):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
                 book_info= {
@@ -557,15 +557,6 @@ def view_edit():
                     )
                 else:
                     st.error("データの読み込みに失敗しました。")
-
-                if pdf_data:
-                    st.download_button(
-                        label="PDFを保存",
-                        data=pdf_data,
-                        file_name=f'{st.session_state.tales["title"]}.pdf',
-                        mime="application/pdf",
-                        disabled=st.session_state.is_guest
-                    )
 
 
 def delete_book(title):
