@@ -15,46 +15,50 @@ def guest_login():
     st.session_state.is_guest = True
 
 
-def main():
-    if "is_login" not in st.session_state:
-        st.session_state.is_login = False
-        st.session_state.is_guest = False
-        st.session_state.user_id = ""
-        st.session_state.email = ""
-        st.session_state.disable_audio = False
-        st.session_state.session = None
+def init_state():
+    st.session_state.is_login = False
+    st.session_state.is_guest = False
+    st.session_state.user_id = ""
+    st.session_state.email = ""
+    st.session_state.disable_audio = False
+    st.session_state.session = None
 
-        # create
-        st.session_state.tales = {
-            "title": "",
-            "number_of_pages": 3,
-            "characters_per_page": const.CHARACTORS_PER_PAGE,
-            "sentence_structure": "バランス",
-            "age_group": "1～2歳",
-            "character_set": "ひらがなのみ",
-            "description": "",
-            "theme": "",
-            "characters": {
-                "lead": {
+    # create
+    st.session_state.tales = {
+        "title": "",
+        "number_of_pages": 3,
+        "characters_per_page": const.CHARACTORS_PER_PAGE,
+        "sentence_structure": "バランス",
+        "age_group": "1～2歳",
+        "character_set": "ひらがなのみ",
+        "description": "",
+        "theme": "",
+        "characters": {
+            "lead": {
+                "name": "",
+                "appearance": "",
+            },
+            "others": [
+                {
                     "name": "",
                     "appearance": "",
                 },
-                "others": [
-                    {
-                        "name": "",
-                        "appearance": "",
-                    },
-                ],
-            },
-            "content": [],
-        }
-        st.session_state.images = {"title": "", "content": []}
-        st.session_state.audios = []
-        st.session_state.not_modify = True
+            ],
+        },
+        "content": [],
+    }
+    st.session_state.images = {"title": "", "content": []}
+    st.session_state.audios = []
+    st.session_state.not_modify = True
 
-        # ai
-        st.session_state.text_model = "gpt-4-1106-preview"
-        st.session_state.image_model = "dall-e-3"
+    # ai
+    st.session_state.text_model = "gpt-4-1106-preview"
+    st.session_state.image_model = "dall-e-3"
+
+
+def main():
+    if "is_login" not in st.session_state:
+        init_state()
 
     st.set_page_config(
         page_title="ふしぎえほん.ai",
@@ -181,6 +185,7 @@ def main():
         play()
     elif selected == "ログアウト":
         logout_button()
+        init_state()
         st.rerun()
 
 
