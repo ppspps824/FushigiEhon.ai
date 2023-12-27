@@ -1,6 +1,6 @@
 import io
 import tempfile
-
+import random
 import const
 import numpy as np
 import streamlit as st
@@ -204,31 +204,38 @@ def create_movie_and_pdf(book_info, bgm):
             # クリップをリストに追加
             clips.append(img_clip)
 
-    bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
-
-    # すべてのクリップを結合
-    final_clip = concatenate_videoclips(
-        [title_image_clip] + clips + [end_image_clip], method="compose"
-    )
-
-    original_audio = final_clip.audio
-
-    # BGMの長さが足りないときはループする。
-    bgm_clip = bgm_clip.audio_loop(duration=final_clip.duration)
-
-    # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
-    bgm_clip = bgm_clip.set_duration(final_clip.duration)
-    bgm_clip = bgm_clip.volumex(0.05)
-    bgm_clip = bgm_clip.audio_fadeout(3)
-
-    if original_audio:
-        # BGMと既存の音声を混ぜる
-        mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
-
-        # 最終的な動画に混合された音声を設定
-        final_clip.audio = mixed_audio
+    if bgm == "ランダム":
+        bgm = random.choice(const.BGM_LIST)
+    elif bgm == "なし":
+        final_clip = concatenate_videoclips(
+            [title_image_clip] + clips + [end_image_clip], method="compose"
+        )
     else:
-        final_clip.audio = bgm_clip
+        bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
+
+        # すべてのクリップを結合
+        final_clip = concatenate_videoclips(
+            [title_image_clip] + clips + [end_image_clip], method="compose"
+        )
+
+        # BGMの長さが足りないときはループする。
+        bgm_clip = bgm_clip.audio_loop(duration=final_clip.duration)
+
+        # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
+        bgm_clip = bgm_clip.set_duration(final_clip.duration)
+        bgm_clip = bgm_clip.volumex(0.05)
+        bgm_clip = bgm_clip.audio_fadeout(3)
+
+        original_audio = final_clip.audio
+
+        if original_audio:
+            # BGMと既存の音声を混ぜる
+            mixed_audio = CompositeAudioClip([original_audio, bgm_clip])
+
+            # 最終的な動画に混合された音声を設定
+            final_clip.audio = mixed_audio
+        else:
+            final_clip.audio = bgm_clip
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
     with tempfile.NamedTemporaryFile(delete=True, suffix=".mp4") as temp_video:

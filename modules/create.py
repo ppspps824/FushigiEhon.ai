@@ -32,6 +32,7 @@ from PIL import Image
 
 # from streamlit_lottie import st_lottie_spinnerf
 
+
 def view_edit():
     st.write("---")
     content_place = st.container()
@@ -46,13 +47,16 @@ def view_edit():
     with content_place:
         title_col1, title_col2, title_col3 = st.columns([2, 4, 1])
         st.session_state.tales["title"] = title_col1.text_input(
-            "タイトル", value=st.session_state.tales["title"]
+            "タイトル", value=st.session_state.tales["title"], max_chars=20
         )
         st.session_state.tales["theme"] = title_col1.text_area(
-            "テーマ・メッセージ", value=st.session_state.tales["theme"]
+            "テーマ・メッセージ", value=st.session_state.tales["theme"], max_chars=100
         )
         st.session_state.tales["description"] = title_col2.text_area(
-            "あらすじ", value=st.session_state.tales["description"], height=185
+            "あらすじ",
+            value=st.session_state.tales["description"],
+            height=185,
+            max_chars=100,
         )
 
         with st.expander("キャラクター", expanded=True):
@@ -62,6 +66,7 @@ def view_edit():
                     "主人公の名前",
                     placeholder=const.RAMDOM_PLACEHOLDER,
                     value=st.session_state.tales["characters"]["lead"]["name"],
+                    max_chars=15,
                 )
                 st.session_state.tales["characters"]["lead"][
                     "appearance"
@@ -69,6 +74,7 @@ def view_edit():
                     "主人公の見た目",
                     placeholder=const.RAMDOM_PLACEHOLDER,
                     value=st.session_state.tales["characters"]["lead"]["appearance"],
+                    max_chars=100,
                 )
                 if st.button("キャラクターを追加"):
                     st.session_state.tales["characters"]["others"].append(
@@ -98,6 +104,7 @@ def view_edit():
                                 chara_num
                             ]["name"],
                             key=f"chara_name{chara_num}",
+                            max_chars=15,
                         )
                         st.session_state.tales["characters"]["others"][chara_num][
                             "appearance"
@@ -108,19 +115,24 @@ def view_edit():
                                 chara_num
                             ]["appearance"],
                             key=f"chara_appearance{chara_num}",
+                            max_chars=100,
                         )
                 if st.button("削除"):
                     st.session_state.tales["characters"]["others"].pop(chara_num)
                     st.rerun()
 
-        bgm = st.selectbox("BGM", options=const.BGM_LIST)
-        if bgm:
+        bgm = st.selectbox("BGM", options=const.BGM_OPTIONS)
+        if bgm not in ["ランダム", "なし"]:
             st.audio(f"assets/{bgm}.mp3")
 
         with title_col3:
             st.write("")
             st.write("")
-            if st.button("えほんを保存する", help="変更した内容でえほんを保存します。",disabled=st.session_state.is_guest):
+            if st.button(
+                "えほんを保存する",
+                help="変更した内容でえほんを保存します。",
+                disabled=st.session_state.is_guest,
+            ):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
 
@@ -137,7 +149,9 @@ def view_edit():
                 st.rerun()
 
             book_trigger_btn = ui.button(
-                text="えほんを削除する", key="book_trigger_btn",disabled=st.session_state.is_guest
+                text="えほんを削除する",
+                key="book_trigger_btn",
+                disabled=st.session_state.is_guest,
             )
             if ui.alert_dialog(
                 show=book_trigger_btn,
@@ -179,7 +193,10 @@ def view_edit():
                     with ai_container:
                         st.write("AI機能")
 
-                        if st.button("あらすじ、テーマ・メッセージを生成する",disabled=st.session_state.is_guest):
+                        if st.button(
+                            "あらすじ、テーマ・メッセージを生成する",
+                            disabled=st.session_state.is_guest,
+                        ):
                             show_overlay()
                             tales_text = "\n".join(st.session_state.tales["content"])
                             with st.spinner("生成中...(あらすじ)"):
@@ -221,7 +238,9 @@ def view_edit():
                             modify()
                             st.rerun()
 
-                        if st.button("表紙を生成する",disabled=st.session_state.is_guest):
+                        if st.button(
+                            "表紙を生成する", disabled=st.session_state.is_guest
+                        ):
                             show_overlay()
                             title = st.session_state.tales["title"]
                             description = st.session_state.tales["description"]
@@ -248,7 +267,9 @@ def view_edit():
 
                             st.rerun()
 
-                        if st.button("表紙を補正する",disabled=st.session_state.is_guest):
+                        if st.button(
+                            "表紙を補正する", disabled=st.session_state.is_guest
+                        ):
                             show_overlay()
                             st.session_state.images["title"] = image_upgrade(
                                 st.session_state.images["title"],
@@ -268,7 +289,10 @@ def view_edit():
                             st.rerun()
                         with st.container(border=True):
                             st.caption("全ページ一括処理")
-                            if st.button("テキスト以外を一括で生成する",disabled=st.session_state.is_guest):
+                            if st.button(
+                                "テキスト以外を一括で生成する",
+                                disabled=st.session_state.is_guest,
+                            ):
                                 show_overlay()
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
@@ -276,7 +300,10 @@ def view_edit():
                                 hide_overlay()
                                 st.rerun()
 
-                            if st.button("音声を一括で生成する",disabled=st.session_state.is_guest):
+                            if st.button(
+                                "音声を一括で生成する",
+                                disabled=st.session_state.is_guest,
+                            ):
                                 show_overlay()
                                 for num, tale in enumerate(
                                     st.session_state.tales["content"]
@@ -286,7 +313,10 @@ def view_edit():
                                 modify()
                                 hide_overlay()
                                 st.rerun()
-                            if st.button("イラストを一括で生成する",disabled=st.session_state.is_guest):
+                            if st.button(
+                                "イラストを一括で生成する",
+                                disabled=st.session_state.is_guest,
+                            ):
                                 show_overlay()
                                 st.session_state.images["title"] = post_image_api(
                                     st.session_state.images["title"],
@@ -317,7 +347,10 @@ def view_edit():
                                 hide_overlay()
                                 st.rerun()
 
-                            if st.button("イラストを一括で補正する",disabled=st.session_state.is_guest):
+                            if st.button(
+                                "イラストを一括で補正する",
+                                disabled=st.session_state.is_guest,
+                            ):
                                 show_overlay()
                                 st.session_state.images["title"] = image_upgrade(
                                     st.session_state.images["title"],
@@ -430,6 +463,7 @@ def view_edit():
                         key=f"{page_count}_tale",
                         value=tale,
                         label_visibility="collapsed",
+                        max_chars=40,
                     )
 
                     # ページのオーディオの表示
@@ -444,7 +478,7 @@ def view_edit():
                         if st.button(
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
-                            disabled=st.session_state.is_guest
+                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             adding_page(page_count + 1)
@@ -457,7 +491,7 @@ def view_edit():
                         if st.button(
                             "内容を生成する",
                             help="このページの文章を、AIによって生成します。",
-                            disabled=st.session_state.is_guest
+                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_tale(page_count)
@@ -468,7 +502,7 @@ def view_edit():
                         if st.button(
                             "音声を生成する",
                             help="このページの音声を、AIによって生成します。",
-                            disabled=st.session_state.is_guest
+                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_audio(page_count, tale)
@@ -479,7 +513,7 @@ def view_edit():
                         if st.button(
                             "イラストを生成する",
                             help="このページのイラストを、文章をベースにAIによって生成します。",
-                            disabled=st.session_state.is_guest
+                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_image(page_count, tale)
@@ -540,13 +574,13 @@ def view_edit():
             if st.button("動画を生成する"):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-                book_info= {
-                            "create_date": create_date_yyyymdd,
-                            "tales": st.session_state.tales,
-                            "images": st.session_state.images,
-                            "audios": st.session_state.audios,
-                        }
-                video_data, pdf_data=create_movie_and_pdf(book_info, bgm)
+                book_info = {
+                    "create_date": create_date_yyyymdd,
+                    "tales": st.session_state.tales,
+                    "images": st.session_state.images,
+                    "audios": st.session_state.audios,
+                }
+                video_data, pdf_data = create_movie_and_pdf(book_info, bgm)
                 if video_data:
                     st.video(video_data)
                     st.download_button(
@@ -573,7 +607,7 @@ def delete_book(title):
         st.toast("タイトルを入力してください")
 
 
-def save_book(book_content, title, bgm="こもれびの道", only_tales=False):
+def save_book(book_content, title, bgm, only_tales=False):
     if title:
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
@@ -744,8 +778,7 @@ def create():
     if mode == "おまかせでつくる":
         with st.container(border=True):
             st.session_state.tales["title"] = st.text_input(
-                "タイトル",
-                placeholder=const.RAMDOM_PLACEHOLDER,
+                "タイトル", placeholder=const.RAMDOM_PLACEHOLDER, max_chars=15
             )
             with st.expander("こだわり設定"):
                 col1, col2, col3, col4 = st.columns(4)
@@ -791,12 +824,14 @@ def create():
                         ] = st.text_input(
                             "主人公の名前",
                             placeholder=const.RAMDOM_PLACEHOLDER,
+                            max_chars=15,
                         )
                         st.session_state.tales["characters"]["lead"][
                             "appearance"
                         ] = st.text_area(
                             "主人公の見た目",
                             placeholder=const.RAMDOM_PLACEHOLDER,
+                            max_chars=100,
                         )
                         if st.button("キャラクターを追加"):
                             st.session_state.tales["characters"]["others"].append(
@@ -808,9 +843,7 @@ def create():
                         chara_num_list = range(
                             len(st.session_state.tales["characters"]["others"])
                         )
-                        chara_tabs = st.tabs(
-                            [str(num + 1) for num in chara_num_list]
-                        )
+                        chara_tabs = st.tabs([str(num + 1) for num in chara_num_list])
                         for chara_num in chara_num_list:
                             with chara_tabs[chara_num]:
                                 st.session_state.tales["characters"]["others"][
@@ -818,6 +851,7 @@ def create():
                                 ]["name"] = st.text_input(
                                     "名前",
                                     placeholder=const.RAMDOM_PLACEHOLDER,
+                                    max_chars=15,
                                     key=f"chara_name{chara_num}",
                                 )
                                 st.session_state.tales["characters"]["others"][
@@ -825,6 +859,7 @@ def create():
                                 ]["appearance"] = st.text_area(
                                     "見た目",
                                     placeholder=const.RAMDOM_PLACEHOLDER,
+                                    max_chars=100,
                                     key=f"chara_appearance{chara_num}",
                                 )
                         if st.button("削除"):
@@ -833,18 +868,19 @@ def create():
                             )
                             st.rerun()
                 bgm = st.selectbox("BGM", options=const.BGM_LIST)
-                if bgm:
+                if bgm not in ["ランダム", "なし"]:
                     st.audio(f"assets/{bgm}.mp3")
 
             only_tales = st.toggle("テキストだけ作成する")
 
-            submit = st.button("生成開始",disabled=st.session_state.is_guest,help="ログイン時のみ利用可能")
+            submit = st.button(
+                "生成開始",
+                disabled=st.session_state.is_guest,
+                help="ログイン時のみ利用可能",
+            )
 
         if submit:
-            if (
-                st.session_state.tales["title"]
-                or st.session_state.tales["description"]
-            ):
+            if st.session_state.tales["title"] or st.session_state.tales["description"]:
                 show_overlay()
                 book_content = create_all(only_tales=only_tales)
 
@@ -858,9 +894,7 @@ def create():
                 hide_overlay()
 
                 try:
-                    st.image(
-                        book_content["images"]["title"], use_column_width="auto"
-                    )
+                    st.image(book_content["images"]["title"], use_column_width="auto")
                 except:
                     st.image("assets/noimage.png", use_column_width="auto")
                 st.write(book_content["tales"]["description"])
@@ -874,9 +908,7 @@ def create():
         images, captions = get_images(
             get_all_book_titles(
                 "story-user-data",
-                const.TITLE_BASE_PATH.replace(
-                    "%%user_id%%", st.session_state.user_id
-                ),
+                const.TITLE_BASE_PATH.replace("%%user_id%%", st.session_state.user_id),
             ),
             st.session_state.user_id,
         )
