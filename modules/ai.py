@@ -52,7 +52,7 @@ def create_tales(
                 break
             except Exception as e:
                 print(e.args)
-                print(f"生成された内容：{content_text}")
+                print(f"生成された内容：{content}")
                 continue
 
     if tales:
