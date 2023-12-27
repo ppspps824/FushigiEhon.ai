@@ -7,4 +7,4 @@ def setting():
         "保有クレジット":200,
         "累計消費クレジット":1200
     }
-    st.table(table_data,columns=["カテゴリ","内容"])
+    st.table(table_data)
