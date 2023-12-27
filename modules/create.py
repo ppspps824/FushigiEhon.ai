@@ -30,9 +30,7 @@ from modules.utils import (
 )
 from PIL import Image
 
-# from streamlit_lottie import st_lottie_spinner
-
-IS_LOGIN= not st.session_state.is_guest
+# from streamlit_lottie import st_lottie_spinnerf
 
 def view_edit():
     st.write("---")
@@ -122,7 +120,7 @@ def view_edit():
         with title_col3:
             st.write("")
             st.write("")
-            if st.button("えほんを保存する", help="変更した内容でえほんを保存します。"):
+            if st.button("えほんを保存する", help="変更した内容でえほんを保存します。",disabled=st.session_state.is_guest):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
 
@@ -139,7 +137,7 @@ def view_edit():
                 st.rerun()
 
             book_trigger_btn = ui.button(
-                text="えほんを削除する", key="book_trigger_btn"
+                text="えほんを削除する", key="book_trigger_btn",disabled=st.session_state.is_guest
             )
             if ui.alert_dialog(
                 show=book_trigger_btn,
@@ -181,7 +179,7 @@ def view_edit():
                     with ai_container:
                         st.write("AI機能")
 
-                        if st.button("あらすじ、テーマ・メッセージを生成する",disabled=IS_LOGIN):
+                        if st.button("あらすじ、テーマ・メッセージを生成する",disabled=st.session_state.is_guest):
                             show_overlay()
                             tales_text = "\n".join(st.session_state.tales["content"])
                             with st.spinner("生成中...(あらすじ)"):
@@ -211,7 +209,7 @@ def view_edit():
 
                         if st.button(
                             "次のページを生成する",
-                            disabled=IS_LOGIN,
+                            disabled=st.session_state.is_guest,
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
                         ):
                             show_overlay()
@@ -223,7 +221,7 @@ def view_edit():
                             modify()
                             st.rerun()
 
-                        if st.button("表紙を生成する",disabled=IS_LOGIN):
+                        if st.button("表紙を生成する",disabled=st.session_state.is_guest):
                             show_overlay()
                             title = st.session_state.tales["title"]
                             description = st.session_state.tales["description"]
@@ -250,7 +248,7 @@ def view_edit():
 
                             st.rerun()
 
-                        if st.button("表紙を補正する",disabled=IS_LOGIN):
+                        if st.button("表紙を補正する",disabled=st.session_state.is_guest):
                             show_overlay()
                             st.session_state.images["title"] = image_upgrade(
                                 st.session_state.images["title"],
@@ -270,7 +268,7 @@ def view_edit():
                             st.rerun()
                         with st.container(border=True):
                             st.caption("全ページ一括処理")
-                            if st.button("テキスト以外を一括で生成する",disabled=IS_LOGIN):
+                            if st.button("テキスト以外を一括で生成する",disabled=st.session_state.is_guest):
                                 show_overlay()
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
@@ -278,7 +276,7 @@ def view_edit():
                                 hide_overlay()
                                 st.rerun()
 
-                            if st.button("音声を一括で生成する",disabled=IS_LOGIN):
+                            if st.button("音声を一括で生成する",disabled=st.session_state.is_guest):
                                 show_overlay()
                                 for num, tale in enumerate(
                                     st.session_state.tales["content"]
@@ -288,7 +286,7 @@ def view_edit():
                                 modify()
                                 hide_overlay()
                                 st.rerun()
-                            if st.button("イラストを一括で生成する",disabled=IS_LOGIN):
+                            if st.button("イラストを一括で生成する",disabled=st.session_state.is_guest):
                                 show_overlay()
                                 st.session_state.images["title"] = post_image_api(
                                     st.session_state.images["title"],
@@ -319,7 +317,7 @@ def view_edit():
                                 hide_overlay()
                                 st.rerun()
 
-                            if st.button("イラストを一括で補正する",disabled=IS_LOGIN):
+                            if st.button("イラストを一括で補正する",disabled=st.session_state.is_guest):
                                 show_overlay()
                                 st.session_state.images["title"] = image_upgrade(
                                     st.session_state.images["title"],
@@ -446,7 +444,7 @@ def view_edit():
                         if st.button(
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
-                            disabled=IS_LOGIN
+                            disabled=st.session_state.is_guest
                         ):
                             show_overlay()
                             adding_page(page_count + 1)
@@ -459,7 +457,7 @@ def view_edit():
                         if st.button(
                             "内容を生成する",
                             help="このページの文章を、AIによって生成します。",
-                            disabled=IS_LOGIN
+                            disabled=st.session_state.is_guest
                         ):
                             show_overlay()
                             create_one_tale(page_count)
@@ -470,7 +468,7 @@ def view_edit():
                         if st.button(
                             "音声を生成する",
                             help="このページの音声を、AIによって生成します。",
-                            disabled=IS_LOGIN
+                            disabled=st.session_state.is_guest
                         ):
                             show_overlay()
                             create_one_audio(page_count, tale)
@@ -481,7 +479,7 @@ def view_edit():
                         if st.button(
                             "イラストを生成する",
                             help="このページのイラストを、文章をベースにAIによって生成します。",
-                            disabled=IS_LOGIN
+                            disabled=st.session_state.is_guest
                         ):
                             show_overlay()
                             create_one_image(page_count, tale)
@@ -490,7 +488,7 @@ def view_edit():
                             st.rerun()
                         if st.button(
                             "イラストを補正する",
-                            disabled=IS_LOGIN,
+                            disabled=st.session_state.is_guest,
                             help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。",
                         ):
                             show_overlay()
@@ -711,11 +709,14 @@ def create_all(only_tale=False, ignore_tale=False):
 
 
 def create():
-    mode = st.selectbox(
-        "あたらしくつくる",
-        options=["", "おまかせでつくる", "いちからつくる"],
-        on_change=clear_session_state,
-    )
+    if st.session_state.is_guest:
+        mode = "いちからつくる"
+    else:
+        mode = st.selectbox(
+            "あたらしくつくる",
+            options=["", "おまかせでつくる", "いちからつくる"],
+            on_change=clear_session_state,
+        )
 
     if mode == "おまかせでつくる":
         with st.container(border=True):
@@ -814,7 +815,7 @@ def create():
 
             only_tales = st.toggle("テキストだけ作成する")
 
-            submit = st.button("生成開始",disabled=IS_LOGIN,help="ログイン時のみ利用可能")
+            submit = st.button("生成開始",disabled=st.session_state.is_guest,help="ログイン時のみ利用可能")
 
         if submit:
             if (
