@@ -536,34 +536,35 @@ def view_edit():
                         delete_page(page_count)
 
     if st.session_state.is_guest:
-        if st.button("動画とPDFを生成する"):
-            create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
-            create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-            book_info= {
-                        "create_date": create_date_yyyymdd,
-                        "tales": st.session_state.tales,
-                        "images": st.session_state.images,
-                        "audios": st.session_state.audios,
-                    }
-            video_data, pdf_data=create_movie_and_pdf(book_info, bgm)
-            if video_data:
-                st.video(video_data)
-                st.download_button(
-                    label="動画を保存",
-                    data=video_data,
-                    file_name=f"{st.session_state.tales["title"]}.mp4",
-                    mime="video/mp4",
-                )
-            else:
-                st.error("データの読み込みに失敗しました。")
+        if st.session_state.tales["title"]:
+            if st.button("動画とPDFを生成する"):
+                create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
+                create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
+                book_info= {
+                            "create_date": create_date_yyyymdd,
+                            "tales": st.session_state.tales,
+                            "images": st.session_state.images,
+                            "audios": st.session_state.audios,
+                        }
+                video_data, pdf_data=create_movie_and_pdf(book_info, bgm)
+                if video_data:
+                    st.video(video_data)
+                    st.download_button(
+                        label="動画を保存",
+                        data=video_data,
+                        file_name=f"{st.session_state.tales["title"]}.mp4",
+                        mime="video/mp4",
+                    )
+                else:
+                    st.error("データの読み込みに失敗しました。")
 
-            if pdf_data:
-                st.download_button(
-                    label="PDFを保存",
-                    data=pdf_data,
-                    file_name=f"{st.session_state.tales["title"]}.pdf",
-                    mime="application/pdf",
-                )
+                if pdf_data:
+                    st.download_button(
+                        label="PDFを保存",
+                        data=pdf_data,
+                        file_name=f"{st.session_state.tales["title"]}.pdf",
+                        mime="application/pdf",
+                    )
 
 
 def delete_book(title):
