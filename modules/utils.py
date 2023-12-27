@@ -276,39 +276,43 @@ def image_select_menu(images, captions):
 
 def add_caption_transparent(image_bytes, caption):
     # Load the image from bytes and convert to RGBA for transparency support
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
+    try:
+        image = Image.open(io.BytesIO(image_bytes)).convert("RGBA")
 
-    # Define the caption size and font
-    caption_height = 30  # height of the caption box
-    font = ImageFont.truetype(
-        "assets/ZenMaruGothic-Bold.ttf", 16
-    )  # Update the path to your font as needed
+        # Define the caption size and font
+        caption_height = 30  # height of the caption box
+        font = ImageFont.truetype(
+            "assets/ZenMaruGothic-Bold.ttf", 16
+        )  # Update the path to your font as needed
 
-    # Create a semi-transparent caption box
-    caption_box = Image.new(
-        "RGBA", (image.width, caption_height), (255, 255, 255, 64)
-    )  # semi-transparent white
+        # Create a semi-transparent caption box
+        caption_box = Image.new(
+            "RGBA", (image.width, caption_height), (255, 255, 255, 64)
+        )  # semi-transparent white
 
-    # Create a new transparent image for the final result
-    new_image = Image.new(
-        "RGBA", (image.width, image.height + caption_height), (0, 0, 0, 0)
-    )
+        # Create a new transparent image for the final result
+        new_image = Image.new(
+            "RGBA", (image.width, image.height + caption_height), (0, 0, 0, 0)
+        )
 
-    # Paste the original image onto the new image
-    new_image.paste(image, (0, 0))
+        # Paste the original image onto the new image
+        new_image.paste(image, (0, 0))
 
-    # Paste the semi-transparent caption box onto the new image
-    new_image.paste(caption_box, (0, image.height), caption_box)
+        # Paste the semi-transparent caption box onto the new image
+        new_image.paste(caption_box, (0, image.height), caption_box)
 
-    # Draw the caption
-    draw = ImageDraw.Draw(new_image)
-    text_width = draw.textlength(caption, font=font)
-    text_height = font.size
-    text_x = (image.width - text_width) / 2
-    text_y = image.height + (caption_height - text_height) / 4
-    draw.text((text_x, text_y), caption, font=font, fill="black")
+        # Draw the caption
+        draw = ImageDraw.Draw(new_image)
+        text_width = draw.textlength(caption, font=font)
+        text_height = font.size
+        text_x = (image.width - text_width) / 2
+        text_y = image.height + (caption_height - text_height) / 4
+        draw.text((text_x, text_y), caption, font=font, fill="black")
 
-    # Convert the image with caption back to bytes
-    with io.BytesIO() as output:
-        new_image.save(output, format="PNG")
-        return output.getvalue()
+        # Convert the image with caption back to bytes
+        with io.BytesIO() as output:
+            new_image.save(output, format="PNG")
+            return output.getvalue()
+    except Exception as e:
+        print(e.args)
+        return ""
