@@ -39,7 +39,7 @@ def play():
     guest_images = [add_caption_transparent(image,caption) for image,caption in zip(guest_images,guest_captions)]
 
     captions+=guest_captions
-    captions=list(set(captions))
+    captions=sorted(set(captions), key=captions.index)
 
     imageUrls = [
         f"data:image/png;base64,{base64.b64encode(image).decode()}" for image in images
@@ -50,7 +50,7 @@ def play():
     ]
 
     imageUrls += guest_imageUrls
-    imageUrls = list(set(imageUrls))
+    imageUrls = sorted(set(imageUrls), key=imageUrls.index)
 
     selectedImageUrl = imageCarouselComponent(imageUrls=imageUrls, height=200)
 

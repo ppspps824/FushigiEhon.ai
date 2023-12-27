@@ -125,8 +125,10 @@ def main():
             title_inner_cols = st.columns(2)
             with title_inner_cols[0]:
                 st.video("assets/title_movie1.mp4")
-            with title_inner_cols[1]:
                 st.video("assets/title_movie2.mp4")
+            with title_inner_cols[1]:
+                st.video("assets/title_movie3.mp4")
+                st.video("assets/title_movie4.mp4")
 
         ## Login
         with title_cols[1]:
@@ -135,7 +137,19 @@ def main():
                     url=st.secrets["SUPABASE_URL"],
                     providers=["google"],
                 )
-                st.button("Free Trial", on_click=guest_login)
+                st.button("Guest", on_click=guest_login)
+
+        ## ライセンス表記
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
+        st.caption("Contact papasim824@gmail.com")
 
         if all([not st.session_state.session, not st.session_state.is_guest]):
             return
@@ -147,7 +161,7 @@ def main():
     # ログイン後画面
     if st.session_state.is_guest:
         st.session_state.user_id = "guest"
-        st.session_state.email = "Free Trial"
+        st.session_state.email = "Guest"
     else:
         st.session_state.user_id = st.session_state.session["user"]["id"]
         st.session_state.email = st.session_state.session["user"]["email"]
@@ -179,6 +193,18 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
+        ## ライセンス表記
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
+        st.caption("Contact papasim824@gmail.com")
     if selected == "つくる":
         create()
     elif selected == "よむ":
