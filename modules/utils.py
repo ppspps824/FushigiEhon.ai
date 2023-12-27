@@ -110,7 +110,7 @@ def create_text_img(text, width, height, font_size, margin=20):
 
 
 @st.cache_data(show_spinner=False)
-def create_movie_and_pdf(book_info,bgm):
+def create_movie_and_pdf(book_info, bgm):
     title = book_info["tales"]["title"]
     title_image_bytes = book_info["images"]["title"]
     tales = book_info["tales"]["content"]
@@ -280,13 +280,19 @@ def add_caption_transparent(image_bytes, caption):
 
     # Define the caption size and font
     caption_height = 30  # height of the caption box
-    font = ImageFont.truetype("assets/ZenMaruGothic-Bold.ttf", 16)  # Update the path to your font as needed
+    font = ImageFont.truetype(
+        "assets/ZenMaruGothic-Bold.ttf", 16
+    )  # Update the path to your font as needed
 
     # Create a semi-transparent caption box
-    caption_box = Image.new("RGBA", (image.width, caption_height), (255, 255, 255, 64))  # semi-transparent white
+    caption_box = Image.new(
+        "RGBA", (image.width, caption_height), (255, 255, 255, 64)
+    )  # semi-transparent white
 
     # Create a new transparent image for the final result
-    new_image = Image.new("RGBA", (image.width, image.height + caption_height), (0, 0, 0, 0))
+    new_image = Image.new(
+        "RGBA", (image.width, image.height + caption_height), (0, 0, 0, 0)
+    )
 
     # Paste the original image onto the new image
     new_image.paste(image, (0, 0))

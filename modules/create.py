@@ -1,8 +1,8 @@
 import base64
 import datetime
-import json
-from PIL import Image
 import io
+import json
+
 import const
 import pytz
 import streamlit as st
@@ -22,12 +22,13 @@ from modules.ai import (
 )
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
 from modules.utils import (
+    add_caption_transparent,
     create_movie_and_pdf,
     get_images,
     hide_overlay,
     show_overlay,
-    add_caption_transparent,
 )
+from PIL import Image
 
 # from streamlit_lottie import st_lottie_spinner
 
@@ -112,11 +113,11 @@ def view_edit():
                 if st.button("削除"):
                     st.session_state.tales["characters"]["others"].pop(chara_num)
                     st.rerun()
-        
-        bgm=st.selectbox("BGM",options=const.BGM_LIST)
+
+        bgm = st.selectbox("BGM", options=const.BGM_LIST)
         if bgm:
             st.audio(f"assets/{bgm}.mp3")
-            
+
         with title_col3:
             st.write("")
             st.write("")
@@ -131,7 +132,7 @@ def view_edit():
                     "audios": st.session_state.audios,
                 }
                 show_overlay()
-                save_book(book_content, st.session_state.tales["title"],bgm)
+                save_book(book_content, st.session_state.tales["title"], bgm)
                 modify()
                 hide_overlay()
                 st.rerun()
@@ -366,16 +367,22 @@ def view_edit():
                                                 [
                                                     adding_page(num)
                                                     for num in range(
-                                                        len(st.session_state.images["content"])
+                                                        len(
+                                                            st.session_state.images[
+                                                                "content"
+                                                            ]
+                                                        )
                                                         + adding_num
                                                     )
                                                 ]
                                             for num, image in enumerate(image_files):
-                                                image = Image.open(io.BytesIO(image.getvalue()))
-                                                image = image.resize((512,512))
+                                                image = Image.open(
+                                                    io.BytesIO(image.getvalue())
+                                                )
+                                                image = image.resize((512, 512))
                                                 # 空のバイトストリームを作成
                                                 bytes_io = io.BytesIO()
-                                                image.save(bytes_io, format='PNG') 
+                                                image.save(bytes_io, format="PNG")
                                                 bytes_data = bytes_io.getvalue()
                                                 st.session_state.images["content"][
                                                     num
@@ -538,7 +545,7 @@ def delete_book(title):
         st.toast("タイトルを入力してください")
 
 
-def save_book(book_content, title,bgm="こもれびの道"):
+def save_book(book_content, title, bgm="こもれびの道", only_tales=False):
     if title:
         with st.spinner("えほんを保存中..."):
             bucket_name = "story-user-data"
@@ -569,11 +576,12 @@ def save_book(book_content, title,bgm="こもれびの道"):
                 s3_upload(bucket_name, audio, audio_path)
 
             # 動画とPDFの生成
-            video_path = base_path + f"{title}.mp4"
-            pdf_path = base_path + f"{title}.pdf"
-            video_data, pdf_data = create_movie_and_pdf(book_content,bgm)
-            s3_upload(bucket_name, video_data, video_path)
-            s3_upload(bucket_name, pdf_data, pdf_path)
+            if not only_tales:
+                video_path = base_path + f"{title}.mp4"
+                pdf_path = base_path + f"{title}.pdf"
+                video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
+                s3_upload(bucket_name, video_data, video_path)
+                s3_upload(bucket_name, pdf_data, pdf_path)
 
             st.toast("保存しました。")
             st.cache_data.clear()
@@ -796,11 +804,11 @@ def create():
                                     chara_num
                                 )
                                 st.rerun()
-                    bgm=st.selectbox("BGM",options=const.BGM_LIST)
+                    bgm = st.selectbox("BGM", options=const.BGM_LIST)
                     if bgm:
                         st.audio(f"assets/{bgm}.mp3")
 
-                only_tale = st.toggle("テキストだけ作成する")
+                only_tales = st.toggle("テキストだけ作成する")
 
                 submit = st.button("生成開始")
 
@@ -810,9 +818,14 @@ def create():
                     or st.session_state.tales["description"]
                 ):
                     show_overlay()
-                    book_content = create_all(only_tale=only_tale)
+                    book_content = create_all(only_tales=only_tales)
 
-                    save_book(book_content, st.session_state.tales["title"],bgm)
+                    save_book(
+                        book_content,
+                        st.session_state.tales["title"],
+                        bgm,
+                        only_tales=only_tales,
+                    )
 
                     hide_overlay()
 
