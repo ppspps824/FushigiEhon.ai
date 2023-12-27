@@ -56,15 +56,16 @@ def get_images(titles, user_id):
             # バイト型データをPIL.Imageオブジェクトに変換
             image = Image.open(io.BytesIO(data))
             # 画像のリサイズ
-            resized_image = image.resize((256, 256))
 
-            img_bytes = io.BytesIO()
-            resized_image.save(img_bytes, format="PNG")
-            img_bytes = img_bytes.getvalue()
-
-            images.append(img_bytes)
         else:
-            images.append("assets/noimage.png")
+            image = Image.open("assets/noimage.png")
+
+        resized_image = image.resize((256, 256))
+        img_bytes = io.BytesIO()
+        resized_image.save(img_bytes, format="PNG")
+        img_bytes = img_bytes.getvalue()
+
+        images.append(img_bytes)
 
     captions = list(all_image.keys())
 
