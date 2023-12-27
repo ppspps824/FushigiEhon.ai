@@ -4,6 +4,7 @@ import const
 import openai
 import streamlit as st
 from modules.create import create
+from modules.setting import setting
 from modules.play import play
 from PIL import Image
 from streamlit_card import card
@@ -171,11 +172,19 @@ def main():
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.png")
     header_cols[2].caption(f"logged in {st.session_state.email}")
+
+    if st.session_state.is_guest:
+        menu_options=["よむ", "つくる", "ログアウト"]
+        menu_icons=["bi-play-btn", "bi-brush", "bi-door-open"]
+    else:
+        menu_options=["よむ", "つくる", "設定"]
+        menu_icons=["bi-play-btn", "bi-brush", "bi-door-open"]
+
     with st.sidebar:
         selected = option_menu(
             None,
-            ["よむ", "つくる", "ログアウト"],
-            icons=["bi-play-btn", "bi-brush", "bi-door-open"],
+            menu_options,
+            icons=menu_icons,
             menu_icon=None,
             default_index=0,
             orientation="vartical",
@@ -213,6 +222,8 @@ def main():
         logout_button()
         init_state()
         st.rerun()
+    elif selected == "設定":
+        setting()
 
 
 if __name__ == "__main__":
