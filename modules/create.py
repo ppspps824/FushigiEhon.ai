@@ -551,7 +551,7 @@ def view_edit():
                 st.download_button(
                     label="動画を保存",
                     data=video_data,
-                    file_name=f"{title}.mp4",
+                    file_name=f"{st.session_state.tales["title"]}.mp4",
                     mime="video/mp4",
                 )
             else:
@@ -561,7 +561,7 @@ def view_edit():
                 st.download_button(
                     label="PDFを保存",
                     data=pdf_data,
-                    file_name=f"{title}.pdf",
+                    file_name=f"{st.session_state.tales["title"]}.pdf",
                     mime="application/pdf",
                 )
 
