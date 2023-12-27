@@ -10,3 +10,4 @@ streamlit_shadcn_ui
 httpx-oauth
 moviepy
 streamlit-supabase-auth
+streamlit-card

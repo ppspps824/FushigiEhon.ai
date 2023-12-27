@@ -1,11 +1,14 @@
+import os
+
 import const
 import openai
 import streamlit as st
 from modules.create import create
 from modules.play import play
 from PIL import Image
+from streamlit_card import card
 from streamlit_option_menu import option_menu
-from streamlit_supabase_auth import login_form
+from streamlit_supabase_auth import login_form, logout_button
 
 
 def guest_login():
@@ -19,6 +22,7 @@ def main():
         st.session_state.user_id = ""
         st.session_state.email = ""
         st.session_state.disable_audio = False
+        st.session_state.session = None
 
         # create
         st.session_state.tales = {
@@ -52,16 +56,10 @@ def main():
         st.session_state.text_model = "gpt-4-1106-preview"
         st.session_state.image_model = "dall-e-3"
 
-    layout = (
-        "wide"
-        if any([st.session_state.is_login, st.session_state.is_guest])
-        else "centered"
-    )
-
     st.set_page_config(
         page_title="ふしぎえほん.ai",
         page_icon=Image.open("assets/logo.png"),
-        layout=layout,
+        layout="wide",
     )
 
     st.markdown(
@@ -69,70 +67,121 @@ def main():
         unsafe_allow_html=True,
     )
 
-    title_place = st.empty()
-    with title_place:
-        title_cols = st.columns([1, 3, 1])
+    os.environ["SUPABASE_KEY"] = st.secrets["SUPABASE_API_KEY"]
+
+    # Welcomページ
+    if not st.session_state.is_login:
+        title_image_cols = st.columns([1, 8])
+        with title_image_cols[0]:
+            st.image("assets/header.png")
+        ## About
+        st.image("assets/title_back.png")
+        title_cols = st.columns([3, 1])
+        with title_cols[0]:
+            card_cols = st.columns(2)
+
+            with card_cols[0]:
+                card(
+                    title="簡単かつ柔軟",
+                    text=[
+                        "タイトルを入力するだけで",
+                        "物語・イラスト・音声すべてをAIが生成します。",
+                    ],
+                    styles=const.TITLE_BOX_STYLE,
+                    key="card1-1",
+                )
+                card(
+                    title="オリジナリティ",
+                    text=[
+                        "手持ちの写真やイラストをアップロードすることもでき",
+                        "AIによって画像をグレードアップすることもできます。",
+                    ],
+                    styles=const.TITLE_BOX_STYLE,
+                    key="card1-2",
+                )
+            with card_cols[1]:
+                card(
+                    title="いつでもどこでも",
+                    text=[
+                        "作成した絵本はクラウド上に保存でき",
+                        "動画やPDFでダウンロードすることもできます。",
+                    ],
+                    styles=const.TITLE_BOX_STYLE,
+                    key="card2-1",
+                )
+                card(
+                    title="すべてが無料",
+                    text=[
+                        "すべての機能は無料で利用できます。",
+                        "クレジットを使い切ったら追加できます。",
+                    ],
+                    styles=const.TITLE_BOX_STYLE,
+                    key="card2-2",
+                )
+            title_inner_cols = st.columns(2)
+            with title_inner_cols[0]:
+                st.video("assets/title_movie1.mp4")
+            with title_inner_cols[1]:
+                st.video("assets/title_movie2.mp4")
+
+        ## Login
         with title_cols[1]:
-            st.image("assets/title.png")
+            with st.container(border=True):
+                st.session_state.session = login_form(
+                    url=st.secrets["SUPABASE_URL"],
+                    providers=["google"],
+                )
+                st.button("Free Trial", on_click=guest_login)
 
-    session = ""
-    if not st.session_state.is_guest:
-        session = login_form(
-            url=st.secrets["SUPABASE_URL"],
-            apiKey=st.secrets["SUPABASE_API_KEY"],
-            providers=["google", "twitter"],
-        )
+        if all([not st.session_state.session, not st.session_state.is_guest]):
+            return
 
-    guest_place = st.empty()
-    guest_place.button("ゲストログイン", on_click=guest_login, type="primary")
+        st.experimental_set_query_params(page=["success"])
+        st.session_state.is_login = True
+        st.rerun()
 
-    if all([not session, not st.session_state.is_guest]):
-        return
-
-    st.experimental_set_query_params(page=["success"])
-    title_place.empty()
-    guest_place.empty()
-
-    st.session_state.is_login = True
-
+    # ログイン後画面
     if st.session_state.is_guest:
         st.session_state.user_id = "guest"
-        st.session_state.email = "ゲスト"
+        st.session_state.email = "Free Trial"
     else:
-        st.session_state.user_id = session["user"]["id"]
-        st.session_state.email = session["user"]["email"]
+        st.session_state.user_id = st.session_state.session["user"]["id"]
+        st.session_state.email = st.session_state.session["user"]["email"]
 
     openai.api_key = st.secrets["OPEN_AI_KEY"]
 
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.png")
     header_cols[2].caption(f"logged in {st.session_state.email}")
-
-    selected = option_menu(
-        None,
-        ["よむ", "つくる"],
-        icons=["bi-play-btn", "bi-brush"],
-        menu_icon=None,
-        default_index=0,
-        orientation="horizontal",
-        styles={
-            "container": {
-                "margin": "0px !important",
-                "background-color": "#fafafa",
+    with st.sidebar:
+        selected = option_menu(
+            None,
+            ["よむ", "つくる", "ログアウト"],
+            icons=["bi-play-btn", "bi-brush"],
+            menu_icon=None,
+            default_index=0,
+            orientation="vartical",
+            styles={
+                "container": {
+                    "margin": "0px !important",
+                    "background-color": "#fafafa",
+                },
+                "icon": {"color": "fafafa", "font-size": "25px"},
+                "nav-link": {
+                    "font-size": "20px",
+                    "margin": "0px",
+                    "--hover-color": "#eee",
+                },
+                "nav-link-selected": {"background-color": "004a55"},
             },
-            "icon": {"color": "fafafa", "font-size": "25px"},
-            "nav-link": {
-                "font-size": "20px",
-                "margin": "0px",
-                "--hover-color": "#eee",
-            },
-            "nav-link-selected": {"background-color": "004a55"},
-        },
-    )
+        )
     if selected == "つくる":
         create()
     elif selected == "よむ":
         play()
+    elif selected == "ログアウト":
+        logout_button()
+        st.rerun()
 
 
 if __name__ == "__main__":

@@ -1,6 +1,21 @@
 import glob
 import os
 
+TITLE_BOX_STYLE = {
+    "title": {"color": "#646464"},
+    "text": {"color": "#646464"},
+    "card": {
+        "padding": "0px",
+        "margin": "0px",
+        "width": "100%",
+        "border-radius": "10px",
+        "box-shadow": "0 0 2px rgba(0,0,0,0.5)",
+    },
+    "filter": {
+        "background-color": "rgba(250, 250, 250, 0)"  # <- make the image not dimmed anymore
+    },
+}
+
 BASE_PATH = "users/%%user_id%%/book_info/%%title%%/"
 TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
 BGM_LIST = [
