@@ -564,6 +564,7 @@ def view_edit():
                         data=pdf_data,
                         file_name=f'{st.session_state.tales["title"]}.pdf',
                         mime="application/pdf",
+                        disabled=st.session_state.is_guest
                     )
 
 
