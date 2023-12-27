@@ -161,7 +161,7 @@ def main():
         selected = option_menu(
             None,
             ["よむ", "つくる", "ログアウト"],
-            icons=["bi-play-btn", "bi-brush"],
+            icons=["bi-play-btn", "bi-brush", "bi-door-open"],
             menu_icon=None,
             default_index=0,
             orientation="vartical",
