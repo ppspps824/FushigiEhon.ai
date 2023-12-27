@@ -67,7 +67,7 @@ HIDE_ST_STYLE = """
                             padding-top: 1rem;
                             padding-right: 3rem;
                             padding-left: 3rem;
-                            padding-bottom: 1rem;
+                            padding-bottom: 5rem;
                         }  
                         .appview-container .sidebar-content {
                             padding-top: 0rem;
@@ -108,11 +108,11 @@ POST_HTML = """
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 """
 
-CHARACTORS_PER_PAGE = 20
+CHARACTORS_PER_PAGE = 30
 SENTENCE_STRUCTURE_SET = ["バランス", "ナレーション中心", "会話中心"]
 CHARACTER_SET = ["ひらがなのみ", "ひらがなとカタカナ", "制限なし"]
 AGE_GROUP = ["1～2歳", "3～5歳", "6～10歳", "11歳～"]
-MAX_PAGE_NUM = 20
+MAX_PAGE_NUM = 10
 
 RAMDOM_PLACEHOLDER = """入力なしの場合自動で生成します。"""
 
