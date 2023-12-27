@@ -1,6 +1,19 @@
 import glob
 import os
 
+FB_SHARE_HTML =     """
+<div id="fb-root"></div>
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v18.0" nonce="CrRr7FQJ"></script>
+<div class="fb-share-button" data-href="https://fushigiehonai.streamlit.app/" data-layout="" data-size=""><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Ffushigiehonai.streamlit.app%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">シェアする</a></div>
+"""
+
+X_SHARE_HTML =     """
+<a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large"
+    data-text="%%title%% - ふしぎえほん.ai" data-url="https://fushigiehonai.streamlit.app/" data-hashtags="絵本,AI,ふしぎえほん"
+    data-show-count="false">Tweet</a>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    """
+
 TITLE_BOX_STYLE = {
     "title": {"color": "#646464"},
     "text": {"color": "#646464"},
@@ -18,12 +31,12 @@ TITLE_BOX_STYLE = {
 
 BASE_PATH = "users/%%user_id%%/book_info/%%title%%/"
 TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
-BGM_LIST=[
+BGM_LIST = [
     os.path.splitext(os.path.basename(path))[0]
     for path in glob.glob("assets/*")
     if "mp3" in path
 ]
-BGM_OPTIONS = ["ランダム","なし"]+BGM_LIST
+BGM_OPTIONS = ["ランダム", "なし"] + BGM_LIST
 
 
 HIDE_ST_STYLE = """

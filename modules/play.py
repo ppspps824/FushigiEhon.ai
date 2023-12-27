@@ -82,19 +82,27 @@ def play():
         )
         if video_data:
             st.video(video_data)
-            st.download_button(
-                label="動画を保存",
-                data=video_data,
-                file_name=f"{title}.mp4",
-                mime="video/mp4",
-            )
+            cols=st.columns([2,2,1,1])
+            with cols[0]:
+                components.html(const.X_SHARE_HTML.replace("%%title%%",title))
+            with cols[1]:
+                components.html(const.FB_SHARE_HTML.replace("%%title%%",title))
+            
+            with cols[2]:
+                st.download_button(
+                    label="動画を保存",
+                    data=video_data,
+                    file_name=f"{title}.mp4",
+                    mime="video/mp4",
+                )
         else:
             st.error("データの読み込みに失敗しました。")
 
         if pdf_data:
-            st.download_button(
-                label="PDFを保存",
-                data=pdf_data,
-                file_name=f"{title}.pdf",
-                mime="application/pdf",
-            )
+            with cols[3]:
+                st.download_button(
+                    label="PDFを保存",
+                    data=pdf_data,
+                    file_name=f"{title}.pdf",
+                    mime="application/pdf",
+                )
