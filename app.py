@@ -14,6 +14,7 @@ from streamlit_supabase_auth import login_form, logout_button
 
 import modules.database as db
 
+
 def guest_login():
     st.session_state.is_guest = True
 
@@ -168,9 +169,12 @@ def main():
     else:
         st.session_state.user_id = st.session_state.session["user"]["id"]
         st.session_state.email = st.session_state.session["user"]["email"]
-        user_info=db.read_user(st.session_state.user_id)
+        user_info = db.read_user(st.session_state.user_id)
         if not user_info.data:
             db.create_user(user_id=st.session_state.user_id)
+            db.adding_credits(
+                user_id=st.session_state.user_id, event="新規登録", value=-100
+            )
 
     openai.api_key = st.secrets["OPEN_AI_KEY"]
 
@@ -179,11 +183,11 @@ def main():
     header_cols[2].caption(f"logged in {st.session_state.email}")
 
     if st.session_state.is_guest:
-        menu_options=["よむ", "つくる", "ログアウト"]
-        menu_icons=["bi-play-btn", "bi-brush", "bi-door-open"]
+        menu_options = ["よむ", "つくる", "ログアウト"]
+        menu_icons = ["bi-play-btn", "bi-brush", "bi-door-open"]
     else:
-        menu_options=["よむ", "つくる", "設定"]
-        menu_icons=["bi-play-btn", "bi-brush", "bi-door-open"]
+        menu_options = ["よむ", "つくる", "設定"]
+        menu_icons = ["bi-play-btn", "bi-brush", "bi-door-open"]
 
     with st.sidebar:
         selected = option_menu(
