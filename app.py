@@ -11,7 +11,7 @@ from PIL import Image
 from streamlit_card import card
 from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
-
+from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
 
 
@@ -211,6 +211,7 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
+        button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
         ## ライセンス表記
         st.write("")
         st.write("")

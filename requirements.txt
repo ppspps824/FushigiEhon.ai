@@ -13,3 +13,4 @@ streamlit-supabase-auth
 streamlit-card
 supabase
 pytz
+streamlit-extras
