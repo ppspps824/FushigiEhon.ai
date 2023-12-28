@@ -22,7 +22,7 @@ def setting():
     created_at = user_info.data[0]["created_at"][:10].replace("-", "/")
 
     # Summary
-    st.write("### ユーザー情報")
+    st.caption("ユーザー情報")
     summary_table_data = [{
         "利用開始日": created_at,
         "保有クレジット": credits,
@@ -31,5 +31,5 @@ def setting():
     st.dataframe(summary_table_data)
 
     # Details
-    st.write("### クレジット明細")
+    st.caption("クレジット明細")
     st.dataframe(details_using_credits)
