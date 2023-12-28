@@ -594,62 +594,56 @@ def view_edit():
 
 
 def delete_book(title):
-    if title:
-        bucket_name = "story-user-data"
-        s3_delete_folder(
-            bucket_name,
-            const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace(
-                "%%title%%", title
-            ),
-        )
-        st.toast(f"{title}を削除しました")
-    else:
-        st.toast("タイトルを入力してください")
+    bucket_name = "story-user-data"
+    s3_delete_folder(
+        bucket_name,
+        const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace(
+            "%%title%%", title
+        ),
+    )
+    st.toast(f"{title}を削除しました")
 
 
 def save_book(book_content, title, bgm, only_tales=False):
-    if title:
-        with st.spinner("えほんを保存中..."):
-            bucket_name = "story-user-data"
-            user_id = st.session_state.user_id
-            base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
-                "%%title%%", title
-            )
+    with st.spinner("えほんを保存中..."):
+        bucket_name = "story-user-data"
+        user_id = st.session_state.user_id
+        base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
+            "%%title%%", title
+        )
 
-            # タイトル画像の保存
-            title_image_path = base_path + "images/title.jpeg"
-            title_image = book_content["images"]["title"]
-            s3_upload(bucket_name, title_image, title_image_path)
+        # タイトル画像の保存
+        title_image_path = base_path + "images/title.jpeg"
+        title_image = book_content["images"]["title"]
+        s3_upload(bucket_name, title_image, title_image_path)
 
-            # 物語の内容（tales.json）の保存
-            tales_path = base_path + "tales.json"
-            tales_data = json.dumps(
-                book_content["tales"], indent=4, ensure_ascii=False
-            ).encode()
-            s3_upload(bucket_name, tales_data, tales_path)
+        # 物語の内容（tales.json）の保存
+        tales_path = base_path + "tales.json"
+        tales_data = json.dumps(
+            book_content["tales"], indent=4, ensure_ascii=False
+        ).encode()
+        s3_upload(bucket_name, tales_data, tales_path)
 
-            # ページ毎の画像とオーディオの保存
-            for ix, (image, audio) in enumerate(
-                zip(book_content["images"]["content"], book_content["audios"])
-            ):
-                image_path = base_path + f"images/image_{ix}.jpeg"
-                audio_path = base_path + f"audios/audio_{ix}.mp3"
-                s3_upload(bucket_name, image, image_path)
-                s3_upload(bucket_name, audio, audio_path)
+        # ページ毎の画像とオーディオの保存
+        for ix, (image, audio) in enumerate(
+            zip(book_content["images"]["content"], book_content["audios"])
+        ):
+            image_path = base_path + f"images/image_{ix}.jpeg"
+            audio_path = base_path + f"audios/audio_{ix}.mp3"
+            s3_upload(bucket_name, image, image_path)
+            s3_upload(bucket_name, audio, audio_path)
 
-            # 動画とPDFの生成
-            if not only_tales:
-                video_path = base_path + f"{title}.mp4"
-                pdf_path = base_path + f"{title}.pdf"
-                video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
-                s3_upload(bucket_name, video_data, video_path)
-                s3_upload(bucket_name, pdf_data, pdf_path)
+        # 動画とPDFの生成
+        if not only_tales:
+            video_path = base_path + f"{title}.mp4"
+            pdf_path = base_path + f"{title}.pdf"
+            video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
+            s3_upload(bucket_name, video_data, video_path)
+            s3_upload(bucket_name, pdf_data, pdf_path)
 
-            st.toast("保存しました。")
-            st.cache_data.clear()
+        st.toast("保存しました。")
+        st.cache_data.clear()
 
-    else:
-        st.toast("タイトルを入力してください")
 
 
 def modify():
@@ -778,7 +772,7 @@ def create():
     if mode == "おまかせでつくる":
         with st.container(border=True):
             st.session_state.tales["title"] = st.text_input(
-                "タイトル", placeholder=const.RAMDOM_PLACEHOLDER, max_chars=15
+                "タイトル", max_chars=15
             )
             with st.expander("こだわり設定"):
                 col1, col2, col3, col4 = st.columns(4)
@@ -889,7 +883,7 @@ def create():
             )
 
         if submit:
-            if st.session_state.tales["title"] or st.session_state.tales["description"]:
+            if st.session_state.tales["title"]:
                 show_overlay()
                 book_content = create_all(only_tales=only_tales)
 
@@ -909,7 +903,7 @@ def create():
                 st.write(book_content["tales"]["description"])
 
             else:
-                st.toast("タイトルかあらすじを内容を入力してください。")
+                st.toast("タイトルを内容を入力してください。")
 
     elif mode == "いちからつくる":
         view_edit()
