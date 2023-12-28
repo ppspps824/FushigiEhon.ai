@@ -33,7 +33,7 @@ def check_credits(user_id, events):
     if credits - use_credit < 0:
         st.toast(f"クレジットが不足しています。/ 保有クレジット：{credits} 消費クレジット：{use_credit}")
         hide_overlay()
-        time.sleep(1)
+        time.sleep(2)
         st.rerun()
 
 
