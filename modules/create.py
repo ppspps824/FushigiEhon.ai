@@ -905,7 +905,7 @@ def create():
                 st.write(book_content["tales"]["description"])
 
             else:
-                st.toast("タイトルを内容を入力してください。")
+                st.toast("タイトルを入力してください。")
 
     elif mode == "いちからつくる":
         view_edit()
