@@ -804,10 +804,12 @@ def create():
                 st.session_state.tales["theme"] = title_col1.text_area(
                     "テーマ・メッセージ",
                     placeholder=const.RAMDOM_PLACEHOLDER,
+                    max_chars=100,
                 )
                 st.session_state.tales["description"] = title_col2.text_area(
                     "設定やあらすじ",
                     placeholder=const.RAMDOM_PLACEHOLDER,
+                    max_chars=100,
                 )
                 with st.container(border=True):
                     st.caption("キャラクター")
