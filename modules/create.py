@@ -27,6 +27,7 @@ from modules.utils import (
     get_images,
     hide_overlay,
     show_overlay,
+    check_credits,
 )
 from PIL import Image
 from modules.utils import culc_use_credits
@@ -293,6 +294,10 @@ def view_edit():
                                 "テキスト以外を一括で生成する",
                                 disabled=st.session_state.is_guest,
                             ):
+                                events = ["イラスト生成"] * len(
+                                    st.session_state.tales["content"]
+                                )
+                                check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
@@ -317,6 +322,10 @@ def view_edit():
                                 "イラストを一括で生成する",
                                 disabled=st.session_state.is_guest,
                             ):
+                                events = ["イラスト生成"] * len(
+                                    st.session_state.tales["content"]
+                                )
+                                check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 st.session_state.images["title"] = post_image_api(
                                     st.session_state.images["title"],
@@ -351,6 +360,10 @@ def view_edit():
                                 "イラストを一括で補正する",
                                 disabled=st.session_state.is_guest,
                             ):
+                                events = ["イラスト生成"] * len(
+                                    st.session_state.tales["content"]
+                                )
+                                check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 st.session_state.images["title"] = image_upgrade(
                                     st.session_state.images["title"],
@@ -645,7 +658,6 @@ def save_book(book_content, title, bgm, only_tales=False):
         st.cache_data.clear()
 
 
-
 def modify():
     st.session_state.not_modify = False
 
@@ -771,9 +783,7 @@ def create():
 
     if mode == "おまかせでつくる":
         with st.container(border=True):
-            st.session_state.tales["title"] = st.text_input(
-                "タイトル", max_chars=15
-            )
+            st.session_state.tales["title"] = st.text_input("タイトル", max_chars=20)
             with st.expander("こだわり設定"):
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -872,10 +882,12 @@ def create():
             if only_tales:
                 events = ["テキスト生成"] * st.session_state.tales["number_of_pages"]
             else:
-                events = ["イラスト生成"]+(["イラスト生成"] * st.session_state.tales["number_of_pages"])
+                events = ["イラスト生成"] + (
+                    ["イラスト生成"] * st.session_state.tales["number_of_pages"]
+                )
                 events += ["テキスト生成"] * st.session_state.tales["number_of_pages"]
                 events += ["オーディオ生成"] * st.session_state.tales["number_of_pages"]
-            use_credit=culc_use_credits(events)
+            use_credit = culc_use_credits(events)
 
             st.caption(f"クレジット消費量：{use_credit}")
             submit = st.button(

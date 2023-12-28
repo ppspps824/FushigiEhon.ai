@@ -31,7 +31,7 @@ def check_credits(user_id, events):
     credits = abs(sum([info["value"] for info in credits_info.data]))
 
     if credits - use_credit < 0:
-        st.toast("クレジットが不足しています。")
+        st.toast("クレジットが不足しています。/ 保有クレジット：{credits} 消費クレジット：{use_credit}")
         hide_overlay()
         time.sleep(1)
         st.rerun()
