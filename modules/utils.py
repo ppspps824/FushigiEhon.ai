@@ -16,18 +16,17 @@ from PIL import Image, ImageDraw, ImageFont
 from streamlit_image_select import image_select
 import modules.database as db
 
-
-def culc_use_credits(event):
-    if event == "イラスト生成":
-        use_credit = 6
-    else:
-        use_credit = 1
+def culc_use_credits(events):
+    use_credit=0
+    for event in events:
+        if event == "イラスト生成":
+            use_credit += 6
 
     return use_credit
 
 
-def check_credits(user_id, event):
-    use_credit =culc_use_credits(event)
+def check_credits(user_id, events):
+    use_credit = culc_use_credits(events)
     credits_info = db.read_credits(user_id)
     credits = abs(sum([info["value"] for info in credits_info.data]))
 

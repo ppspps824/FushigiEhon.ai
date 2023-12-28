@@ -86,6 +86,15 @@ def main():
         st.image("assets/title_back.png")
         title_cols = st.columns([3, 1])
         with title_cols[0]:
+            card(
+                title="すぐに始める",
+                text=[
+                    "※ログインするとAI機能の利用および保存が可能になります。",
+                ],
+                styles=const.TITLE_LINK_BOX_STYLE,
+                key="card",
+                on_click=guest_login
+            )
             card_cols = st.columns(2)
 
             with card_cols[0]:
@@ -118,10 +127,10 @@ def main():
                     key="card2-1",
                 )
                 card(
-                    title="無料ではじめる",
+                    title="すべての機能を最初から",
                     text=[
-                        "新規登録時に100クレジットが付与されるので",
-                        "すぐにすべての機能を利用できます。",
+                        "初回ログイン時に100クレジットが付与されるので、すぐにすべての機能を利用できます。",
+                        "※クレジットはイラスト生成でのみ消費します。",
                     ],
                     styles=const.TITLE_BOX_STYLE,
                     key="card2-2",
@@ -141,7 +150,6 @@ def main():
                     url=st.secrets["SUPABASE_URL"],
                     providers=["google"],
                 )
-                st.button("Guest", on_click=guest_login)
 
         ## ライセンス表記
         st.write("")
@@ -183,11 +191,11 @@ def main():
     header_cols[2].caption(f"logged in {st.session_state.email}")
 
     if st.session_state.is_guest:
-        menu_options = ["よむ", "つくる", "ログアウト"]
+        menu_options = ["よむ", "つくる", "戻る"]
         menu_icons = ["bi-play-btn", "bi-brush", "bi-door-open"]
     else:
         menu_options = ["よむ", "つくる", "設定"]
-        menu_icons = ["bi-play-btn", "bi-brush", "bi-door-open"]
+        menu_icons = ["bi-play-btn", "bi-brush", "bi-gear"]
 
     with st.sidebar:
         selected = option_menu(
@@ -216,7 +224,9 @@ def main():
         st.write("")
         st.write("")
         st.write("")
-        button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
+        if not st.session_state.is_guest:
+            st.caption("クレジット購入はこちらから")
+            button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
         ## ライセンス表記
         st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact papasim824@gmail.com")
@@ -224,7 +234,7 @@ def main():
         create()
     elif selected == "よむ":
         play()
-    elif selected == "ログアウト":
+    elif selected == "戻る":
         logout_button()
         init_state()
         st.rerun()

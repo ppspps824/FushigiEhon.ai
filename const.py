@@ -8,9 +8,24 @@ X_SHARE_HTML =     """
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
     """
 
+TITLE_LINK_BOX_STYLE = {
+    "title": {"color": "#fafafa"},
+    "text": {"color": "#fafafa"},
+    "card": {
+        "padding": "10px",
+        "margin": "0px",
+        "width": "100%",
+        "height":"50%",
+        "border-radius": "10px",
+        "box-shadow": "0 0 2px rgba(0,0,0,0.5)",
+    },
+    "filter": {
+        "background-color": "#004a55"  # <- make the image not dimmed anymore
+    },
+}
 TITLE_BOX_STYLE = {
-    "title": {"color": "#646464"},
-    "text": {"color": "#646464"},
+    "title": {"color": "#004a55"},
+    "text": {"color": "#004a55"},
     "card": {
         "padding": "0px",
         "margin": "0px",

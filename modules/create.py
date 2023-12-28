@@ -29,7 +29,7 @@ from modules.utils import (
     show_overlay,
 )
 from PIL import Image
-
+from modules.utils import culc_use_credits
 # from streamlit_lottie import st_lottie_spinnerf
 
 
@@ -873,6 +873,15 @@ def create():
 
             only_tales = st.toggle("テキストだけ作成する")
 
+            if only_tales:
+                events = ["テキスト生成"] * st.session_state.tales["number_of_pages"]
+            else:
+                events = ["イラスト生成"]+(["イラスト生成"] * st.session_state.tales["number_of_pages"])
+                events += ["テキスト生成"] * st.session_state.tales["number_of_pages"]
+                events += ["オーディオ生成"] * st.session_state.tales["number_of_pages"]
+            use_credit=culc_use_credits(events)
+
+            st.caption(f"クレジット消費量：{use_credit}")
             submit = st.button(
                 "生成開始",
                 disabled=st.session_state.is_guest,
