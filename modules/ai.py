@@ -8,14 +8,19 @@ import openai
 import requests
 import streamlit as st
 from PIL import Image
+from modules.utils import check_credits
+import modules.database as db
 
 
 def post_text_api(prompt):
+    event="テキスト生成"
+    check_credits(st.session_state.user_id,event)
     response = openai.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[{"role": "system", "content": prompt}],
     )
     content_text = response.choices[0].message.content
+    db.adding_credits(user_id=st.session_state.user_id, event=event)
 
     return content_text
 
@@ -64,6 +69,8 @@ def create_tales(
 
 
 def post_image_api(prompt, size):
+    event="イラスト生成"
+    check_credits(st.session_state.user_id,event)
     image_url = ""
     if st.session_state.image_model == "dall-e-3":
         gen_size = "1024x1024"
@@ -94,7 +101,7 @@ def post_image_api(prompt, size):
 
         buffer = io.BytesIO()
         image.save(buffer, format="JPEG", quality=50)
-
+        db.adding_credits(user_id=st.session_state.user_id, event=event)
         return buffer.getvalue()
     else:
         return ""
@@ -144,16 +151,20 @@ def create_audios(tales):
 
 
 def post_audio_api(tale):
+    event="オーディオ生成"
+    check_credits(st.session_state.user_id,event)
     response = openai.audio.speech.create(
         model="tts-1",
         voice="nova",
         input=tale,
     )
-
+    db.adding_credits(user_id=st.session_state.user_id, event=event)
     return response.content
 
 
 def image_upgrade(image, title, description, theme, characters, tale):
+    event="イラスト生成"
+    check_credits(st.session_state.user_id,event)
     if image:
         base_prompt = """
         あなたの役割は入力された画像と説明を理解し、より詳細な画像を生成するためのプロンプトテキストを生成することです。
@@ -193,6 +204,7 @@ def image_upgrade(image, title, description, theme, characters, tale):
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
             result = post_image_api(prompt, size=(1024, 1024))
+            db.adding_credits(user_id=st.session_state.user_id, event=event)
         return result
 
 
@@ -220,7 +232,7 @@ def create_one_tale(num):
             )
             .replace(
                 "%%number_of_pages_placeholder%%",
-                st.session_state.tales["number_of_pages"],
+                str(st.session_state.tales["number_of_pages"]),
             )
             .replace(
                 "%%character_set_placeholder%%",

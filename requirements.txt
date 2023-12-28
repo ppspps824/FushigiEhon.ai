@@ -11,3 +11,5 @@ httpx-oauth
 moviepy
 streamlit-supabase-auth
 streamlit-card
+supabase
+pytz

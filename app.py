@@ -6,11 +6,13 @@ import streamlit as st
 from modules.create import create
 from modules.setting import setting
 from modules.play import play
+from modules.database import *
 from PIL import Image
 from streamlit_card import card
 from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
 
+import modules.database as db
 
 def guest_login():
     st.session_state.is_guest = True
@@ -166,6 +168,9 @@ def main():
     else:
         st.session_state.user_id = st.session_state.session["user"]["id"]
         st.session_state.email = st.session_state.session["user"]["email"]
+        user_info=db.read_user(st.session_state.user_id)
+        if not user_info.data:
+            db.create_user(user_id=st.session_state.user_id)
 
     openai.api_key = st.secrets["OPEN_AI_KEY"]
 

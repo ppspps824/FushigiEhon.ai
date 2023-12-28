@@ -11,8 +11,31 @@ from moviepy.editor import (
     ImageClip,
     concatenate_videoclips,
 )
+import time
 from PIL import Image, ImageDraw, ImageFont
 from streamlit_image_select import image_select
+import modules.database as db
+
+
+def culc_use_credits(event):
+    if event == "イラスト生成":
+        use_credit = 3
+    else:
+        use_credit = 1
+
+    return use_credit
+
+
+def check_credits(user_id, event):
+    use_credit =culc_use_credits(event)
+    credits_info = db.read_credits(user_id)
+    credits = abs(sum([info["value"] for info in credits_info.data]))
+
+    if credits - use_credit < 0:
+        st.toast("クレジットが不足しています。")
+        hide_overlay()
+        time.sleep(1)
+        st.rerun()
 
 
 # オーバーレイを表示
