@@ -92,8 +92,8 @@ def main():
                 card(
                     title="簡単かつ柔軟",
                     text=[
-                        "タイトルを入力するだけで",
-                        "物語・イラスト・音声すべてをAIが生成します。",
+                        "タイトルを入力するだけですべてをAIが生成します。",
+                        "何度でも自由に編集ができます。",
                     ],
                     styles=const.TITLE_BOX_STYLE,
                     key="card1-1",
@@ -118,10 +118,10 @@ def main():
                     key="card2-1",
                 )
                 card(
-                    title="すべてが無料",
+                    title="無料ではじめる",
                     text=[
-                        "すべての機能は無料で利用できます。",
-                        "クレジットを使い切ったら追加できます。",
+                        "新規登録時に100クレジットが付与されるので",
+                        "すぐにすべての機能を利用できます。",
                     ],
                     styles=const.TITLE_BOX_STYLE,
                     key="card2-2",
@@ -211,17 +211,13 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
+        st.write("")
         button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
         ## ライセンス表記
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
         st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact papasim824@gmail.com")
     if selected == "つくる":
