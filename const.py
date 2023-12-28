@@ -76,7 +76,7 @@ HIDE_ST_STYLE = """
                             padding-top: 1rem;
                             padding-right: 3rem;
                             padding-left: 3rem;
-                            padding-bottom: 5rem;
+                            padding-bottom: 7rem;
                         }  
                         .appview-container .sidebar-content {
                             padding-top: 0rem;

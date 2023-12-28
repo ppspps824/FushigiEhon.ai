@@ -19,7 +19,7 @@ import modules.database as db
 
 def culc_use_credits(event):
     if event == "イラスト生成":
-        use_credit = 3
+        use_credit = 6
     else:
         use_credit = 1
 
