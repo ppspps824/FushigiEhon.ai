@@ -86,15 +86,6 @@ def main():
         st.image("assets/title_back.png")
         title_cols = st.columns([3, 1])
         with title_cols[0]:
-            card(
-                title="すぐに始める",
-                text=[
-                    "※ログインするとAI機能の利用および保存が可能になります。",
-                ],
-                styles=const.TITLE_LINK_BOX_STYLE,
-                key="card",
-                on_click=guest_login
-            )
             card_cols = st.columns(2)
 
             with card_cols[0]:
@@ -135,6 +126,13 @@ def main():
                     styles=const.TITLE_BOX_STYLE,
                     key="card2-2",
                 )
+            card(
+                title="すぐに始める",
+                styles=const.TITLE_LINK_BOX_STYLE,
+                key="card",
+                on_click=guest_login
+            )
+            
             title_inner_cols = st.columns(2)
             with title_inner_cols[0]:
                 st.video("assets/title_movie1.mp4")
@@ -146,6 +144,7 @@ def main():
         ## Login
         with title_cols[1]:
             with st.container(border=True):
+                st.caption("ログインするとAI機能の利用および絵本の保存が可能になります。")
                 st.session_state.session = login_form(
                     url=st.secrets["SUPABASE_URL"],
                     providers=["google"],
