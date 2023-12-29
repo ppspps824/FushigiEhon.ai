@@ -899,7 +899,7 @@ def create():
         if submit:
             if st.session_state.tales["title"]:
                 show_overlay()
-                book_content = create_all(only_tales=only_tales)
+                book_content = create_all(only_tale=only_tales)
 
                 save_book(
                     book_content,
