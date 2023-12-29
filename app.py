@@ -160,8 +160,8 @@ def main():
         st.write("")
         st.write("")
         st.write("")
-        st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
-        st.caption("Contact papasim824@gmail.com")
+        st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
+        st.caption("Contact fushigiehon@gmail.com")
 
         if all([not st.session_state.session, not st.session_state.is_guest]):
             return
