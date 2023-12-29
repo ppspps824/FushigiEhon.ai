@@ -162,17 +162,6 @@ def main():
             elif step_num == 2:
                 st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
                 # st.video("assets/title_movie4.mp4")
-            sac.buttons(
-                [
-                    sac.ButtonsItem(
-                        label="▶️ Youtube",
-                        href="https://www.youtube.com/channel/UCP2Rylv6L9s8FgtNGiUXptQ",
-                    ),
-                ],
-                format_func="title",
-                align="start",
-                return_index=True,
-            )
 
         ## Login
         with title_cols[1]:
