@@ -128,6 +128,7 @@ def main():
                 )
             card(
                 title="すぐに始める",
+                text="",
                 styles=const.TITLE_LINK_BOX_STYLE,
                 key="card",
                 on_click=guest_login
