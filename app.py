@@ -228,8 +228,8 @@ def main():
             st.caption("クレジット購入はこちらから")
             button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
         ## ライセンス表記
-        st.caption("© 2023 ふしぎえほん.ai All Rights Reserved.")
-        st.caption("Contact papasim824@gmail.com")
+        st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
+        st.caption("Contact fushigiehon@gmail.com")
     if selected == "つくる":
         create()
     elif selected == "よむ":
