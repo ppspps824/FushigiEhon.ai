@@ -20,7 +20,7 @@ def culc_use_credits(events):
     use_credit=0
     for event in events:
         if event == "イラスト生成":
-            use_credit += 6
+            use_credit += 10
 
     return use_credit
 

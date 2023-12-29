@@ -13,6 +13,7 @@ from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
 from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
+import streamlit_antd_components as sac
 
 
 def guest_login():
@@ -126,26 +127,56 @@ def main():
                     styles=const.TITLE_BOX_STYLE,
                     key="card2-2",
                 )
-            card(
-                title="すぐに始める",
-                text="",
-                styles=const.TITLE_LINK_BOX_STYLE,
-                key="card",
-                on_click=guest_login
+            step_num = sac.steps(
+                items=[
+                    sac.StepsItem(
+                        title="どきどき。どんなお話ができるかな",
+                        subtitle="タイトルだけで絵本を作ってみましょう。",
+                    ),
+                    sac.StepsItem(
+                        title="わくわく。絵日記をつくろう",
+                        subtitle="楽しかった一日を、写真と一緒に絵本にしましょう。",
+                    ),
+                    sac.StepsItem(
+                        title="チャレンジ！みんなと大冒険",
+                        subtitle="家族、お友達、私！みんなで大冒険するお話を作りましょう。",
+                    ),
+                ],
+                format_func="title",
+                placement="vertical",
+                return_index=True,
+                dot=True,
             )
-            
-            title_inner_cols = st.columns(2)
-            with title_inner_cols[0]:
-                st.video("assets/title_movie1.mp4")
-                st.video("assets/title_movie2.mp4")
-            with title_inner_cols[1]:
-                st.video("assets/title_movie3.mp4")
-                st.video("assets/title_movie4.mp4")
+            # card(
+            #     title="すぐに始める",
+            #     text="",
+            #     styles=const.TITLE_LINK_BOX_STYLE,
+            #     key="card",
+            #     on_click=guest_login
+            # )
+
+            if step_num == 0:
+                st.video("https://www.youtube.com/watch?v=5w3ClFBEb2Q&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+            elif step_num == 1:
+                st.video("https://www.youtube.com/watch?v=FxJEFbY7tTI&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+            elif step_num == 2:
+                st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
+                # st.video("assets/title_movie4.mp4")
+            sac.buttons(
+                [
+                    sac.ButtonsItem(
+                        label="▶️ Youtube",
+                        href="https://www.youtube.com/channel/UCP2Rylv6L9s8FgtNGiUXptQ",
+                    ),
+                ],
+                format_func="title",
+                align="start",
+                return_index=True,
+            )
 
         ## Login
         with title_cols[1]:
             with st.container(border=True):
-                st.caption("ログインするとAI機能の利用および絵本の保存が可能になります。")
                 st.session_state.session = login_form(
                     url=st.secrets["SUPABASE_URL"],
                     providers=["google"],
@@ -226,7 +257,13 @@ def main():
         st.write("")
         if not st.session_state.is_guest:
             st.caption("クレジット購入はこちらから")
-            button(username="papasim824C", floating=False,bg_color="#004a55",font_color="#FFFFFF",coffee_color="#FFFFFF")
+            button(
+                username="papasim824C",
+                floating=False,
+                bg_color="#004a55",
+                font_color="#FFFFFF",
+                coffee_color="#FFFFFF",
+            )
         ## ライセンス表記
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact fushigiehon@gmail.com")
