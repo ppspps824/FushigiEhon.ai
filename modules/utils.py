@@ -245,7 +245,7 @@ def create_movie_and_pdf(book_info, bgm):
 
         # 最終的な動画の長さに合わせてBGMを設定（必要に応じてループやフェードイン・アウトを追加）
         bgm_clip = bgm_clip.set_duration(final_clip.duration)
-        bgm_clip = bgm_clip.volumex(0.05)
+        bgm_clip = bgm_clip.volumex(0.1)
         bgm_clip = bgm_clip.audio_fadeout(3)
 
         original_audio = final_clip.audio
