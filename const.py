@@ -83,9 +83,9 @@ HIDE_ST_STYLE = """
                     background-color: rgba(0,0,0,0.5);
                     z-index: 99;
                     cursor: not-allowed;
-                    display: flex; /* Flexboxを使用して中央配置 */
-                    justify-content: center; /* 水平中央 */
-                    align-items: center; /* 垂直中央 */
+                    display: flex; /* Flexboxを使用して中央配置/
+                    justify-content: center; /* 水平中央/
+                    align-items: center; /* 垂直中央/
                 }
 				        .appview-container .main .block-container{
                             padding-top: 1rem;
@@ -350,3 +350,22 @@ END_ROLE = """
 """
 
 LOTTIE = "https://lottie.host/fc04f21d-abcf-4e8c-840a-548301d00539/2wqct1sOBx.json"
+
+
+
+LEGAL="""
+特定商取引法に基づく表記
+
+- 料金: サイト上に表示している金額です。
+
+- 支払い時期・支払い方法: お支払い方法はサイト内に表示する方法となります。
+
+- ご利用いただけるクレジットカード: 決済画面にて指定するクレジットカードとなります。
+
+- お客様のお支払いの時期: お客様とクレジットカード会社との会員規約に基づきます。
+
+- サービスの提供時期: サイトに表示する方法によるお支払方法の手続きが完了し次第、すぐにご利用いただけます。
+
+- 省略した事項について: 「fushigiehon@gmail.com」まで開示申請をいただきましたら遅延なく開示いたします。
+
+"""

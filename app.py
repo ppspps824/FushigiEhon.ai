@@ -14,7 +14,7 @@ from streamlit_supabase_auth import login_form, logout_button
 from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
 import streamlit_antd_components as sac
-
+from streamlit_modal import Modal
 
 def guest_login():
     st.session_state.is_guest = True
@@ -163,6 +163,8 @@ def main():
                 st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
                 # st.video("assets/title_movie4.mp4")
 
+
+
         ## Login
         with title_cols[1]:
             with st.container(border=True):
@@ -179,9 +181,10 @@ def main():
         st.write("")
         st.write("")
         st.write("")
-        st.write("")
+        st.write("---")
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
-        st.caption("Contact fushigiehon@gmail.com")
+        st.caption(const.LEGAL)
+        
 
         if all([not st.session_state.session, not st.session_state.is_guest]):
             return
