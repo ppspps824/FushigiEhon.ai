@@ -14,7 +14,6 @@ from streamlit_supabase_auth import login_form, logout_button
 from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
 import streamlit_antd_components as sac
-from streamlit_modal import Modal
 
 def guest_login():
     st.session_state.is_guest = True
