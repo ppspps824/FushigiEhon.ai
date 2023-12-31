@@ -228,11 +228,8 @@ def create_movie_and_pdf(book_info, bgm):
 
     if bgm == "ランダム":
         bgm = random.choice(const.BGM_LIST)
-    elif bgm == "なし":
-        final_clip = concatenate_videoclips(
-            [title_image_clip] + clips + [end_image_clip], method="compose"
-        )
-    else:
+        
+    if bgm != "なし":
         bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
 
         # すべてのクリップを結合
@@ -258,6 +255,11 @@ def create_movie_and_pdf(book_info, bgm):
             final_clip.audio = mixed_audio
         else:
             final_clip.audio = bgm_clip
+            
+    else:
+        final_clip = concatenate_videoclips(
+            [title_image_clip] + clips + [end_image_clip], method="compose"
+        )
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
     with tempfile.NamedTemporaryFile(delete=True, suffix=".mp4") as temp_video:
