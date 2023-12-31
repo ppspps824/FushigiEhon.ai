@@ -14,7 +14,6 @@ from streamlit_supabase_auth import login_form, logout_button
 from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
 import streamlit_antd_components as sac
-import streamlit.components.v1 as components
 
 def guest_login():
     st.session_state.is_guest = True
@@ -183,7 +182,7 @@ def main():
         st.write("")
         st.write("---")
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
-        components.html(const.LEGAL)
+        st.markdown(const.LEGAL,unsafe_allow_html=True)
         
 
         if all([not st.session_state.session, not st.session_state.is_guest]):
@@ -251,7 +250,7 @@ def main():
         ## ライセンス表記
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact fushigiehon@gmail.com")
-        components.html(const.LEGAL)
+        st.markdown(const.LEGAL,unsafe_allow_html=True)
     if selected == "つくる":
         create()
     elif selected == "よむ":
