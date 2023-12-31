@@ -354,5 +354,5 @@ LOTTIE = "https://lottie.host/fc04f21d-abcf-4e8c-840a-548301d00539/2wqct1sOBx.js
 
 
 LEGAL="""
-<p><a href=”https://orchid-background-17a.notion.site/e1f71b4ecd2c414ba04dc5ff69495896” target="_blank">特定商取引法に基づく表記</a></p>
+https://orchid-background-17a.notion.site/e1f71b4ecd2c414ba04dc5ff69495896
 """
