@@ -265,13 +265,13 @@ def create_movie_and_pdf(book_info, bgm):
         )
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
-    with tempfile.NamedTemporaryFile(delete=True, suffix=".webm") as temp_video:
+    with tempfile.NamedTemporaryFile(delete=True, suffix=".mp4") as temp_video:
         final_clip.write_videofile(
             temp_video.name,  # write_videofileに一時ファイル名を提供
             fps=24,
             codec="libx264",
             audio_codec="aac",
-            temp_audiofile="temp-audio.webm",
+            temp_audiofile="temp-audio.m4a",
             remove_temp=True,
         )
 
