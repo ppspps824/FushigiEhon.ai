@@ -180,7 +180,7 @@ def main():
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
         
-
+        print(st.session_state.session)
         if not st.session_state.session:
             return
 
