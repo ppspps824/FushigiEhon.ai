@@ -5,6 +5,7 @@ from pprint import pprint
 
 
 def setting():
+    st.cache_data.clear()
     user_info = db.read_user(st.session_state.user_id)
     credits_info = db.read_credits(st.session_state.user_id)
 
