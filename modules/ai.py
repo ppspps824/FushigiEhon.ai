@@ -68,9 +68,9 @@ def create_tales(
         return ""
 
 
-def post_image_api(prompt, size=(512,512)):
+def post_image_api(prompt, size,user_id):
     event = "イラスト生成"
-    check_credits(st.session_state.user_id, [event])
+    check_credits(user_id, [event])
     image_url = ""
     if st.session_state.image_model == "dall-e-3":
         gen_size = "1024x1024"
@@ -80,7 +80,7 @@ def post_image_api(prompt, size=(512,512)):
     for _ in range(3):
         try:
             response =openai.images.generate(
-                model=st.session_state.image_model,
+                model=const.IMAGE_MODEL,
                 prompt=prompt,
                 size=gen_size,
                 quality="standard",
@@ -102,14 +102,13 @@ def post_image_api(prompt, size=(512,512)):
         buffer = io.BytesIO()
         image.save(buffer, format="jpeg", quality=50)
         db.adding_credits(
-            user_id=st.session_state.user_id, value=culc_use_credits([event]), event=event
+            user_id=user_id, value=culc_use_credits([event]), event=event
         )
         return buffer.getvalue()
     else:
         return ""
 
-async def generate_image(tale, title, description, theme, characters):
-    print(tale)
+async def generate_image(user_id,tale, title, description, theme, characters):
     # Combine the individual pieces of information into a single prompt string.
     prompt = (
         const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
@@ -118,13 +117,12 @@ async def generate_image(tale, title, description, theme, characters):
         .replace("%%characters_placeholder%%", characters)
         .replace("%%tale_placeholder%%", tale)
     )
-    # Call post_image_api with the properly formatted prompt and the size.
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor() as pool:
-        image = await loop.run_in_executor(pool, post_image_api, prompt, (1024, 1024))
+        image = await loop.run_in_executor(pool, post_image_api, prompt, (1024, 1024),user_id)
     return image
 
-async def create_images(tales: dict) -> dict:
+async def create_images(tales: dict,user_id:str) -> dict:
     images = {"title": "", "content": []}
     
     title = tales["title"]
@@ -137,12 +135,12 @@ async def create_images(tales: dict) -> dict:
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    images["title"] = post_image_api(title_prompt, (512, 512))
+    images["title"] = post_image_api(title_prompt, (512, 512),user_id)
 
     # Asynchronously generate images for each item in tales["content"]
     tasks = []
     for tale in tales["content"]:
-        task = asyncio.create_task(generate_image(tale, title, description, theme, characters))
+        task = asyncio.create_task(generate_image(tale, title, description, theme, characters,user_id))
         tasks.append(task)
 
     images["content"] = await asyncio.gather(*tasks)
@@ -170,7 +168,7 @@ def post_audio_api(tale):
     return response.content
 
 
-def image_upgrade(image,characters, tale):
+def image_upgrade(image,characters, tale,user_id):
     event = "イラスト生成"
     check_credits(st.session_state.user_id, [event])
     if image:
@@ -209,7 +207,7 @@ def image_upgrade(image,characters, tale):
                 .replace("%%characters_placeholder%%", characters)
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
-            result = post_image_api(prompt, size=(1024, 1024))
+            result = post_image_api(prompt, size=(1024, 1024),user_id=user_id)
             if result:
                 db.adding_credits(user_id=st.session_state.user_id, value=culc_use_credits([event]),event=event)
             else:
@@ -273,10 +271,10 @@ def create_one_audio(num, tale):
         st.session_state.audios[num] = post_audio_api(tale)
 
 
-def create_one_image(num, tale):
+def create_one_image(num, tale,user_id):
     with st.spinner("生成中...(イラスト)"):
         result = post_image_api(
-        const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
+        const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale,user_id)
         .replace("%%title_placeholder%%", st.session_state.tales["title"])
         .replace(
             "%%description_placeholder%%", st.session_state.tales["description"]

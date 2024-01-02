@@ -365,3 +365,5 @@ STRIPE_URL="https://buy.stripe.com/test_3cs5mb83A6th3G84gg"
 LEGAL="""
 https://orchid-background-17a.notion.site/e1f71b4ecd2c414ba04dc5ff69495896
 """
+
+IMAGE_MODEL="dall-e-3"
