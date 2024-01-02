@@ -271,7 +271,7 @@ def create_one_audio(num, tale):
 def create_one_image(num, tale,user_id):
     with st.spinner("生成中...(イラスト)"):
         result = post_image_api(
-        const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale,user_id)
+        const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
         .replace("%%title_placeholder%%", st.session_state.tales["title"])
         .replace(
             "%%description_placeholder%%", st.session_state.tales["description"]
@@ -284,7 +284,7 @@ def create_one_image(num, tale,user_id):
             "%%characters_placeholder%%",
             json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
         ),
-        (512, 512),
+        (512, 512),user_id
     )
         if result:
             st.session_state.images["content"][num] = result
