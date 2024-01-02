@@ -627,14 +627,14 @@ def save_book(book_content, title, bgm, only_tales=False):
         for ix, (image, audio) in enumerate(
             zip(book_content["images"]["content"], book_content["audios"])
         ):
-            image_path = base_path + f"images/image_{ix}.jpeg"
+            image_path = base_path + f"images/image_{ix}.webp"
             audio_path = base_path + f"audios/audio_{ix}.mp3"
             s3_upload(bucket_name, image, image_path)
             s3_upload(bucket_name, audio, audio_path)
 
         # 動画とPDFの生成
         if not only_tales:
-            video_path = base_path + f"{title}.mp4"
+            video_path = base_path + f"{title}.webm"
             pdf_path = base_path + f"{title}.pdf"
             video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
             s3_upload(bucket_name, video_data, video_path)

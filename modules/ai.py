@@ -100,7 +100,7 @@ def post_image_api(prompt, size):
         image = image.resize(size)
 
         buffer = io.BytesIO()
-        image.save(buffer, format="JPEG", quality=50)
+        image.save(buffer, format="webp", quality=50)
         db.adding_credits(user_id=st.session_state.user_id, event=event)
         return buffer.getvalue()
     else:
