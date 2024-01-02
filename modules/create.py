@@ -390,7 +390,7 @@ def view_edit():
 
                                 modify()
                                 hide_overlay()
-                                st.rerun()
+                                # st.rerun()
 
                             if st.button(
                                 "イラストを一括で補正する",

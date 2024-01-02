@@ -105,7 +105,7 @@ def post_image_api(prompt,user_id):
     else:
         return ""
 
-async def generate_image(user_id,tale, title, description, theme, characters):
+async def generate_image(tale, title, description, theme, characters,user_id):
     # Combine the individual pieces of information into a single prompt string.
     prompt = (
         const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
