@@ -109,6 +109,7 @@ def post_image_api(prompt, size):
         return ""
 
 async def generate_image(tale, title, description, theme, characters):
+    # Combine the individual pieces of information into a single prompt string.
     prompt = (
         const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
@@ -116,14 +117,13 @@ async def generate_image(tale, title, description, theme, characters):
         .replace("%%characters_placeholder%%", characters)
         .replace("%%tale_placeholder%%", tale)
     )
-
-    image = await post_image_api(prompt, size=(1024, 1024))
+    # Call post_image_api with the properly formatted prompt and the size.
+    image = await post_image_api(prompt, (1024, 1024))  # Adjust the size as needed.
     return image
 
 async def create_images(tales: dict) -> dict:
     images = {"title": "", "content": []}
-
-    # タイトル画像の生成
+    
     title = tales["title"]
     description = tales["description"]
     theme = tales["theme"]
@@ -134,9 +134,9 @@ async def create_images(tales: dict) -> dict:
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    images["title"] = await post_image_api(title_prompt, size=(512, 512))
+    images["title"] = await post_image_api(title_prompt, (512, 512))
 
-    # 各物語の内容に対する画像を非同期で生成
+    # Asynchronously generate images for each item in tales["content"]
     tasks = []
     for tale in tales["content"]:
         task = asyncio.create_task(generate_image(tale, title, description, theme, characters))
