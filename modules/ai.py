@@ -68,7 +68,7 @@ def create_tales(
         return ""
 
 
-def post_image_api(prompt, size,user_id):
+def post_image_api(prompt,user_id):
     event = "イラスト生成"
     check_credits(user_id, [event])
     image_url = ""
@@ -94,7 +94,7 @@ def post_image_api(prompt, size,user_id):
             image_data = web_file.read()
 
         image = Image.open(io.BytesIO(image_data))
-        image = image.resize(size)
+        image = image.resize((512,512))
 
         buffer = io.BytesIO()
         image.save(buffer, format="jpeg", quality=50)
@@ -116,7 +116,7 @@ async def generate_image(user_id,tale, title, description, theme, characters):
     )
     loop = asyncio.get_running_loop()
     with ThreadPoolExecutor() as pool:
-        image = await loop.run_in_executor(pool, post_image_api, prompt, (1024, 1024),user_id)
+        image = await loop.run_in_executor(pool, post_image_api, prompt,user_id)
     return image
 
 async def create_images(tales: dict,user_id:str) -> dict:
@@ -132,7 +132,7 @@ async def create_images(tales: dict,user_id:str) -> dict:
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    images["title"] = post_image_api(title_prompt, (512, 512),user_id)
+    images["title"] = post_image_api(title_prompt,user_id)
 
     # Asynchronously generate images for each item in tales["content"]
     tasks = []
@@ -204,7 +204,7 @@ def image_upgrade(image,characters, tale,user_id):
                 .replace("%%characters_placeholder%%", characters)
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
-            result = post_image_api(prompt, size=(1024, 1024),user_id=user_id)
+            result = post_image_api(prompt,user_id)
             if result:
                 db.adding_credits(user_id=st.session_state.user_id, value=culc_use_credits([event]),event=event)
             else:
@@ -284,7 +284,7 @@ def create_one_image(num, tale,user_id):
             "%%characters_placeholder%%",
             json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
         ),
-        (512, 512),user_id
+        user_id
     )
         if result:
             st.session_state.images["content"][num] = result

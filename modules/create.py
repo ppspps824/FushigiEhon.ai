@@ -296,7 +296,7 @@ def view_edit():
                             )
                             with st.spinner("生成中...(表紙)"):
                                 st.session_state.images["title"] = post_image_api(
-                                    prompt, size=(512, 512),user_id=st.session_state.user_id
+                                    prompt,user_id=st.session_state.user_id
                                 )
                             modify()
                             hide_overlay()
