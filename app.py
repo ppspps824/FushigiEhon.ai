@@ -230,7 +230,6 @@ def main():
             },
         )
         if st.button("サインアウト"):
-            logout_button()
             init_state()
             st.rerun()
 
