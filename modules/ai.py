@@ -2,7 +2,7 @@ import base64
 import io
 import json
 import urllib
-
+from concurrent.futures import ThreadPoolExecutor
 import const
 import openai
 import requests
@@ -68,7 +68,7 @@ def create_tales(
         return ""
 
 
-async def post_image_api(prompt, size=(512,512)):
+def post_image_api(prompt, size=(512,512)):
     event = "イラスト生成"
     check_credits(st.session_state.user_id, [event])
     image_url = ""
@@ -79,7 +79,7 @@ async def post_image_api(prompt, size=(512,512)):
 
     for _ in range(3):
         try:
-            response = await openai.images.generate(
+            response =openai.images.generate(
                 model=st.session_state.image_model,
                 prompt=prompt,
                 size=gen_size,
@@ -119,7 +119,9 @@ async def generate_image(tale, title, description, theme, characters):
         .replace("%%tale_placeholder%%", tale)
     )
     # Call post_image_api with the properly formatted prompt and the size.
-    image = await post_image_api(prompt, (1024, 1024))  # Adjust the size as needed.
+    loop = asyncio.get_running_loop()
+    with ThreadPoolExecutor() as pool:
+        image = await loop.run_in_executor(pool, post_image_api, prompt, (1024, 1024))
     return image
 
 async def create_images(tales: dict) -> dict:
