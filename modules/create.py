@@ -188,6 +188,54 @@ def view_edit():
                             st.rerun()
 
                 with col2:
+                    if st.button("表紙を削除する"):
+                        st.session_state.images["title"] = ""
+                        modify()
+                        st.rerun()
+                    with st.expander("画像を一括でアップロード"):
+                        image_files = st.file_uploader(
+                            "",
+                            label_visibility="collapsed",
+                            accept_multiple_files=True,
+                            type=["png", "jpg"],
+                        )
+                        if image_files:
+                            st.image(image_files)
+
+                            if st.button("取り込み", key="all_image_upload"):
+                                show_overlay()
+                                with st.spinner("取り込み中..."):
+                                    adding_num = len(image_files) - len(
+                                        st.session_state.images["content"]
+                                    )
+                                    if adding_num > 0:
+                                        [
+                                            adding_page(num)
+                                            for num in range(
+                                                len(
+                                                    st.session_state.images[
+                                                        "content"
+                                                    ]
+                                                )
+                                                + adding_num
+                                            )
+                                        ]
+                                    for num, image in enumerate(image_files):
+                                        image = Image.open(
+                                            io.BytesIO(image.getvalue())
+                                        )
+                                        image = image.resize((512, 512))
+                                        # 空のバイトストリームを作成
+                                        bytes_io = io.BytesIO()
+                                        image.save(bytes_io, format="PNG")
+                                        bytes_data = bytes_io.getvalue()
+                                        st.session_state.images["content"][
+                                            num
+                                        ] = bytes_data
+
+                                    modify()
+                                    hide_overlay()
+                                    st.rerun()
                     with st.expander("AI機能"):
                         if st.button(
                             "あらすじ、テーマ・メッセージを生成する",
@@ -275,11 +323,6 @@ def view_edit():
                             )
                             modify()
                             hide_overlay()
-                            st.rerun()
-
-                        if st.button("表紙を削除する"):
-                            st.session_state.images["title"] = ""
-                            modify()
                             st.rerun()
                         with st.container(border=True):
                             st.caption("全ページ一括処理")
@@ -382,50 +425,6 @@ def view_edit():
                                 modify()
                                 hide_overlay()
                                 st.rerun()
-                            with st.expander("画像を一括でアップロード"):
-                                image_files = st.file_uploader(
-                                    "",
-                                    label_visibility="collapsed",
-                                    accept_multiple_files=True,
-                                    type=["png", "jpg"],
-                                )
-                                if image_files:
-                                    st.image(image_files)
-
-                                    if st.button("取り込み", key="all_image_upload"):
-                                        show_overlay()
-                                        with st.spinner("取り込み中..."):
-                                            adding_num = len(image_files) - len(
-                                                st.session_state.images["content"]
-                                            )
-                                            if adding_num > 0:
-                                                [
-                                                    adding_page(num)
-                                                    for num in range(
-                                                        len(
-                                                            st.session_state.images[
-                                                                "content"
-                                                            ]
-                                                        )
-                                                        + adding_num
-                                                    )
-                                                ]
-                                            for num, image in enumerate(image_files):
-                                                image = Image.open(
-                                                    io.BytesIO(image.getvalue())
-                                                )
-                                                image = image.resize((512, 512))
-                                                # 空のバイトストリームを作成
-                                                bytes_io = io.BytesIO()
-                                                image.save(bytes_io, format="PNG")
-                                                bytes_data = bytes_io.getvalue()
-                                                st.session_state.images["content"][
-                                                    num
-                                                ] = bytes_data
-
-                                            modify()
-                                            hide_overlay()
-                                            st.rerun()
                 with col3:
                     if st.button(
                         "次のページを追加する",
