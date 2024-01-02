@@ -231,6 +231,7 @@ def main():
         )
         if st.button("サインアウト"):
             logout_button()
+            init_state()
             st.rerun()
 
         st.link_button("クレジット購入",url=st.secrets["stripe_link"]+"?prefilled_email="+st.session_state.email)
