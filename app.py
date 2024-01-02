@@ -229,9 +229,8 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
-        if st.button("サインアウト"):
-            init_state()
-            st.rerun()
+        logout_button() 
+
 
         st.link_button("クレジット購入",url=st.secrets["stripe_link"]+"?prefilled_email="+st.session_state.email)
         st.write("")
