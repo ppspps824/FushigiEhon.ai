@@ -79,7 +79,7 @@ async def post_image_api(prompt, size=(512,512)):
 
     for _ in range(3):
         try:
-            response = openai.images.generate(
+            response = await openai.images.generate(
                 model=st.session_state.image_model,
                 prompt=prompt,
                 size=gen_size,
