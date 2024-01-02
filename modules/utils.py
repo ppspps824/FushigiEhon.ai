@@ -162,13 +162,16 @@ def create_movie_and_pdf(book_info, bgm):
 
     # エンディング画像の準備 (PIL.Image形式)
     end_image = Image.open("assets/header.png")
-    end_image = end_image.resize((128,256))
+    base_width= 300
+    wpercent = (base_width / float(end_image.size[0]))
+    hsize = int((float(end_image.size[1]) * float(wpercent)))
+    end_image = end_image.resize((base_width, hsize), Image.Resampling.LANCZOS)
     end_dst = Image.new(
         "RGB",
         (1024, 512),
         "#fafafa",
     )
-    end_dst.paste(end_image, (256,512))
+    end_dst.paste(end_image,(512-end_image.width//2,256-end_image.height//2))
     np_end_image = np.array(end_dst)
     end_image_clip = ImageClip(np_end_image).set_duration(3)
 
