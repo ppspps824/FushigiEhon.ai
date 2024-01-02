@@ -68,12 +68,6 @@ HIDE_ST_STYLE = """
                 visibility: hidden;
                 height: 0%;
                 }
-                footer{
-                    width: 100%;
-                    text-align: center;
-                    position: absolute;/*←絶対位置*/
-                    bottom: 0; /*下に固定*/
-                }
                 .overlay {
                     position: fixed;
                     width: 100%;
