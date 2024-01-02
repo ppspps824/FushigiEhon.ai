@@ -407,7 +407,7 @@ def view_edit():
                                 st.session_state.images["title"] = image_upgrade(
                                     json.dumps(st.session_state.tales["characters"]),
                                     json.dumps(st.session_state.tales["content"]),
-                                    t.session_state.user_id
+                                    st.session_state.user_id
                                 )
 
                                 for num, image in enumerate(
@@ -421,7 +421,7 @@ def view_edit():
                                             st.session_state.tales["characters"]
                                         ),
                                         json.dumps(st.session_state.tales["content"]),
-                                        t.session_state.user_id
+                                        st.session_state.user_id
                                     )
 
                                 modify()
