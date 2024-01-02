@@ -109,6 +109,7 @@ def post_image_api(prompt, size=(512,512)):
         return ""
 
 async def generate_image(tale, title, description, theme, characters):
+    print(tale)
     # Combine the individual pieces of information into a single prompt string.
     prompt = (
         const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
