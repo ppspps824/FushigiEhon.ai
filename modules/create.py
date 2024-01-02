@@ -132,7 +132,6 @@ def view_edit():
             if st.button(
                 "えほんを保存する",
                 help="変更した内容でえほんを保存します。",
-                disabled=st.session_state.is_guest,
             ):
                 create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
                 create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
@@ -152,7 +151,6 @@ def view_edit():
             book_trigger_btn = ui.button(
                 text="えほんを削除する",
                 key="book_trigger_btn",
-                disabled=st.session_state.is_guest,
             )
             if ui.alert_dialog(
                 show=book_trigger_btn,
@@ -196,7 +194,6 @@ def view_edit():
 
                         if st.button(
                             "あらすじ、テーマ・メッセージを生成する",
-                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             tales_text = "\n".join(st.session_state.tales["content"])
@@ -227,7 +224,6 @@ def view_edit():
 
                         if st.button(
                             "次のページを生成する",
-                            disabled=st.session_state.is_guest,
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
                         ):
                             show_overlay()
@@ -240,7 +236,7 @@ def view_edit():
                             st.rerun()
 
                         if st.button(
-                            "表紙を生成する", disabled=st.session_state.is_guest
+                            "表紙を生成する",
                         ):
                             show_overlay()
                             title = st.session_state.tales["title"]
@@ -269,7 +265,7 @@ def view_edit():
                             st.rerun()
 
                         if st.button(
-                            "表紙を補正する", disabled=st.session_state.is_guest
+                            "表紙を補正する",
                         ):
                             show_overlay()
                             st.session_state.images["title"] = image_upgrade(
@@ -292,7 +288,6 @@ def view_edit():
                             st.caption("全ページ一括処理")
                             if st.button(
                                 "テキスト以外を一括で生成する",
-                                disabled=st.session_state.is_guest,
                             ):
                                 events = ["イラスト生成"] * len(
                                     st.session_state.tales["content"]
@@ -307,7 +302,6 @@ def view_edit():
 
                             if st.button(
                                 "音声を一括で生成する",
-                                disabled=st.session_state.is_guest,
                             ):
                                 show_overlay()
                                 for num, tale in enumerate(
@@ -320,7 +314,6 @@ def view_edit():
                                 st.rerun()
                             if st.button(
                                 "イラストを一括で生成する",
-                                disabled=st.session_state.is_guest,
                             ):
                                 events = ["イラスト生成"] * len(
                                     st.session_state.tales["content"]
@@ -358,7 +351,6 @@ def view_edit():
 
                             if st.button(
                                 "イラストを一括で補正する",
-                                disabled=st.session_state.is_guest,
                             ):
                                 events = ["イラスト生成"] * len(
                                     st.session_state.tales["content"]
@@ -491,7 +483,6 @@ def view_edit():
                         if st.button(
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
-                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             adding_page(page_count + 1)
@@ -504,7 +495,6 @@ def view_edit():
                         if st.button(
                             "内容を生成する",
                             help="このページの文章を、AIによって生成します。",
-                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_tale(page_count)
@@ -515,7 +505,6 @@ def view_edit():
                         if st.button(
                             "音声を生成する",
                             help="このページの音声を、AIによって生成します。",
-                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_audio(page_count, tale)
@@ -526,7 +515,6 @@ def view_edit():
                         if st.button(
                             "イラストを生成する",
                             help="このページのイラストを、文章をベースにAIによって生成します。",
-                            disabled=st.session_state.is_guest,
                         ):
                             show_overlay()
                             create_one_image(page_count, tale)
@@ -535,7 +523,6 @@ def view_edit():
                             st.rerun()
                         if st.button(
                             "イラストを補正する",
-                            disabled=st.session_state.is_guest,
                             help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。",
                         ):
                             show_overlay()
@@ -582,28 +569,27 @@ def view_edit():
                     ):
                         delete_page(page_count)
 
-    if st.session_state.is_guest:
-        if st.session_state.tales["title"]:
-            if st.button("動画を生成する"):
-                create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
-                create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-                book_info = {
-                    "create_date": create_date_yyyymdd,
-                    "tales": st.session_state.tales,
-                    "images": st.session_state.images,
-                    "audios": st.session_state.audios,
-                }
-                video_data, pdf_data = create_movie_and_pdf(book_info, bgm)
-                if video_data:
-                    st.video(video_data)
-                    st.download_button(
-                        label="動画を保存",
-                        data=video_data,
-                        file_name=f'{st.session_state.tales["title"]}.mp4',
-                        mime="video/mp4",
-                    )
-                else:
-                    st.error("データの読み込みに失敗しました。")
+    if st.session_state.tales["title"]:
+        if st.button("動画を生成する"):
+            create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
+            create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
+            book_info = {
+                "create_date": create_date_yyyymdd,
+                "tales": st.session_state.tales,
+                "images": st.session_state.images,
+                "audios": st.session_state.audios,
+            }
+            video_data, pdf_data = create_movie_and_pdf(book_info, bgm)
+            if video_data:
+                st.video(video_data)
+                st.download_button(
+                    label="動画を保存",
+                    data=video_data,
+                    file_name=f'{st.session_state.tales["title"]}.mp4',
+                    mime="video/mp4",
+                )
+            else:
+                st.error("データの読み込みに失敗しました。")
 
 
 def delete_book(title):
@@ -772,14 +758,11 @@ def create_all(only_tale=False, ignore_tale=False):
 
 
 def create():
-    if st.session_state.is_guest:
-        mode = "いちからつくる"
-    else:
-        mode = st.selectbox(
-            "あたらしくつくる",
-            options=["", "おまかせでつくる", "いちからつくる"],
-            on_change=clear_session_state,
-        )
+    mode = st.selectbox(
+        "あたらしくつくる",
+        options=["", "おまかせでつくる", "いちからつくる"],
+        on_change=clear_session_state,
+    )
 
     if mode == "おまかせでつくる":
         with st.container(border=True):
@@ -892,7 +875,6 @@ def create():
             st.caption(f"クレジット消費量：{use_credit}")
             submit = st.button(
                 "生成開始",
-                disabled=st.session_state.is_guest,
                 help="ログイン時のみ利用可能",
             )
 

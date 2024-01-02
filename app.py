@@ -14,13 +14,10 @@ from streamlit_supabase_auth import login_form, logout_button
 import modules.database as db
 import streamlit_antd_components as sac
 
-def guest_login():
-    st.session_state.is_guest = True
 
 
 def init_state():
     st.session_state.is_login = False
-    st.session_state.is_guest = False
     st.session_state.user_id = ""
     st.session_state.email = ""
     st.session_state.disable_audio = False
@@ -184,7 +181,7 @@ def main():
         st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
         
 
-        if all([not st.session_state.session, not st.session_state.is_guest]):
+        if not st.session_state.session:
             return
 
         st.experimental_set_query_params(page=["success"])
@@ -192,18 +189,14 @@ def main():
         st.rerun()
 
     # ログイン後画面
-    if st.session_state.is_guest:
-        st.session_state.user_id = "guest"
-        st.session_state.email = "Guest"
-    else:
-        st.session_state.user_id = st.session_state.session["user"]["id"]
-        st.session_state.email = st.session_state.session["user"]["email"]
-        user_info = db.read_user(st.session_state.user_id)
-        if not user_info.data:
-            db.create_user(user_id=st.session_state.user_id,email=st.session_state.email)
-            db.adding_credits(
-                user_id=st.session_state.user_id, event="新規登録", value=-100
-            )
+    st.session_state.user_id = st.session_state.session["user"]["id"]
+    st.session_state.email = st.session_state.session["user"]["email"]
+    user_info = db.read_user(st.session_state.user_id)
+    if not user_info.data:
+        db.create_user(user_id=st.session_state.user_id,email=st.session_state.email)
+        db.adding_credits(
+            user_id=st.session_state.user_id, event="新規登録", value=-100
+        )
 
     openai.api_key = st.secrets["OPEN_AI_KEY"]
 
