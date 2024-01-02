@@ -351,7 +351,7 @@ END_ROLE = """
 
 LOTTIE = "https://lottie.host/fc04f21d-abcf-4e8c-840a-548301d00539/2wqct1sOBx.json"
 
-
+STRIPE_URL="https://buy.stripe.com/test_3cs5mb83A6th3G84gg"
 
 LEGAL="""
 特定商取引法に基づく表記

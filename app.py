@@ -11,7 +11,6 @@ from PIL import Image
 from streamlit_card import card
 from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
-from streamlit_extras.buy_me_a_coffee import button
 import modules.database as db
 import streamlit_antd_components as sac
 
@@ -201,7 +200,7 @@ def main():
         st.session_state.email = st.session_state.session["user"]["email"]
         user_info = db.read_user(st.session_state.user_id)
         if not user_info.data:
-            db.create_user(user_id=st.session_state.user_id)
+            db.create_user(user_id=st.session_state.user_id,email=st.session_state.email)
             db.adding_credits(
                 user_id=st.session_state.user_id, event="新規登録", value=-100
             )
@@ -212,12 +211,8 @@ def main():
     header_cols[0].image("assets/header.png")
     header_cols[2].caption(f"logged in {st.session_state.email}")
 
-    if st.session_state.is_guest:
-        menu_options = ["よむ", "つくる", "戻る"]
-        menu_icons = ["bi-play-btn", "bi-brush", "bi-door-open"]
-    else:
-        menu_options = ["よむ", "つくる", "設定"]
-        menu_icons = ["bi-play-btn", "bi-brush", "bi-gear"]
+    menu_options = ["よむ", "つくる", "設定"]
+    menu_icons = ["bi-play-btn", "bi-brush", "bi-gear"]
 
     with st.sidebar:
         selected = option_menu(
@@ -241,20 +236,14 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
+
+        st.link_button("クレジット購入",url=st.secrets["stripe_link"]+"?prefilled_email="+st.session_state.email)
         st.write("")
         st.write("")
         st.write("")
         st.write("")
         st.write("")
-        if not st.session_state.is_guest:
-            st.caption("クレジット購入はこちらから")
-            button(
-                username="papasim824C",
-                floating=False,
-                bg_color="#004a55",
-                font_color="#FFFFFF",
-                coffee_color="#FFFFFF",
-            )
+
         ## ライセンス表記
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact fushigiehon@gmail.com")
@@ -266,6 +255,7 @@ def main():
         logout_button()
         init_state()
         st.rerun()
+
     elif selected == "設定":
         setting()
 

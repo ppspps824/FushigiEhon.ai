@@ -11,10 +11,10 @@ supabase: Client = create_client(url, key)
 jst_tz = pytz.timezone("Asia/Tokyo")
 
 
-def create_user(user_id: str):
+def create_user(user_id: str,email:str):
     """新しいユーザーを作成する"""
     now = datetime.now(jst_tz).isoformat()
-    data = {"user_id": user_id, "created_at": now}
+    data = {"user_id": user_id, "created_at": now,"email":email}
     supabase.table("users").insert(data).execute()
 
 
