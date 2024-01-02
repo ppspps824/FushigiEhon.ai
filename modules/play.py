@@ -62,7 +62,6 @@ def play():
             "story-user-data",
             st.session_state.user_id,
             captions[select_book - 1],
-            is_guest=is_guest,
         )
 
         description = book_info["tales"]["description"]

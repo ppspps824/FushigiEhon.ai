@@ -268,7 +268,11 @@ def view_edit():
                             show_overlay()
                             adding_page(0)
                             create_one_tale(0)
-                            create_one_image(0, st.session_state.tales["content"][0],st.session_state.user_id)
+                            create_one_image(
+                                0,
+                                st.session_state.tales["content"][0],
+                                st.session_state.user_id,
+                            )
                             create_one_audio(0, st.session_state.tales["content"][0])
                             hide_overlay()
                             modify()
@@ -296,7 +300,7 @@ def view_edit():
                             )
                             with st.spinner("生成中...(表紙)"):
                                 st.session_state.images["title"] = post_image_api(
-                                    prompt,user_id=st.session_state.user_id
+                                    prompt, user_id=st.session_state.user_id
                                 )
                             modify()
                             hide_overlay()
@@ -310,7 +314,7 @@ def view_edit():
                             st.session_state.images["title"] = image_upgrade(
                                 json.dumps(st.session_state.tales["characters"]),
                                 json.dumps(st.session_state.tales["content"]),
-                                st.session_state.user_id
+                                st.session_state.user_id,
                             )
                             modify()
                             hide_overlay()
@@ -377,7 +381,10 @@ def view_edit():
                                 )
                                 with st.spinner("一括で生成中..."):
                                     images = asyncio.run(
-                                        create_images(st.session_state.tales,st.session_state.user_id)
+                                        create_images(
+                                            st.session_state.tales,
+                                            st.session_state.user_id,
+                                        )
                                     )
 
                                     st.session_state.images["title"] = images["title"]
@@ -475,7 +482,9 @@ def view_edit():
                             show_overlay()
                             adding_page(page_count + 1)
                             create_one_tale(page_count + 1)
-                            create_one_image(page_count + 1, tale,st.session_state.user_id)
+                            create_one_image(
+                                page_count + 1, tale, st.session_state.user_id
+                            )
                             create_one_audio(page_count + 1, tale)
                             modify()
                             hide_overlay()
@@ -505,7 +514,7 @@ def view_edit():
                             help="このページのイラストを、文章をベースにAIによって生成します。",
                         ):
                             show_overlay()
-                            create_one_image(page_count, tale,st.session_state.user_id)
+                            create_one_image(page_count, tale, st.session_state.user_id)
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -644,7 +653,9 @@ def adding_page(num):
 def adding_and_create_page(num):
     adding_page(num)
     create_one_tale(num)
-    create_one_image(num, st.session_state.tales["content"][num],st.session_state.user_id)
+    create_one_image(
+        num, st.session_state.tales["content"][num], st.session_state.user_id
+    )
     create_one_audio(num, st.session_state.tales["content"][num])
     modify()
     st.rerun()
@@ -704,7 +715,9 @@ def create_all(only_tale=False, ignore_tale=False):
         }
         st.session_state.audios = ["" for _ in st.session_state.tales["content"]]
     else:
-        st.session_state.images = create_images(st.session_state.tales,st.session_state.user_id)
+        st.session_state.images = create_images(
+            st.session_state.tales, st.session_state.user_id
+        )
         st.session_state.audios = create_audios(st.session_state.tales)
 
     create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -892,9 +905,10 @@ def create():
             select_book = imageUrls.index(selectedImageUrl) + 1
             try:
                 caption = captions[select_book - 1]
-            except:
+            except Exception as e:
+                print(e.args)
                 caption = captions[0]
-            print(st.session_state.not_modify,st.session_state.tales["title"] , caption)
+
             if (
                 st.session_state.not_modify
                 or st.session_state.tales["title"] != caption

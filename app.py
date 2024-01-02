@@ -55,7 +55,7 @@ def init_state():
 
 
 def main():
-    if "is_login" not in st.session_state:
+    if "user_id" not in st.session_state:
         init_state()
 
     st.set_page_config(
