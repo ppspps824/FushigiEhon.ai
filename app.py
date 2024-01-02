@@ -71,10 +71,9 @@ def main():
 
     os.environ["SUPABASE_KEY"] = st.secrets["SUPABASE_API_KEY"]
 
-    # Welcomページ
-    title_image_cols = st.columns([1, 8])
 
     ## Login
+    title_cols = st.columns([3, 1])
     with title_cols[1]:
         with st.container(border=True):
             session = login_form(
@@ -82,11 +81,12 @@ def main():
                 providers=["google"],
             )
     if not session:
+        # Welcomページ
+        title_image_cols = st.columns([1, 8])
         with title_image_cols[0]:
             st.image("assets/header.png")
         ## About
         st.image("assets/title_back.png")
-        title_cols = st.columns([3, 1])
         with title_cols[0]:
             card_cols = st.columns(2)
 
