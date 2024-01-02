@@ -75,7 +75,7 @@ def play():
 
         submit= st.button("みる")
         if submit:
-            content_place=st.container(border=True)
+            content_place.empty()
             video_data = s3_download(
                 "story-user-data",
                 f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.mp4'
