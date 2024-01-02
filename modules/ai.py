@@ -119,7 +119,6 @@ async def generate_image(tale, title, description, theme, characters):
     )
     # Call post_image_api with the properly formatted prompt and the size.
     image = await post_image_api(prompt, (1024, 1024))  # Adjust the size as needed.
-    st.image(image)
     return image
 
 async def create_images(tales: dict) -> dict:
