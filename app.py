@@ -184,9 +184,11 @@ def main():
     st.experimental_set_query_params(page=["success"])
 
     # ログイン後画面
+    print(session)
     st.session_state.user_id = session["user"]["id"]
     st.session_state.email = session["user"]["email"]
     user_info = db.read_user(st.session_state.user_id)
+    print(user_info)
     if not user_info.data:
         db.create_user(user_id=st.session_state.user_id,email=st.session_state.email)
         db.adding_credits(
