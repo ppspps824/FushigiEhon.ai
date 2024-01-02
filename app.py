@@ -71,7 +71,8 @@ def main():
 
     os.environ["SUPABASE_KEY"] = st.secrets["SUPABASE_API_KEY"]
 
-    title_image_cols = st.columns([1, 8,1])
+    title_logo_cols = st.columns([1, 8])
+    title_image_place = st.empty()
 
     title_cols = st.columns([3, 1])
     with title_cols[1]:
@@ -83,10 +84,10 @@ def main():
     ## Login
     if not session:
         # Welcomページ
-        with title_image_cols[0]:
+        with title_logo_cols[0]:
             st.image("assets/header.png")
         ## About
-        with title_image_cols[1]:
+        with title_image_place:
             st.image("assets/title_back.png")
         
         with title_cols[0]:
