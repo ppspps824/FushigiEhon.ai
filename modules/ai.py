@@ -137,7 +137,7 @@ async def create_images(tales: dict) -> dict:
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    images["title"] = await post_image_api(title_prompt, (512, 512))
+    images["title"] = post_image_api(title_prompt, (512, 512))
 
     # Asynchronously generate images for each item in tales["content"]
     tasks = []
