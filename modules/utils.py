@@ -163,7 +163,6 @@ def create_movie_and_pdf(book_info, bgm):
     # エンディング画像の準備 (PIL.Image形式)
     end_image = Image.open("assets/header.png")
     end_image = end_image.resize((128,256))
-    end_image = end_image.resize((end_image.width // 3, end_image.height // 3))
     end_dst = Image.new(
         "RGB",
         (1024, 512),
