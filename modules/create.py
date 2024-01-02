@@ -627,7 +627,7 @@ def save_book(book_content, title, bgm, only_tales=False):
         for ix, (image, audio) in enumerate(
             zip(book_content["images"]["content"], book_content["audios"])
         ):
-            image_path = base_path + f"images/image_{ix}.webp"
+            image_path = base_path + f"images/image_{ix}.jpeg"
             audio_path = base_path + f"audios/audio_{ix}.mp3"
             s3_upload(bucket_name, image, image_path)
             s3_upload(bucket_name, audio, audio_path)

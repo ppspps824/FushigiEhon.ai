@@ -132,6 +132,7 @@ def create_text_img(text, width, height, font_size, margin=20):
     return im
 
 
+@st.cache_data(show_spinner=False)
 def create_movie_and_pdf(book_info, bgm):
     title = book_info["tales"]["title"]
     title_image_bytes = book_info["images"]["title"]
