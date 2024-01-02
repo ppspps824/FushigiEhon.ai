@@ -73,118 +73,117 @@ def main():
     os.environ["SUPABASE_KEY"] = st.secrets["SUPABASE_API_KEY"]
 
     # Welcomページ
-    if not st.session_state.is_login:
-        title_image_cols = st.columns([1, 8])
-        with title_image_cols[0]:
-            st.image("assets/header.png")
-        ## About
-        st.image("assets/title_back.png")
-        title_cols = st.columns([3, 1])
-        with title_cols[0]:
-            card_cols = st.columns(2)
+    title_image_cols = st.columns([1, 8])
+    with title_image_cols[0]:
+        st.image("assets/header.png")
+    ## About
+    st.image("assets/title_back.png")
+    title_cols = st.columns([3, 1])
+    with title_cols[0]:
+        card_cols = st.columns(2)
 
-            with card_cols[0]:
-                card(
-                    title="簡単かつ柔軟",
-                    text=[
-                        "タイトルを入力するだけですべてをAIが生成します。",
-                        "何度でも自由に編集ができます。",
-                    ],
-                    styles=const.TITLE_BOX_STYLE,
-                    key="card1-1",
-                )
-                card(
-                    title="オリジナリティ",
-                    text=[
-                        "手持ちの写真やイラストをアップロードすることもでき",
-                        "AIによって画像をグレードアップすることもできます。",
-                    ],
-                    styles=const.TITLE_BOX_STYLE,
-                    key="card1-2",
-                )
-            with card_cols[1]:
-                card(
-                    title="いつでもどこでも",
-                    text=[
-                        "作成した絵本はクラウド上に保存でき",
-                        "動画やPDFでダウンロードすることもできます。",
-                    ],
-                    styles=const.TITLE_BOX_STYLE,
-                    key="card2-1",
-                )
-                card(
-                    title="すべての機能を最初から",
-                    text=[
-                        "初回ログイン時に100クレジットが付与されるので、すぐにすべての機能を利用できます。",
-                        "※クレジットはイラスト生成でのみ消費します。",
-                    ],
-                    styles=const.TITLE_BOX_STYLE,
-                    key="card2-2",
-                )
-            step_num = sac.steps(
-                items=[
-                    sac.StepsItem(
-                        title="どきどき。どんなお話ができるかな",
-                        subtitle="タイトルだけで絵本を作ってみましょう。",
-                    ),
-                    sac.StepsItem(
-                        title="わくわく。絵日記をつくろう",
-                        subtitle="楽しかった一日を、写真と一緒に絵本にしましょう。",
-                    ),
-                    sac.StepsItem(
-                        title="チャレンジ！みんなと大冒険",
-                        subtitle="家族、お友達、私！みんなで大冒険するお話を作りましょう。",
-                    ),
+        with card_cols[0]:
+            card(
+                title="簡単かつ柔軟",
+                text=[
+                    "タイトルを入力するだけですべてをAIが生成します。",
+                    "何度でも自由に編集ができます。",
                 ],
-                format_func="title",
-                placement="vertical",
-                return_index=True,
-                dot=True,
+                styles=const.TITLE_BOX_STYLE,
+                key="card1-1",
             )
-            # card(
-            #     title="すぐに始める",
-            #     text="",
-            #     styles=const.TITLE_LINK_BOX_STYLE,
-            #     key="card",
-            #     on_click=guest_login
-            # )
+            card(
+                title="オリジナリティ",
+                text=[
+                    "手持ちの写真やイラストをアップロードすることもでき",
+                    "AIによって画像をグレードアップすることもできます。",
+                ],
+                styles=const.TITLE_BOX_STYLE,
+                key="card1-2",
+            )
+        with card_cols[1]:
+            card(
+                title="いつでもどこでも",
+                text=[
+                    "作成した絵本はクラウド上に保存でき",
+                    "動画やPDFでダウンロードすることもできます。",
+                ],
+                styles=const.TITLE_BOX_STYLE,
+                key="card2-1",
+            )
+            card(
+                title="すべての機能を最初から",
+                text=[
+                    "初回ログイン時に100クレジットが付与されるので、すぐにすべての機能を利用できます。",
+                    "※クレジットはイラスト生成でのみ消費します。",
+                ],
+                styles=const.TITLE_BOX_STYLE,
+                key="card2-2",
+            )
+        step_num = sac.steps(
+            items=[
+                sac.StepsItem(
+                    title="どきどき。どんなお話ができるかな",
+                    subtitle="タイトルだけで絵本を作ってみましょう。",
+                ),
+                sac.StepsItem(
+                    title="わくわく。絵日記をつくろう",
+                    subtitle="楽しかった一日を、写真と一緒に絵本にしましょう。",
+                ),
+                sac.StepsItem(
+                    title="チャレンジ！みんなと大冒険",
+                    subtitle="家族、お友達、私！みんなで大冒険するお話を作りましょう。",
+                ),
+            ],
+            format_func="title",
+            placement="vertical",
+            return_index=True,
+            dot=True,
+        )
+        # card(
+        #     title="すぐに始める",
+        #     text="",
+        #     styles=const.TITLE_LINK_BOX_STYLE,
+        #     key="card",
+        #     on_click=guest_login
+        # )
 
-            if step_num == 0:
-                st.video("https://www.youtube.com/watch?v=5w3ClFBEb2Q&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
-            elif step_num == 1:
-                st.video("https://www.youtube.com/watch?v=FxJEFbY7tTI&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
-            elif step_num == 2:
-                st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
-                # st.video("assets/title_movie4.mp4")
+        if step_num == 0:
+            st.video("https://www.youtube.com/watch?v=5w3ClFBEb2Q&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+        elif step_num == 1:
+            st.video("https://www.youtube.com/watch?v=FxJEFbY7tTI&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+        elif step_num == 2:
+            st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
+            # st.video("assets/title_movie4.mp4")
 
 
 
-        ## Login
-        with title_cols[1]:
-            with st.container(border=True):
-                session = login_form(
-                    url=st.secrets["SUPABASE_URL"],
-                    providers=["google"],
-                )
+    ## Login
+    with title_cols[1]:
+        with st.container(border=True):
+            session = login_form(
+                url=st.secrets["SUPABASE_URL"],
+                providers=["google"],
+            )
 
-        ## ライセンス表記
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("")
-        st.write("---")
-        st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
-        st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
-        
-        if not session:
-            return
+    ## ライセンス表記
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("")
+    st.write("---")
+    st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
+    st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
+    
+    if not session:
+        return
 
-        st.experimental_set_query_params(page=["success"])
-        st.session_state.is_login = True
-        st.rerun()
+    st.experimental_set_query_params(page=["success"])
+    st.session_state.is_login = True
+    st.rerun()
 
     # ログイン後画面
     st.session_state.user_id = session["user"]["id"]
