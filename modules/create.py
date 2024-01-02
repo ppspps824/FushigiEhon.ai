@@ -2,7 +2,7 @@ import base64
 import datetime
 import io
 import json
-
+import asyncio
 import const
 import pytz
 import streamlit as st
@@ -374,14 +374,15 @@ def view_edit():
                                         ),
                                     )
                                 )
-                                with st.spinner("表紙を生成中..."):
-                                    st.session_state.images["title"] = post_image_api(
-                                        prompt
+                                with st.spinner("一括で生成中..."):
+                                    images = asyncio.run(
+                                        create_images(st.session_state.tales)
                                     )
-                                with st.spinner("イラストを生成中..."):
-                                    st.session_state.images["content"] = create_images(
-                                        st.session_state.tales
-                                    )
+
+                                    st.session_state.images["title"] = images["title"]
+                                    st.session_state.images["content"] = images[
+                                        "content"
+                                    ]
 
                                 modify()
                                 hide_overlay()
