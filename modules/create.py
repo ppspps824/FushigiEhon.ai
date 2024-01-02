@@ -384,13 +384,10 @@ def view_edit():
                                     st.session_state.images["content"] = images[
                                         "content"
                                     ]
-                                st.image(st.session_state.images["title"])
-
-                                [st.image(image) for image in st.session_state.images["content"]]
 
                                 modify()
                                 hide_overlay()
-                                # st.rerun()
+                                st.rerun()
 
                             if st.button(
                                 "イラストを一括で補正する",
@@ -841,7 +838,6 @@ def create():
             st.caption(f"クレジット消費量：{use_credit}")
             submit = st.button(
                 "生成開始",
-                help="ログイン時のみ利用可能",
             )
 
         if submit:
@@ -898,6 +894,7 @@ def create():
                 caption = captions[select_book - 1]
             except:
                 caption = captions[0]
+            print(st.session_state.not_modify,st.session_state.tales["title"] , caption)
             if (
                 st.session_state.not_modify
                 or st.session_state.tales["title"] != caption
