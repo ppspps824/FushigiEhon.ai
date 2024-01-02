@@ -21,7 +21,6 @@ def init_state():
     st.session_state.user_id = ""
     st.session_state.email = ""
     st.session_state.disable_audio = False
-    st.session_state.session = None
 
     # create
     st.session_state.tales = {
@@ -163,7 +162,7 @@ def main():
         ## Login
         with title_cols[1]:
             with st.container(border=True):
-                st.session_state.session = login_form(
+                session = login_form(
                     url=st.secrets["SUPABASE_URL"],
                     providers=["google"],
                 )
@@ -180,8 +179,7 @@ def main():
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
         
-        print("session=",st.session_state.session)
-        if not st.session_state.session:
+        if not session:
             return
 
         st.experimental_set_query_params(page=["success"])
