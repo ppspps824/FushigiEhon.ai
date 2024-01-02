@@ -199,9 +199,7 @@ def image_upgrade(image, title, description, theme, characters, tale):
             ).json()
             response_text = response["choices"][0]["message"]["content"]
             prompt = (
-                const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
-                .replace("%%description_placeholder%%", description)
-                .replace("%%theme_placeholder%%", theme)
+                const.IMAGE_UP_PROMPT
                 .replace("%%characters_placeholder%%", characters)
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )

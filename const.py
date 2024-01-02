@@ -312,6 +312,21 @@ IMAGES_PROMPT = """
 
 """
 
+
+IMAGE_UP_PROMPT = """
+あなたはプロの絵本作家です。与えられたテキストから素晴らしい絵本のイラストを作成してください。
+
+## 注意事項
+- 絵本にふさわしいかわいらしいタッチ
+
+## 登場人物
+%%characters_placeholder%%
+
+## 生成するイラストの内容
+%%tale_placeholder%%
+
+"""
+
 TITLE_MARKDOWN = """
 
 <img src="data:image/jpg;base64,%%image_placeholder%%" height="400" />
