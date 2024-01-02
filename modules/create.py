@@ -212,18 +212,12 @@ def view_edit():
                                         [
                                             adding_page(num)
                                             for num in range(
-                                                len(
-                                                    st.session_state.images[
-                                                        "content"
-                                                    ]
-                                                )
+                                                len(st.session_state.images["content"])
                                                 + adding_num
                                             )
                                         ]
                                     for num, image in enumerate(image_files):
-                                        image = Image.open(
-                                            io.BytesIO(image.getvalue())
-                                        )
+                                        image = Image.open(io.BytesIO(image.getvalue()))
                                         image = image.resize((512, 512))
                                         # 空のバイトストリームを作成
                                         bytes_io = io.BytesIO()
@@ -365,21 +359,9 @@ def view_edit():
                                     json.dumps(st.session_state.tales["content"]),
                                 )
 
-                                for num, image in enumerate(
-                                    st.session_state.images["content"]
-                                ):
-                                    st.session_state.images["content"][
-                                        num
-                                    ] = post_image_api(
-                                        image,
-                                        st.session_state.tales["title"],
-                                        st.session_state.tales["description"],
-                                        st.session_state.tales["theme"],
-                                        json.dumps(
-                                            st.session_state.tales["characters"]
-                                        ),
-                                        json.dumps(st.session_state.tales["content"]),
-                                    )
+                                st.session_state.images["content"] = create_images(
+                                    st.session_state.tales
+                                )
 
                                 modify()
                                 hide_overlay()

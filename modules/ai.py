@@ -10,7 +10,7 @@ import streamlit as st
 from PIL import Image
 from modules.utils import check_credits, culc_use_credits
 import modules.database as db
-
+import asyncio
 
 def post_text_api(prompt):
     event = "テキスト生成"
@@ -64,7 +64,7 @@ def create_tales(
         # st.write(tales)
         return tales
     else:
-        st.error("文章の生成に失敗しました。")
+        st.toast("文章の生成に失敗しました。")
         return ""
 
 
@@ -108,40 +108,41 @@ def post_image_api(prompt, size):
     else:
         return ""
 
+async def generate_image(tale, title, description, theme, characters):
+    prompt = (
+        const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
+        .replace("%%description_placeholder%%", description)
+        .replace("%%theme_placeholder%%", theme)
+        .replace("%%characters_placeholder%%", characters)
+        .replace("%%tale_placeholder%%", tale)
+    )
 
-def create_images(tales):
+    image = await post_image_api(prompt, size=(1024, 1024))
+    return image
+
+async def create_images(tales: dict) -> dict:
     images = {"title": "", "content": []}
 
+    # タイトル画像の生成
     title = tales["title"]
     description = tales["description"]
     theme = tales["theme"]
     characters = json.dumps(tales["characters"], ensure_ascii=False)
-    prompt = (
+    title_prompt = (
         const.DESCRIPTION_IMAGE_PROMPT.replace("%%title_placeholder%%", title)
         .replace("%%description_placeholder%%", description)
         .replace("%%theme_placeholder%%", theme)
         .replace("%%characters_placeholder%%", characters)
     )
-    with st.spinner("生成中...(表紙)"):
-        result=post_image_api(prompt, size=(512, 512))
-    if not result:
-        st.toast("表紙の生成に失敗しました。テキスト内容を変更して再実行してみてください。")
-    else:
-        images["title"] = result
+    images["title"] = await post_image_api(title_prompt, size=(512, 512))
 
-    for num, tale in enumerate(tales["content"]):
-        with st.spinner(f'生成中...(イラスト {num+1}/{len(tales["content"])})'):
-            prompt = (
-                const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
-                .replace("%%description_placeholder%%", description)
-                .replace("%%theme_placeholder%%", theme)
-                .replace("%%characters_placeholder%%", characters)
-                .replace("%%tale_placeholder%%", tale)
-            )
-            result = post_image_api(prompt, size=(1024, 1024))
-            images["content"].append(result)
-            if not result:
-                st.toast(f"ページ{num+1}のイラスト生成に失敗しました。テキスト内容を変更して再実行してみてください。")
+    # 各物語の内容に対する画像を非同期で生成
+    tasks = []
+    for tale in tales["content"]:
+        task = asyncio.create_task(generate_image(tale, title, description, theme, characters))
+        tasks.append(task)
+
+    images["content"] = await asyncio.gather(*tasks)
     return images
 
 
