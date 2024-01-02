@@ -188,7 +188,7 @@ def view_edit():
                             st.rerun()
 
                 with col2:
-                    with st.expnder("AI機能",border=True):
+                    with st.expnder("AI機能"):
                         if st.button(
                             "あらすじ、テーマ・メッセージを生成する",
                         ):
@@ -474,7 +474,7 @@ def view_edit():
                     except:
                         pass
 
-                    with st.expander("AI機能",border=True):
+                    with st.expander("AI機能"):
                         # AIによるコンテンツ生成機能
                         if st.button(
                             "次のページを生成する",
