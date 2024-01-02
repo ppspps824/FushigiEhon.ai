@@ -65,42 +65,51 @@ def play():
             is_guest=is_guest,
         )
 
+        description = book_info["tales"]["description"]
         title = book_info["tales"]["title"]
+        content_place=st.container(border=True)
 
-        video_data = s3_download(
-            "story-user-data",
-            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.mp4'
-            if is_guest
-            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
-        )
+        with content_place:
+            st.caption("あらすじ")
+            st.caption(description)
 
-        pdf_data = s3_download(
-            "story-user-data",
-            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.pdf'
-            if is_guest
-            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
-        )
-        if video_data:
-            st.video(video_data)
-            cols=st.columns([2,1,1])
-            
-            with cols[0]:
-                st.download_button(
-                    label="動画を保存",
-                    data=video_data,
-                    file_name=f"{title}.mp4",
-                    mime="video/mp4",
+        if st.button("みる"):
+            content_place.empty()
+            with content_place:
+                video_data = s3_download(
+                    "story-user-data",
+                    f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.mp4'
+                    if is_guest
+                    else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
                 )
-        else:
-            st.error("データの読み込みに失敗しました。")
 
-        if pdf_data:
-            with cols[0]:
-                st.download_button(
-                    label="PDFを保存",
-                    data=pdf_data,
-                    file_name=f"{title}.pdf",
-                    mime="application/pdf",
+                pdf_data = s3_download(
+                    "story-user-data",
+                    f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.pdf'
+                    if is_guest
+                    else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
                 )
-        with cols[0]:
-            components.html(const.X_SHARE_HTML.replace("%%title%%",title))
+                if video_data:
+                    st.video(video_data)
+                    cols=st.columns([2,1,1])
+                    
+                    with cols[0]:
+                        st.download_button(
+                            label="動画を保存",
+                            data=video_data,
+                            file_name=f"{title}.mp4",
+                            mime="video/mp4",
+                        )
+                else:
+                    st.error("データの読み込みに失敗しました。")
+
+                if pdf_data:
+                    with cols[0]:
+                        st.download_button(
+                            label="PDFを保存",
+                            data=pdf_data,
+                            file_name=f"{title}.pdf",
+                            mime="application/pdf",
+                        )
+                with cols[0]:
+                    components.html(const.X_SHARE_HTML.replace("%%title%%",title))
