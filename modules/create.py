@@ -350,13 +350,32 @@ def view_edit():
                                 )
                                 check_credits(st.session_state.user_id, events)
                                 show_overlay()
+                                prompt = (
+                                    const.DESCRIPTION_IMAGE_PROMPT.replace(
+                                        "%%title_placeholder%%",
+                                        st.session_state.tales["title"],
+                                    )
+                                    .replace(
+                                        "%%description_placeholder%%",
+                                        st.session_state.tales["description"],
+                                    )
+                                    .replace(
+                                        "%%theme_placeholder%%",
+                                        st.session_state.tales["theme"],
+                                    )
+                                    .replace(
+                                        "%%theme_placeholder%%",
+                                        st.session_state.tales["theme"],
+                                    )
+                                    .replace(
+                                        "%%characters_placeholder%%",
+                                        json.dumps(
+                                            st.session_state.tales["characters"]
+                                        ),
+                                    )
+                                )
                                 st.session_state.images["title"] = post_image_api(
-                                    st.session_state.images["title"],
-                                    st.session_state.tales["title"],
-                                    st.session_state.tales["description"],
-                                    st.session_state.tales["theme"],
-                                    json.dumps(st.session_state.tales["characters"]),
-                                    json.dumps(st.session_state.tales["content"]),
+                                    prompt
                                 )
 
                                 st.session_state.images["content"] = create_images(
