@@ -68,7 +68,7 @@ def create_tales(
         return ""
 
 
-def post_image_api(prompt, size=(512,512)):
+async def post_image_api(prompt, size=(512,512)):
     event = "イラスト生成"
     check_credits(st.session_state.user_id, [event])
     image_url = ""
