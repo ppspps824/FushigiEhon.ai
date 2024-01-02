@@ -181,7 +181,7 @@ def main():
         st.write("")
         st.write("---")
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
-        st.caption(const.LEGAL)
+        st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
         
 
         if all([not st.session_state.session, not st.session_state.is_guest]):
@@ -247,6 +247,7 @@ def main():
         ## ライセンス表記
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact fushigiehon@gmail.com")
+        st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
     if selected == "つくる":
         create()
     elif selected == "よむ":
