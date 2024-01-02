@@ -377,7 +377,7 @@ def view_edit():
                                 )
                                 with st.spinner("一括で生成中..."):
                                     images = asyncio.run(
-                                        create_images(st.session_state.tales)
+                                        create_images(st.session_state.tales,st.session_state.user_id)
                                     )
 
                                     st.session_state.images["title"] = images["title"]
