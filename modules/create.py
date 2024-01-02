@@ -374,13 +374,14 @@ def view_edit():
                                         ),
                                     )
                                 )
-                                st.session_state.images["title"] = post_image_api(
-                                    prompt
-                                )
-
-                                st.session_state.images["content"] = create_images(
-                                    st.session_state.tales
-                                )
+                                with st.spinner("表紙を生成中..."):
+                                    st.session_state.images["title"] = post_image_api(
+                                        prompt
+                                    )
+                                with st.spinner("イラストを生成中..."):
+                                    st.session_state.images["content"] = create_images(
+                                        st.session_state.tales
+                                    )
 
                                 modify()
                                 hide_overlay()
@@ -550,28 +551,6 @@ def view_edit():
                         key="alert_dialog_page",
                     ):
                         delete_page(page_count)
-
-    if st.session_state.tales["title"]:
-        if st.button("動画を生成する"):
-            create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
-            create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
-            book_info = {
-                "create_date": create_date_yyyymdd,
-                "tales": st.session_state.tales,
-                "images": st.session_state.images,
-                "audios": st.session_state.audios,
-            }
-            video_data, pdf_data = create_movie_and_pdf(book_info, bgm)
-            if video_data:
-                st.video(video_data)
-                st.download_button(
-                    label="動画を保存",
-                    data=video_data,
-                    file_name=f'{st.session_state.tales["title"]}.mp4',
-                    mime="video/mp4",
-                )
-            else:
-                st.error("データの読み込みに失敗しました。")
 
 
 def delete_book(title):
