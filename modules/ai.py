@@ -100,7 +100,7 @@ def post_image_api(prompt, size=(512,512)):
         image = image.resize(size)
 
         buffer = io.BytesIO()
-        image.save(buffer, format="webp", quality=50)
+        image.save(buffer, format="jpeg", quality=50)
         db.adding_credits(
             user_id=st.session_state.user_id, value=culc_use_credits([event]), event=event
         )
@@ -119,6 +119,7 @@ async def generate_image(tale, title, description, theme, characters):
     )
     # Call post_image_api with the properly formatted prompt and the size.
     image = await post_image_api(prompt, (1024, 1024))  # Adjust the size as needed.
+    st.image(image)
     return image
 
 async def create_images(tales: dict) -> dict:
