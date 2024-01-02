@@ -72,10 +72,7 @@ def post_image_api(prompt, size,user_id):
     event = "イラスト生成"
     check_credits(user_id, [event])
     image_url = ""
-    if st.session_state.image_model == "dall-e-3":
-        gen_size = "1024x1024"
-    else:
-        gen_size = "512x512"
+    gen_size = "1024x1024"
 
     for _ in range(3):
         try:
