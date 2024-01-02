@@ -384,6 +384,9 @@ def view_edit():
                                     st.session_state.images["content"] = images[
                                         "content"
                                     ]
+                                st.image(st.session_state.images["title"])
+
+                                [st.image(image) for image in st.session_state.images["content"]]
 
                                 modify()
                                 hide_overlay()
