@@ -634,7 +634,7 @@ def save_book(book_content, title, bgm, only_tales=False):
 
         # 動画とPDFの生成
         if not only_tales:
-            video_path = base_path + f"{title}.webm"
+            video_path = base_path + f"{title}.mp4"
             pdf_path = base_path + f"{title}.pdf"
             video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
             s3_upload(bucket_name, video_data, video_path)
