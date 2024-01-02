@@ -314,10 +314,6 @@ def view_edit():
                         ):
                             show_overlay()
                             st.session_state.images["title"] = image_upgrade(
-                                st.session_state.images["title"],
-                                st.session_state.tales["title"],
-                                st.session_state.tales["description"],
-                                st.session_state.tales["theme"],
                                 json.dumps(st.session_state.tales["characters"]),
                                 json.dumps(st.session_state.tales["content"]),
                             )
@@ -398,10 +394,6 @@ def view_edit():
                                 check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 st.session_state.images["title"] = image_upgrade(
-                                    st.session_state.images["title"],
-                                    st.session_state.tales["title"],
-                                    st.session_state.tales["description"],
-                                    st.session_state.tales["theme"],
                                     json.dumps(st.session_state.tales["characters"]),
                                     json.dumps(st.session_state.tales["content"]),
                                 )
@@ -413,9 +405,6 @@ def view_edit():
                                         num
                                     ] = image_upgrade(
                                         image,
-                                        st.session_state.tales["title"],
-                                        st.session_state.tales["description"],
-                                        st.session_state.tales["theme"],
                                         json.dumps(
                                             st.session_state.tales["characters"]
                                         ),
@@ -525,9 +514,6 @@ def view_edit():
                                 page_count
                             ] = image_upgrade(
                                 st.session_state.images["title"],
-                                st.session_state.tales["title"],
-                                st.session_state.tales["description"],
-                                st.session_state.tales["theme"],
                                 json.dumps(st.session_state.tales["characters"]),
                                 st.session_state.tales["content"][page_count],
                             )

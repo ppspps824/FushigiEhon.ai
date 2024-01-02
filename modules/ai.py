@@ -123,9 +123,11 @@ def create_images(tales):
         .replace("%%characters_placeholder%%", characters)
     )
     with st.spinner("生成中...(表紙)"):
-        images["title"] = post_image_api(prompt, size=(512, 512))
-    if not images["title"]:
-        st.error("表紙の生成に失敗しました。")
+        result=post_image_api(prompt, size=(512, 512))
+    if not result:
+        st.toast("表紙の生成に失敗しました。テキスト内容を変更して再実行してみてください。")
+    else:
+        images["title"] = result
 
     for num, tale in enumerate(tales["content"]):
         with st.spinner(f'生成中...(イラスト {num+1}/{len(tales["content"])})'):
@@ -139,7 +141,7 @@ def create_images(tales):
             result = post_image_api(prompt, size=(1024, 1024))
             images["content"].append(result)
             if not result:
-                st.error("イラストの生成に失敗しました。")
+                st.toast(f"ページ{num+1}のイラスト生成に失敗しました。テキスト内容を変更して再実行してみてください。")
     return images
 
 
@@ -164,7 +166,7 @@ def post_audio_api(tale):
     return response.content
 
 
-def image_upgrade(image, title, description, theme, characters, tale):
+def image_upgrade(image,characters, tale):
     event = "イラスト生成"
     check_credits(st.session_state.user_id, [event])
     if image:
@@ -189,7 +191,7 @@ def image_upgrade(image, title, description, theme, characters, tale):
                     ],
                 }
             ],
-            "max_tokens": 300,
+            "max_tokens": 1000,
         }
         with st.spinner("イラストを補正中..."):
             response = requests.post(
@@ -204,7 +206,11 @@ def image_upgrade(image, title, description, theme, characters, tale):
                 .replace("%%tale_placeholder%%", tale + "\n\n" + response_text)
             )
             result = post_image_api(prompt, size=(1024, 1024))
-            db.adding_credits(user_id=st.session_state.user_id, value=culc_use_credits([event]),event=event)
+            if result:
+                db.adding_credits(user_id=st.session_state.user_id, value=culc_use_credits([event]),event=event)
+            else:
+                st.toast("イラストの補正に失敗しました。")
+
         return result
 
 
@@ -265,19 +271,23 @@ def create_one_audio(num, tale):
 
 def create_one_image(num, tale):
     with st.spinner("生成中...(イラスト)"):
-        st.session_state.images["content"][num] = post_image_api(
-            const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
-            .replace("%%title_placeholder%%", st.session_state.tales["title"])
-            .replace(
-                "%%description_placeholder%%", st.session_state.tales["description"]
-            )
-            .replace(
-                "%%theme_placeholder%%",
-                st.session_state.tales["theme"],
-            )
-            .replace(
-                "%%characters_placeholder%%",
-                json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
-            ),
-            (512, 512),
+        result = post_image_api(
+        const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
+        .replace("%%title_placeholder%%", st.session_state.tales["title"])
+        .replace(
+            "%%description_placeholder%%", st.session_state.tales["description"]
         )
+        .replace(
+            "%%theme_placeholder%%",
+            st.session_state.tales["theme"],
+        )
+        .replace(
+            "%%characters_placeholder%%",
+            json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
+        ),
+        (512, 512),
+    )
+        if result:
+            st.session_state.images["content"][num] = result
+        else:
+            st.toast("イラストの生成に失敗しました。テキスト内容を変更して再実行してみてください。")
