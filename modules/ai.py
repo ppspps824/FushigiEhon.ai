@@ -105,7 +105,7 @@ def post_image_api(prompt,user_id):
     else:
         return ""
 
-async def generate_image(tale, title, description, theme, characters,user_id):
+def generate_image(tale, title, description, theme, characters,user_id):
     # Combine the individual pieces of information into a single prompt string.
     prompt = (
         const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
@@ -114,12 +114,10 @@ async def generate_image(tale, title, description, theme, characters,user_id):
         .replace("%%characters_placeholder%%", characters)
         .replace("%%tale_placeholder%%", tale)
     )
-    loop = asyncio.get_running_loop()
-    with ThreadPoolExecutor() as pool:
-        image = await loop.run_in_executor(pool, post_image_api, prompt,user_id)
+    image = post_image_api(prompt,user_id)
     return image
 
-async def create_images(tales: dict,user_id:str) -> dict:
+def create_images(tales: dict,user_id:str) -> dict:
     images = {"title": "", "content": []}
     
     title = tales["title"]
@@ -135,12 +133,14 @@ async def create_images(tales: dict,user_id:str) -> dict:
     images["title"] = post_image_api(title_prompt,user_id)
 
     # Asynchronously generate images for each item in tales["content"]
+    loop = asyncio.get_event_loop()
     tasks = []
     for tale in tales["content"]:
         task = asyncio.create_task(generate_image(tale, title, description, theme, characters,user_id))
         tasks.append(task)
 
-    images["content"] = await asyncio.gather(*tasks)
+    gather = asyncio.gather(*tasks)
+    images["content"] = loop.run_until_complete
     return images
 
 
