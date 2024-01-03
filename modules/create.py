@@ -197,7 +197,7 @@ def view_edit():
                             "",
                             label_visibility="collapsed",
                             accept_multiple_files=True,
-                            type=["png", "jpg"],
+                            type=["png", "jpg","webp"],
                         )
                         if image_files:
                             st.image(image_files)
