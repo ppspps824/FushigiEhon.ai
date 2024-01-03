@@ -160,11 +160,11 @@ def main():
             # )
 
             if step_num == 0:
-                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
+                st.video("https://youtu.be/vL3l0ZB_pD4")
             elif step_num == 1:
-                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
+                st.video("https://youtu.be/vL3l0ZB_pD4")
             elif step_num == 2:
-                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
+                st.video("https://youtu.be/vL3l0ZB_pD4")
             
 
         ## ライセンス表記
