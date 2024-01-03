@@ -17,6 +17,7 @@ from modules.ai import (
     create_one_tale,
     create_tales,
     image_upgrade,
+    images_upgrade,
     post_image_api,
     post_text_api,
 )
