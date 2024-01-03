@@ -140,7 +140,7 @@ def create_images(tales: dict,user_id:str) -> dict:
         tasks.append(task)
 
     gather = asyncio.gather(*tasks)
-    images["content"] = loop.run_until_complete
+    images["content"] = loop.run_until_complete(gather)
     return images
 
 
@@ -172,7 +172,7 @@ def images_upgrade(images,characters, tales,user_id):
         tasks.append(task)
 
     gather = asyncio.gather(*tasks)
-    images = loop.run_until_complete
+    images = loop.run_until_complete(gather)
     
     return images
 
