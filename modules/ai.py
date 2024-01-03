@@ -180,7 +180,7 @@ def images_upgrade(images,characters, tales,user_id):
     loop = get_or_create_eventloop()
     asyncio.set_event_loop(loop)
     tasks = []
-    for image,tale in zip([images,tales]):
+    for image,tale in zip(images,tales):
         task = asyncio.create_task(image_upgrade(image,characters, tale,user_id))
         tasks.append(task)
 
