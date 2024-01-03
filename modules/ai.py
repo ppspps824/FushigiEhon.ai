@@ -13,15 +13,6 @@ import modules.database as db
 import asyncio
 
 
-def get_or_create_eventloop():
-    try:
-        return asyncio.get_event_loop()
-    except RuntimeError as ex:
-        if "There is no current event loop in thread" in str(ex):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            return asyncio.get_event_loop()
-
 def post_text_api(prompt):
     event = "テキスト生成"
     check_credits(st.session_state.user_id, [event])
@@ -115,17 +106,6 @@ def post_image_api(prompt,user_id):
     else:
         return ""
 
-def generate_image(tale, title, description, theme, characters,user_id):
-    # Combine the individual pieces of information into a single prompt string.
-    prompt = (
-        const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
-        .replace("%%description_placeholder%%", description)
-        .replace("%%theme_placeholder%%", theme)
-        .replace("%%characters_placeholder%%", characters)
-        .replace("%%tale_placeholder%%", tale)
-    )
-    image = post_image_api(prompt,user_id)
-    return image
 
 def create_images(tales: dict,user_id:str) -> dict:
     images = {"title": "", "content": []}
@@ -141,18 +121,17 @@ def create_images(tales: dict,user_id:str) -> dict:
         .replace("%%characters_placeholder%%", characters)
     )
     images["title"] = post_image_api(title_prompt,user_id)
-
-    # Asynchronously generate images for each item in tales["content"]
-    loop = get_or_create_eventloop()
-    asyncio.set_event_loop(loop)
     
-    tasks = []
-    for tale in tales["content"]:
-        task = asyncio.create_task(generate_image(tale, title, description, theme, characters,user_id))
-        tasks.append(task)
-
-    gather = asyncio.gather(*tasks)
-    images["content"] = loop.run_until_complete(gather)
+    for num,tale in enumerate(tales["content"]):
+        page_prompt = (
+            const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
+            .replace("%%description_placeholder%%", description)
+            .replace("%%theme_placeholder%%", theme)
+            .replace("%%characters_placeholder%%", characters)
+            .replace("%%tale_placeholder%%", tale)
+        )
+        images["content"][num] = post_image_api(page_prompt,user_id)
+    
     return images
 
 
