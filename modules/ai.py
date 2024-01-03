@@ -122,7 +122,7 @@ def create_images(tales: dict,user_id:str) -> dict:
     )
     images["title"] = post_image_api(title_prompt,user_id)
     
-    for num,tale in enumerate(tales["content"]):
+    for tale in tales["content"]:
         page_prompt = (
             const.IMAGES_PROMPT.replace("%%title_placeholder%%", title)
             .replace("%%description_placeholder%%", description)
@@ -130,7 +130,7 @@ def create_images(tales: dict,user_id:str) -> dict:
             .replace("%%characters_placeholder%%", characters)
             .replace("%%tale_placeholder%%", tale)
         )
-        images["content"][num] = post_image_api(page_prompt,user_id)
+        images["content"].append(post_image_api(page_prompt,user_id))
     
     return images
 
