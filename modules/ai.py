@@ -156,22 +156,16 @@ def post_audio_api(tale):
     return response.content
 
 def images_upgrade(images,characters, tales,user_id):
-    loop = get_or_create_eventloop()
-    asyncio.set_event_loop(loop)
-    tasks = []
-    for image,tale in zip(images,tales):
-        task = asyncio.create_task(image_upgrade(image,characters, tale,user_id))
-        tasks.append(task)
-
-    gather = asyncio.gather(*tasks)
-    images = loop.run_until_complete(gather)
+    result=[]
+    for num,info in enumerate(zip(images,tales)):
+        result.append(image_upgrade(info[0],characters, info[1],user_id))
     
-    result={
-    "title":images[0],
-    "content":images[1:]
+    images={
+    "title":result[0],
+    "content":result[1:]
     }
     
-    return result
+    return images
 
 def image_upgrade(image,characters, tale,user_id):
     event = "イラスト生成"
