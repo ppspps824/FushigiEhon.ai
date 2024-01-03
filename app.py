@@ -162,7 +162,7 @@ def main():
             if step_num == 0:
                 st.video("https://youtu.be/1TiL2p5WSeQ?feature=shared")
             elif step_num == 1:
-                st.video("https://youtu.be/1TiL2p5WSeQ?feature=shared")
+                st.video("https://youtu.be/tNwTA9wSVkM?feature=shared")
             elif step_num == 2:
                 st.video("https://youtu.be/1TiL2p5WSeQ?feature=shared")
             
