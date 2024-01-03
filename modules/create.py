@@ -60,7 +60,7 @@ def view_edit():
             max_chars=100,
         )
 
-        with st.expander("キャラクター", expanded=True):
+        with st.expander("キャラクター"):
             chara_col1, chara_col2 = st.columns(2)
             with chara_col1:
                 st.session_state.tales["characters"]["lead"]["name"] = st.text_input(
