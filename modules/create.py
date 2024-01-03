@@ -380,17 +380,12 @@ def view_edit():
                                     )
                                 )
                                 with st.spinner("一括で生成中..."):
-                                    images = asyncio.run(
+                                    st.session_state.images = asyncio.run(
                                         create_images(
                                             st.session_state.tales,
                                             st.session_state.user_id,
                                         )
                                     )
-
-                                    st.session_state.images["title"] = images["title"]
-                                    st.session_state.images["content"] = images[
-                                        "content"
-                                    ]
 
                                 modify()
                                 hide_overlay()
