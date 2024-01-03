@@ -380,13 +380,11 @@ def view_edit():
                                     )
                                 )
                                 with st.spinner("一括で生成中..."):
-                                    st.session_state.images = asyncio.run(
-                                        create_images(
+                                    st.session_state.images = create_images(
                                             st.session_state.tales,
                                             st.session_state.user_id,
                                         )
-                                    )
-
+                                    
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -713,12 +711,10 @@ def create_all(only_tale=False, ignore_tale=False):
         }
         st.session_state.audios = ["" for _ in st.session_state.tales["content"]]
     else:
-        st.session_state.images = asyncio.run(
-                                        create_images(
+        st.session_state.images = create_images(
                                             st.session_state.tales,
                                             st.session_state.user_id,
                                         )
-                                    )
 
         st.session_state.audios = create_audios(st.session_state.tales)
 
