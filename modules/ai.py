@@ -164,10 +164,10 @@ def post_audio_api(tale):
     db.adding_credits(user_id=st.session_state.user_id, value=culc_use_credits([event]),event=event)
     return response.content
 
-def images_upgrade(images,characters, tale,user_id)
+def images_upgrade(images,characters, tales,user_id)
     loop = asyncio.get_event_loop()
     tasks = []
-    for image in images:
+    for image,tale in zip([images,tales]):
         task = asyncio.create_task(image_upgrade(image,characters, tale,user_id))
         tasks.append(task)
 
