@@ -12,6 +12,16 @@ from modules.utils import check_credits, culc_use_credits
 import modules.database as db
 import asyncio
 
+
+def get_or_create_eventloop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
+
 def post_text_api(prompt):
     event = "テキスト生成"
     check_credits(st.session_state.user_id, [event])
@@ -133,7 +143,9 @@ def create_images(tales: dict,user_id:str) -> dict:
     images["title"] = post_image_api(title_prompt,user_id)
 
     # Asynchronously generate images for each item in tales["content"]
-    loop = asyncio.get_event_loop()
+    loop = get_or_create_eventloop()
+    asyncio.set_event_loop(loop)
+    
     tasks = []
     for tale in tales["content"]:
         task = asyncio.create_task(generate_image(tale, title, description, theme, characters,user_id))
@@ -165,7 +177,8 @@ def post_audio_api(tale):
     return response.content
 
 def images_upgrade(images,characters, tales,user_id):
-    loop = asyncio.get_event_loop()
+    loop = get_or_create_eventloop()
+    asyncio.set_event_loop(loop)
     tasks = []
     for image,tale in zip([images,tales]):
         task = asyncio.create_task(image_upgrade(image,characters, tale,user_id))
