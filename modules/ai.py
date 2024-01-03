@@ -174,7 +174,12 @@ def images_upgrade(images,characters, tales,user_id):
     gather = asyncio.gather(*tasks)
     images = loop.run_until_complete(gather)
     
-    return images
+    result={
+    "title":images[0],
+    "content":images[1:]
+    }
+    
+    return result
 
 def image_upgrade(image,characters, tale,user_id):
     event = "イラスト生成"
