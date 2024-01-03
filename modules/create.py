@@ -397,7 +397,7 @@ def view_edit():
                                 )
                                 check_credits(st.session_state.user_id, events)
                                 show_overlay()
-                                st.session_state.images["title"] = image_upgrade(
+                                st.session_state.images["title"] = images_upgrade(
                                     json.dumps(st.session_state.tales["characters"]),
                                     json.dumps(st.session_state.tales["content"]),
                                     st.session_state.user_id
