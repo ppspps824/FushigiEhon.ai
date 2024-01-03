@@ -177,7 +177,7 @@ def view_edit():
                     title_upload_file = st.file_uploader(
                         "画像をアップロード",
                         key="title_upload_file",
-                        type=["png", "jpg"],
+                        type=["png", "jpg","webp"],
                     )
                     if title_upload_file:
                         if st.button("取り込み", key="title_upload_file_button"):
