@@ -134,16 +134,16 @@ def main():
             step_num = sac.steps(
                 items=[
                     sac.StepsItem(
-                        title="どきどき。どんなお話ができるかな",
-                        subtitle="タイトルだけで絵本を作ってみましょう。",
+                        title="どきどき。きょうのおはなし",
+                        subtitle="タイトルだけで絵本を作ろう",
                     ),
                     sac.StepsItem(
-                        title="わくわく。絵日記をつくろう",
-                        subtitle="楽しかった一日を、写真と一緒に絵本にしましょう。",
+                        title="にこにこ。おもいでえほん",
+                        subtitle="楽しかった一日を、写真と一緒に絵本にしよう。",
                     ),
                     sac.StepsItem(
-                        title="チャレンジ！みんなと大冒険",
-                        subtitle="家族、お友達、私！みんなで大冒険するお話を作りましょう。",
+                        title="わくわく！みんなとだいぼうけん。",
+                        subtitle="家族、お友達、私！みんなで大冒険するお話を作ろう。",
                     ),
                 ],
                 format_func="title",
