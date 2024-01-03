@@ -160,12 +160,12 @@ def main():
             # )
 
             if step_num == 0:
-                st.video("https://www.youtube.com/watch?v=5w3ClFBEb2Q&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
             elif step_num == 1:
-                st.video("https://www.youtube.com/watch?v=FxJEFbY7tTI&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=2")
+                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
             elif step_num == 2:
-                st.video("https://www.youtube.com/watch?v=a8kWYtg7FTw&list=PLnyEZLh2Rr4I8lZGmDk0mOXxGP-ytiZR6&index=3")
-                # st.video("assets/title_movie4.mp4")
+                st.video("https://youtube.com/shorts/vL3l0ZB_pD4?feature=shared")
+            
 
         ## ライセンス表記
         st.write("")
