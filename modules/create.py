@@ -405,7 +405,7 @@ def view_edit():
                                         json.dumps(
                                             st.session_state.tales["characters"]
                                         ),
-                                        [""]+json.dumps(st.session_state.tales["content"]),
+                                        [""]+st.session_state.tales["content"],
                                         st.session_state.user_id
                                     )
 
