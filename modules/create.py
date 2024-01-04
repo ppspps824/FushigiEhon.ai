@@ -282,9 +282,10 @@ def view_edit():
 
                         if st.button(
                             "表紙を生成する",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="えほんの内容に応じて表紙を生成します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="生成中...(表紙)")
                             title = st.session_state.tales["title"]
@@ -313,9 +314,10 @@ def view_edit():
 
                         if st.button(
                             "表紙を補正する",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="表紙を補正します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="表紙を補正中...")
                             st.session_state.images["title"] = asyncio.run(
