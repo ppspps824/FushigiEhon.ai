@@ -1,10 +1,11 @@
 import base64
 import io
+
 import const
 import streamlit as st
 import streamlit.components.v1 as components
 from modules.s3 import get_all_book_titles, get_book_data, s3_download
-from modules.utils import get_images,add_caption_transparent
+from modules.utils import add_caption_transparent, get_images
 
 
 def pil_to_base64(image):
@@ -14,7 +15,7 @@ def pil_to_base64(image):
 
     return img_str
 
-    
+
 def play():
     images, captions = get_images(
         get_all_book_titles(
@@ -35,11 +36,17 @@ def play():
         "image-carousel-component", path="frontend/public"
     )
 
-    images = [add_caption_transparent(image,caption) for image,caption in zip(images,captions)]
-    guest_images = [add_caption_transparent(image,caption) for image,caption in zip(guest_images,guest_captions)]
+    images = [
+        add_caption_transparent(image, caption)
+        for image, caption in zip(images, captions)
+    ]
+    guest_images = [
+        add_caption_transparent(image, caption)
+        for image, caption in zip(guest_images, guest_captions)
+    ]
 
-    captions+=guest_captions
-    captions=sorted(set(captions), key=captions.index)
+    captions += guest_captions
+    captions = sorted(set(captions), key=captions.index)
 
     imageUrls = [
         f"data:image/png;base64,{base64.b64encode(image).decode()}" for image in images
@@ -66,7 +73,7 @@ def play():
 
         description = book_info["tales"]["description"]
         title = book_info["tales"]["title"]
-        content_place=st.container(border=True)
+        content_place = st.container(border=True)
 
         with content_place:
             st.caption("あらすじ")
@@ -87,8 +94,8 @@ def play():
         )
         if video_data:
             st.video(video_data)
-            cols=st.columns([2,1,1])
-            
+            cols = st.columns([2, 1, 1])
+
             with cols[0]:
                 st.download_button(
                     label="動画を保存",
@@ -108,4 +115,4 @@ def play():
                     mime="application/pdf",
                 )
         with cols[0]:
-            components.html(const.X_SHARE_HTML.replace("%%title%%",title))
+            components.html(const.X_SHARE_HTML.replace("%%title%%", title))

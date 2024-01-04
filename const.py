@@ -82,6 +82,12 @@ HIDE_ST_STYLE = """
                 padding-bottom: 5rem;
                 }
 
+                .loader-text {
+                    color: white; /* テキストの色 */
+                    margin-top: 20px; /* ローダーとの間隔 */
+                    font-size: 20px; /* テキストサイズ */
+                    text-align: center; /* 中央揃え */
+                    }
 
                 /* ローダー要素のスタイル定義 */
                 .loader {

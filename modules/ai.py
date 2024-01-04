@@ -50,17 +50,16 @@ def create_tales(
         .replace("%%characters_per_page_placeholder%%", characters_per_page)
         .replace("%%character_set_placeholder%%", character_set)
     )
-    with st.spinner("生成中...(テキスト)"):
-        for _ in range(3):
-            try:
-                content_text = post_text_api(content)
-                content_text = content_text.replace("json", "").replace("```", "")
-                tales = json.loads(content_text)
-                break
-            except Exception as e:
-                print(e.args)
-                print(f"プロンプト{content}")
-                continue
+    for _ in range(3):
+        try:
+            content_text = post_text_api(content)
+            content_text = content_text.replace("json", "").replace("```", "")
+            tales = json.loads(content_text)
+            break
+        except Exception as e:
+            print(e.args)
+            print(f"プロンプト{content}")
+            continue
 
     if tales:
         # st.write(tales)

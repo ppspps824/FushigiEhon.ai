@@ -34,8 +34,6 @@ from modules.utils import (
 )
 from PIL import Image
 
-# from streamlit_lottie import st_lottie_spinnerf
-
 
 def view_edit():
     st.write("---")
@@ -145,7 +143,7 @@ def view_edit():
                     "images": st.session_state.images,
                     "audios": st.session_state.audios,
                 }
-                show_overlay()
+                show_overlay(text="保存中...")
                 save_book(book_content, st.session_state.tales["title"], bgm)
                 modify()
                 hide_overlay()
@@ -206,29 +204,26 @@ def view_edit():
                             st.image(image_files)
 
                             if st.button("取り込み", key="all_image_upload"):
-                                show_overlay()
-                                with st.spinner("取り込み中..."):
-                                    adding_num = len(image_files) - len(
-                                        st.session_state.images["content"]
-                                    )
-                                    if adding_num > 0:
-                                        [
-                                            adding_page(num)
-                                            for num in range(
-                                                len(st.session_state.images["content"])
-                                                + adding_num
-                                            )
-                                        ]
-                                    for num, image in enumerate(image_files):
-                                        image = Image.open(io.BytesIO(image.getvalue()))
-                                        image = image.resize((512, 512))
-                                        # 空のバイトストリームを作成
-                                        bytes_io = io.BytesIO()
-                                        image.save(bytes_io, format="PNG")
-                                        bytes_data = bytes_io.getvalue()
-                                        st.session_state.images["content"][
-                                            num
-                                        ] = bytes_data
+                                show_overlay(text="取り込み中...")
+                                adding_num = len(image_files) - len(
+                                    st.session_state.images["content"]
+                                )
+                                if adding_num > 0:
+                                    [
+                                        adding_page(num)
+                                        for num in range(
+                                            len(st.session_state.images["content"])
+                                            + adding_num
+                                        )
+                                    ]
+                                for num, image in enumerate(image_files):
+                                    image = Image.open(io.BytesIO(image.getvalue()))
+                                    image = image.resize((512, 512))
+                                    # 空のバイトストリームを作成
+                                    bytes_io = io.BytesIO()
+                                    image.save(bytes_io, format="PNG")
+                                    bytes_data = bytes_io.getvalue()
+                                    st.session_state.images["content"][num] = bytes_data
 
                                     modify()
                                     hide_overlay()
@@ -237,31 +232,30 @@ def view_edit():
                         if st.button(
                             "あらすじ、テーマ・メッセージを生成する",
                         ):
-                            show_overlay()
+                            show_overlay(text="生成中...(あらすじ)")
                             tales_text = "\n".join(st.session_state.tales["content"])
-                            with st.spinner("生成中...(あらすじ)"):
-                                st.session_state.tales["description"] = post_text_api(
-                                    const.DESCRIPTION_PROMPT.replace(
-                                        "%%tales_placeholder%%", tales_text
-                                    )
-                                    .replace(
-                                        "%%title_placeholder%%",
-                                        st.session_state.tales["title"],
-                                    )
-                                    .replace(
-                                        "%%theme_placeholder%%",
-                                        st.session_state.tales["theme"],
-                                    )
-                                    .replace(
-                                        "%%characters_placeholder%%",
-                                        json.dumps(
-                                            st.session_state.tales["characters"],
-                                            ensure_ascii=False,
-                                        ),
-                                    )
+                            st.session_state.tales["description"] = post_text_api(
+                                const.DESCRIPTION_PROMPT.replace(
+                                    "%%tales_placeholder%%", tales_text
                                 )
-                                modify()
-                                hide_overlay()
+                                .replace(
+                                    "%%title_placeholder%%",
+                                    st.session_state.tales["title"],
+                                )
+                                .replace(
+                                    "%%theme_placeholder%%",
+                                    st.session_state.tales["theme"],
+                                )
+                                .replace(
+                                    "%%characters_placeholder%%",
+                                    json.dumps(
+                                        st.session_state.tales["characters"],
+                                        ensure_ascii=False,
+                                    ),
+                                )
+                            )
+                            modify()
+                            hide_overlay()
                             st.rerun()
 
                         if st.button(
@@ -271,20 +265,15 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
+                            show_overlay(text="生成中...")
                             adding_page(0)
-                            with st.spinner("生成中...(内容)"):
-                                create_one_tale(0)
-                            with st.spinner("生成中...(イラスト)"):
-                                create_one_image(
-                                    0,
-                                    st.session_state.tales["content"][0],
-                                    st.session_state.user_id,
-                                )
-                            with st.spinner("生成中...(音声)"):
-                                create_one_audio(
-                                    0, st.session_state.tales["content"][0]
-                                )
+                            create_one_tale(0)
+                            create_one_image(
+                                0,
+                                st.session_state.tales["content"][0],
+                                st.session_state.user_id,
+                            )
+                            create_one_audio(0, st.session_state.tales["content"][0])
                             hide_overlay()
                             modify()
                             st.rerun()
@@ -295,7 +284,7 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
+                            show_overlay(text="生成中...(表紙)")
                             title = st.session_state.tales["title"]
                             description = st.session_state.tales["description"]
                             characters = json.dumps(
@@ -312,12 +301,9 @@ def view_edit():
                                 )
                                 .replace("%%characters_placeholder%%", characters)
                             )
-                            with st.spinner("生成中...(表紙)"):
-                                st.session_state.images["title"] = asyncio.run(
-                                    post_image_api(
-                                        prompt, user_id=st.session_state.user_id
-                                    )
-                                )
+                            st.session_state.images["title"] = asyncio.run(
+                                post_image_api(prompt, user_id=st.session_state.user_id)
+                            )
                             modify()
                             hide_overlay()
 
@@ -329,7 +315,7 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
+                            show_overlay(text="表紙を補正中...")
                             st.session_state.images["title"] = asyncio.run(
                                 image_upgrade(
                                     st.session_state.images["title"],
@@ -352,7 +338,7 @@ def view_edit():
                                     st.session_state.user_id, events
                                 ),
                             ):
-                                show_overlay()
+                                show_overlay(text="一括で生成中...")
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
                                 modify()
@@ -362,11 +348,10 @@ def view_edit():
                             if st.button(
                                 "音声を一括で生成する",
                             ):
-                                show_overlay()
-                                with st.spinner("生成中...(音声)"):
-                                    st.session_state.audios = asyncio.run(
-                                        create_audios(st.session_state.tales["content"])
-                                    )
+                                show_overlay(text="生成中...(音声)")
+                                st.session_state.audios = asyncio.run(
+                                    create_audios(st.session_state.tales["content"])
+                                )
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -380,7 +365,7 @@ def view_edit():
                                     st.session_state.user_id, events
                                 ),
                             ):
-                                show_overlay()
+                                show_overlay(text="一括で生成中...")
                                 prompt = (
                                     const.DESCRIPTION_IMAGE_PROMPT.replace(
                                         "%%title_placeholder%%",
@@ -405,13 +390,12 @@ def view_edit():
                                         ),
                                     )
                                 )
-                                with st.spinner("一括で生成中..."):
-                                    st.session_state.images = asyncio.run(
-                                        create_images(
-                                            st.session_state.tales,
-                                            st.session_state.user_id,
-                                        )
+                                st.session_state.images = asyncio.run(
+                                    create_images(
+                                        st.session_state.tales,
+                                        st.session_state.user_id,
                                     )
+                                )
 
                                 modify()
                                 hide_overlay()
@@ -426,20 +410,19 @@ def view_edit():
                                     st.session_state.user_id, events
                                 ),
                             ):
-                                with st.spinner("イラストを一括で補正中"):
-                                    show_overlay()
+                                show_overlay(text="一括で補正中...")
 
-                                    st.session_state.images = asyncio.run(
-                                        images_upgrade(
-                                            [st.session_state.images["title"]]
-                                            + st.session_state.images["content"],
-                                            json.dumps(
-                                                st.session_state.tales["characters"]
-                                            ),
-                                            [""] + st.session_state.tales["content"],
-                                            st.session_state.user_id,
-                                        )
+                                st.session_state.images = asyncio.run(
+                                    images_upgrade(
+                                        [st.session_state.images["title"]]
+                                        + st.session_state.images["content"],
+                                        json.dumps(
+                                            st.session_state.tales["characters"]
+                                        ),
+                                        [""] + st.session_state.tales["content"],
+                                        st.session_state.user_id,
                                     )
+                                )
 
                                 modify()
                                 hide_overlay()
@@ -508,16 +491,13 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
+                            show_overlay(text="生成中...")
                             adding_page(page_count + 1)
-                            with st.spinner("生成中...(内容)"):
-                                create_one_tale(page_count + 1)
-                            with st.spinner("生成中...(イラスト)"):
-                                create_one_image(
-                                    page_count + 1, tale, st.session_state.user_id
-                                )
-                            with st.spinner("生成中...(音声)"):
-                                create_one_audio(page_count + 1, tale)
+                            create_one_tale(page_count + 1)
+                            create_one_image(
+                                page_count + 1, tale, st.session_state.user_id
+                            )
+                            create_one_audio(page_count + 1, tale)
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -525,9 +505,8 @@ def view_edit():
                             "内容を生成する",
                             help="このページの文章を、AIによって生成します。",
                         ):
-                            show_overlay()
-                            with st.spinner("生成中...(内容)"):
-                                create_one_tale(page_count)
+                            show_overlay(text="生成中...(内容)")
+                            create_one_tale(page_count)
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -536,9 +515,8 @@ def view_edit():
                             "音声を生成する",
                             help="このページの音声を、AIによって生成します。",
                         ):
-                            show_overlay()
-                            with st.spinner("生成中...(音声)"):
-                                create_one_audio(page_count, tale)
+                            show_overlay(text="生成中...(音声)")
+                            create_one_audio(page_count, tale)
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -550,11 +528,8 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
-                            with st.spinner("生成中...(イラスト)"):
-                                create_one_image(
-                                    page_count, tale, st.session_state.user_id
-                                )
+                            show_overlay(text="生成中...(イラスト)")
+                            create_one_image(page_count, tale, st.session_state.user_id)
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -565,7 +540,7 @@ def view_edit():
                                 st.session_state.user_id, ["イラスト生成"]
                             ),
                         ):
-                            show_overlay()
+                            show_overlay(text="イラストを補正中...")
                             st.session_state.images["content"][
                                 page_count
                             ] = asyncio.run(
@@ -615,44 +590,43 @@ def delete_book(title):
 
 
 def save_book(book_content, title, bgm, only_tales=False):
-    with st.spinner("えほんを保存中..."):
-        bucket_name = "story-user-data"
-        user_id = st.session_state.user_id
-        base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
-            "%%title%%", title
-        )
+    bucket_name = "story-user-data"
+    user_id = st.session_state.user_id
+    base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
+        "%%title%%", title
+    )
 
-        # タイトル画像の保存
-        title_image_path = base_path + "images/title.jpeg"
-        title_image = book_content["images"]["title"]
-        s3_upload(bucket_name, title_image, title_image_path)
+    # タイトル画像の保存
+    title_image_path = base_path + "images/title.jpeg"
+    title_image = book_content["images"]["title"]
+    s3_upload(bucket_name, title_image, title_image_path)
 
-        # 物語の内容（tales.json）の保存
-        tales_path = base_path + "tales.json"
-        tales_data = json.dumps(
-            book_content["tales"], indent=4, ensure_ascii=False
-        ).encode()
-        s3_upload(bucket_name, tales_data, tales_path)
+    # 物語の内容（tales.json）の保存
+    tales_path = base_path + "tales.json"
+    tales_data = json.dumps(
+        book_content["tales"], indent=4, ensure_ascii=False
+    ).encode()
+    s3_upload(bucket_name, tales_data, tales_path)
 
-        # ページ毎の画像とオーディオの保存
-        for ix, (image, audio) in enumerate(
-            zip(book_content["images"]["content"], book_content["audios"])
-        ):
-            image_path = base_path + f"images/image_{ix}.jpeg"
-            audio_path = base_path + f"audios/audio_{ix}.mp3"
-            s3_upload(bucket_name, image, image_path)
-            s3_upload(bucket_name, audio, audio_path)
+    # ページ毎の画像とオーディオの保存
+    for ix, (image, audio) in enumerate(
+        zip(book_content["images"]["content"], book_content["audios"])
+    ):
+        image_path = base_path + f"images/image_{ix}.jpeg"
+        audio_path = base_path + f"audios/audio_{ix}.mp3"
+        s3_upload(bucket_name, image, image_path)
+        s3_upload(bucket_name, audio, audio_path)
 
-        # 動画とPDFの生成
-        if not only_tales:
-            video_path = base_path + f"{title}.mp4"
-            pdf_path = base_path + f"{title}.pdf"
-            video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
-            s3_upload(bucket_name, video_data, video_path)
-            s3_upload(bucket_name, pdf_data, pdf_path)
+    # 動画とPDFの生成
+    if not only_tales:
+        video_path = base_path + f"{title}.mp4"
+        pdf_path = base_path + f"{title}.pdf"
+        video_data, pdf_data = create_movie_and_pdf(book_content, bgm)
+        s3_upload(bucket_name, video_data, video_path)
+        s3_upload(bucket_name, pdf_data, pdf_path)
 
-        st.toast("保存しました。")
-        st.cache_data.clear()
+    st.toast("保存しました。")
+    st.cache_data.clear()
 
 
 def modify():
@@ -691,14 +665,11 @@ def adding_page(num):
 
 def adding_and_create_page(num):
     adding_page(num)
-    with st.spinner("生成中...(内容)"):
-        create_one_tale(num)
-    with st.spinner("生成中...(イラスト)"):
-        create_one_image(
-            num, st.session_state.tales["content"][num], st.session_state.user_id
-        )
-    with st.spinner("生成中...(音声)"):
-        create_one_audio(num, st.session_state.tales["content"][num])
+    create_one_tale(num)
+    create_one_image(
+        num, st.session_state.tales["content"][num], st.session_state.user_id
+    )
+    create_one_audio(num, st.session_state.tales["content"][num])
     modify()
     st.rerun()
 
@@ -757,17 +728,15 @@ def create_all(only_tale=False, ignore_tale=False):
         }
         st.session_state.audios = ["" for _ in st.session_state.tales["content"]]
     else:
-        with st.spinner("イラストを生成中..."):
-            st.session_state.images = asyncio.run(
-                create_images(
-                    st.session_state.tales,
-                    st.session_state.user_id,
-                )
+        st.session_state.images = asyncio.run(
+            create_images(
+                st.session_state.tales,
+                st.session_state.user_id,
             )
-        with st.spinner("音声を生成中..."):
-            st.session_state.audios = asyncio.run(
-                create_audios(st.session_state.tales["content"])
-            )
+        )
+        st.session_state.audios = asyncio.run(
+            create_audios(st.session_state.tales["content"])
+        )
 
     create_date = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
     create_date_yyyymdd = create_date.strftime("%Y%m%d_%H%M%S")
@@ -905,7 +874,7 @@ def create():
 
         if submit:
             if st.session_state.tales["title"]:
-                show_overlay()
+                show_overlay(text="生成中...")
                 book_content = create_all(only_tale=only_tales)
 
                 save_book(

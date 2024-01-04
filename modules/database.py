@@ -31,13 +31,11 @@ def adding_credits(user_id: str, event: str, value: int = 1):
     supabase.table("credits").insert(data).execute()
 
 
-@st.cache_resource(show_spinner=False)
 def read_credits(user_id: str):
     """ユーザー情報のクレジット消費情報を取得する"""
     return supabase.table("credits").select("*").eq("user_id", user_id).execute()
 
 
-@st.cache_resource(show_spinner=False)
 def read_user(user_id: str):
     """ユーザー情報を取得する"""
     return supabase.table("users").select("*").eq("user_id", user_id).execute()

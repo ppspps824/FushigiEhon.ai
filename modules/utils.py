@@ -35,12 +35,13 @@ def is_not_enough_credit(user_id, events):
 
 
 # オーバーレイを表示
-def show_overlay():
+def show_overlay(text=""):
     st.markdown(
-        """
+        f"""
         <div class="overlay">
-  <div class="loader"></div>
-</div>
+            <div class="loader"></div>
+            <div class="loader-text">{text}</div>
+        </div>
         """,
         unsafe_allow_html=True,
     )
