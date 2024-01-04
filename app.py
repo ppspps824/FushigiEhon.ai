@@ -220,13 +220,16 @@ def main():
             },
         )
         logout_button()
-
-        st.link_button(
-            "クレジット購入",
-            url=st.secrets["stripe_link"]
-            + "?prefilled_email="
-            + st.session_state.email,
-        )
+        with st.container(border=True):
+            credits_info = db.read_credits(st.session_state.user_id)
+            credits = abs(sum([info["value"] for info in credits_info.data]))
+            st.caption(f"クレジット残量：{credits}")
+            st.link_button(
+                "クレジット購入",
+                url=st.secrets["stripe_link"]
+                + "?prefilled_email="
+                + st.session_state.email,
+            )
         st.write("")
         st.write("")
         st.write("")

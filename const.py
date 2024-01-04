@@ -1,7 +1,7 @@
 import glob
 import os
 
-X_SHARE_HTML =     """
+X_SHARE_HTML = """
 <a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-size="large"
     data-text="%%title%% - ふしぎえほん.ai" data-url="https://fushigiehonai.streamlit.app/" data-hashtags="絵本,AI,ふしぎえほん"
     data-show-count="false">Tweet</a>
@@ -15,7 +15,7 @@ TITLE_LINK_BOX_STYLE = {
         "padding": "10px",
         "margin": "0px",
         "width": "100%",
-        "height":"50%",
+        "height": "50%",
         "border-radius": "10px",
         "box-shadow": "0 0 2px rgba(0,0,0,0.5)",
     },
@@ -60,6 +60,11 @@ HIDE_ST_STYLE = """
                 height: 0%;
                 position: fixed;
                 }
+                div[data-testid="stStatusWidget"] {
+                visibility: hidden;
+                height: 0%;
+                position: fixed;
+                }
                 #MainMenu {
                 visibility: hidden;
                 height: 0%;
@@ -67,6 +72,14 @@ HIDE_ST_STYLE = """
                 header {
                 visibility: hidden;
                 height: 0%;
+                }
+                footer {
+                visibility: hidden;
+                height: 0%;
+                }
+                .block-container {
+                padding-top: 2rem;
+                padding-bottom: 5rem;
                 }
                 .overlay {
                     position: fixed;
@@ -81,36 +94,7 @@ HIDE_ST_STYLE = """
                     justify-content: center; /* 水平中央/
                     align-items: center; /* 垂直中央/
                 }
-				        .appview-container .main .block-container{
-                            padding-top: 1rem;
-                            padding-right: 3rem;
-                            padding-left: 3rem;
-                            padding-bottom: 7rem;
-                        }  
-                        .appview-container .sidebar-content {
-                            padding-top: 0rem;
-                        }
-                        .reportview-container {
-                            padding-top: 0rem;
-                            padding-right: 3rem;
-                            padding-left: 3rem;
-                            padding-bottom: 0rem;
-                        }
-                        .reportview-container .sidebar-content {
-                            padding-top: 0rem;
-                        }
-                        header[data-testid="stHeader"] {
-                            z-index: -1;
-                        }
-                        div[data-testid="stToolbar"] {
-                        z-index: 100;
-                        }
-                        div[data-testid="stDecoration"] {
-                        z-index: 100;
-                        }
-                        .reportview-container .sidebar-content {
-                            padding-top: 0rem;
-                        }
+
                 </style>
                 """
 
@@ -360,10 +344,10 @@ END_ROLE = """
 
 LOTTIE = "https://lottie.host/fc04f21d-abcf-4e8c-840a-548301d00539/2wqct1sOBx.json"
 
-STRIPE_URL="https://buy.stripe.com/test_3cs5mb83A6th3G84gg"
+STRIPE_URL = "https://buy.stripe.com/test_3cs5mb83A6th3G84gg"
 
-LEGAL="""
+LEGAL = """
 https://orchid-background-17a.notion.site/e1f71b4ecd2c414ba04dc5ff69495896
 """
 
-IMAGE_MODEL="dall-e-3"
+IMAGE_MODEL = "dall-e-3"

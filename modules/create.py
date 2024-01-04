@@ -25,11 +25,11 @@ from modules.ai import (
 from modules.s3 import get_all_book_titles, get_book_data, s3_delete_folder, s3_upload
 from modules.utils import (
     add_caption_transparent,
-    check_credits,
     create_movie_and_pdf,
     culc_use_credits,
     get_images,
     hide_overlay,
+    is_not_enough_credit,
     show_overlay,
 )
 from PIL import Image
@@ -267,6 +267,9 @@ def view_edit():
                         if st.button(
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             adding_page(0)
@@ -288,6 +291,9 @@ def view_edit():
 
                         if st.button(
                             "表紙を生成する",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             title = st.session_state.tales["title"]
@@ -319,6 +325,9 @@ def view_edit():
 
                         if st.button(
                             "表紙を補正する",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             st.session_state.images["title"] = asyncio.run(
@@ -334,13 +343,15 @@ def view_edit():
                             st.rerun()
                         with st.container(border=True):
                             st.caption("全ページ一括処理")
+                            events = ["イラスト生成"] * len(
+                                st.session_state.tales["content"]
+                            )
                             if st.button(
                                 "テキスト以外を一括で生成する",
+                                disabled=is_not_enough_credit(
+                                    st.session_state.user_id, events
+                                ),
                             ):
-                                events = ["イラスト生成"] * len(
-                                    st.session_state.tales["content"]
-                                )
-                                check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 book_content = create_all(ignore_tale=True)
                                 save_book(book_content, st.session_state.tales["title"])
@@ -359,13 +370,16 @@ def view_edit():
                                 modify()
                                 hide_overlay()
                                 st.rerun()
+
+                            events = ["イラスト生成"] * len(
+                                st.session_state.tales["content"]
+                            )
                             if st.button(
                                 "イラストを一括で生成する",
+                                disabled=is_not_enough_credit(
+                                    st.session_state.user_id, events
+                                ),
                             ):
-                                events = ["イラスト生成"] * len(
-                                    st.session_state.tales["content"]
-                                )
-                                check_credits(st.session_state.user_id, events)
                                 show_overlay()
                                 prompt = (
                                     const.DESCRIPTION_IMAGE_PROMPT.replace(
@@ -403,14 +417,16 @@ def view_edit():
                                 hide_overlay()
                                 st.rerun()
 
+                            events = ["イラスト生成"] * len(
+                                st.session_state.tales["content"]
+                            )
                             if st.button(
                                 "イラストを一括で補正する",
+                                disabled=is_not_enough_credit(
+                                    st.session_state.user_id, events
+                                ),
                             ):
                                 with st.spinner("イラストを一括で補正中"):
-                                    events = ["イラスト生成"] * len(
-                                        st.session_state.tales["content"]
-                                    )
-                                    check_credits(st.session_state.user_id, events)
                                     show_overlay()
 
                                     st.session_state.images = asyncio.run(
@@ -476,11 +492,21 @@ def view_edit():
                     except:
                         pass
 
+                    if st.button(
+                        "イラストを削除する",
+                        help="このページのイラストを削除します。",
+                    ):
+                        st.session_state.images["content"][page_count] = ""
+                        modify()
+                        st.rerun()
                     with st.expander("AI機能"):
                         # AIによるコンテンツ生成機能
                         if st.button(
                             "次のページを生成する",
                             help="次のページの文章、イラスト、音声をAIによって生成します。",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             adding_page(page_count + 1)
@@ -520,6 +546,9 @@ def view_edit():
                         if st.button(
                             "イラストを生成する",
                             help="このページのイラストを、文章をベースにAIによって生成します。",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             with st.spinner("生成中...(イラスト)"):
@@ -532,6 +561,9 @@ def view_edit():
                         if st.button(
                             "イラストを補正する",
                             help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。",
+                            disabled=is_not_enough_credit(
+                                st.session_state.user_id, ["イラスト生成"]
+                            ),
                         ):
                             show_overlay()
                             st.session_state.images["content"][
@@ -546,13 +578,6 @@ def view_edit():
                             )
                             modify()
                             hide_overlay()
-                            st.rerun()
-                        if st.button(
-                            "イラストを削除する",
-                            help="このページのイラストを削除します。",
-                        ):
-                            st.session_state.images["content"][page_count] = ""
-                            modify()
                             st.rerun()
 
                 with col3:
@@ -875,6 +900,7 @@ def create():
             st.caption(f"クレジット消費量：{use_credit}")
             submit = st.button(
                 "生成開始",
+                disabled=is_not_enough_credit(st.session_state.user_id, events),
             )
 
         if submit:

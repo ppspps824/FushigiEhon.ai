@@ -1,7 +1,9 @@
 import io
-import tempfile
 import random
+import tempfile
+
 import const
+import modules.database as db
 import numpy as np
 import streamlit as st
 from modules.s3 import s3_download
@@ -11,13 +13,12 @@ from moviepy.editor import (
     ImageClip,
     concatenate_videoclips,
 )
-import time
 from PIL import Image, ImageDraw, ImageFont
 from streamlit_image_select import image_select
-import modules.database as db
+
 
 def culc_use_credits(events):
-    use_credit=0
+    use_credit = 0
     for event in events:
         if event == "イラスト生成":
             use_credit += 10
@@ -25,16 +26,12 @@ def culc_use_credits(events):
     return use_credit
 
 
-def check_credits(user_id, events):
+def is_not_enough_credit(user_id, events):
     use_credit = culc_use_credits(events)
     credits_info = db.read_credits(user_id)
     credits = abs(sum([info["value"] for info in credits_info.data]))
 
-    if credits - use_credit < 0:
-        st.toast(f"クレジットが不足しています。/ 保有クレジット：{credits} 消費クレジット：{use_credit}")
-        hide_overlay()
-        time.sleep(2)
-        st.rerun()
+    return credits - use_credit < 0
 
 
 # オーバーレイを表示
@@ -162,8 +159,8 @@ def create_movie_and_pdf(book_info, bgm):
 
     # エンディング画像の準備 (PIL.Image形式)
     end_image = Image.open("assets/header.png")
-    base_width= 300
-    wpercent = (base_width / float(end_image.size[0]))
+    base_width = 300
+    wpercent = base_width / float(end_image.size[0])
     hsize = int((float(end_image.size[1]) * float(wpercent)))
     end_image = end_image.resize((base_width, hsize), Image.Resampling.LANCZOS)
     end_dst = Image.new(
@@ -171,7 +168,7 @@ def create_movie_and_pdf(book_info, bgm):
         (1024, 512),
         "#fafafa",
     )
-    end_dst.paste(end_image,(512-end_image.width//2,256-end_image.height//2))
+    end_dst.paste(end_image, (512 - end_image.width // 2, 256 - end_image.height // 2))
     np_end_image = np.array(end_dst)
     end_image_clip = ImageClip(np_end_image).set_duration(3)
 
@@ -231,7 +228,7 @@ def create_movie_and_pdf(book_info, bgm):
 
     if bgm == "ランダム":
         bgm = random.choice(const.BGM_LIST)
-        
+
     if bgm != "なし":
         bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
 
@@ -258,7 +255,7 @@ def create_movie_and_pdf(book_info, bgm):
             final_clip.audio = mixed_audio
         else:
             final_clip.audio = bgm_clip
-            
+
     else:
         final_clip = concatenate_videoclips(
             [title_image_clip] + clips + [end_image_clip], method="compose"

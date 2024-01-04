@@ -154,15 +154,21 @@ async def create_audios(tales):
 
 async def post_audio_api(tale):
     event = "オーディオ生成"
-    response = await client.audio.speech.create(
-        model="tts-1",
-        voice="nova",
-        input=tale,
-    )
-    db.adding_credits(
-        user_id=st.session_state.user_id, value=culc_use_credits([event]), event=event
-    )
-    return response.content
+    try:
+        response = await client.audio.speech.create(
+            model="tts-1",
+            voice="nova",
+            input=tale,
+        )
+        db.adding_credits(
+            user_id=st.session_state.user_id,
+            value=culc_use_credits([event]),
+            event=event,
+        )
+        return response.content
+    except Exception:
+        st.toast("エラーが発生しました。")
+        return []
 
 
 async def images_upgrade(images, characters, tales, user_id):
@@ -170,6 +176,7 @@ async def images_upgrade(images, characters, tales, user_id):
         image_upgrade(image, characters, tale, user_id)
         for image, tale in zip(images, tales)
     ]
+
     results = await asyncio.gather(*content_image_tasks)
 
     images = {"title": results[0], "content": results[1:]}
