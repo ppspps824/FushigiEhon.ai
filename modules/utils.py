@@ -37,7 +37,12 @@ def is_not_enough_credit(user_id, events):
 # オーバーレイを表示
 def show_overlay():
     st.markdown(
-        '<div class="overlay" style="display:block"></div>', unsafe_allow_html=True
+        """
+        <div class="overlay">
+  <div class="loader"></div>
+</div>
+        """,
+        unsafe_allow_html=True,
     )
     pass
 
@@ -47,7 +52,7 @@ def hide_overlay():
     st.markdown(
         """
     <style>
-    .spinner, .overlay {
+    .loader, .overlay {
         display: none !important;
     }
     </style>
