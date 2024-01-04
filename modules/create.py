@@ -28,6 +28,7 @@ from modules.utils import (
     create_movie_and_pdf,
     culc_use_credits,
     get_images,
+    get_user_credits,
     hide_overlay,
     is_not_enough_credit,
     show_overlay,
@@ -36,6 +37,7 @@ from PIL import Image
 
 
 def view_edit():
+    one_disabled = is_not_enough_credit(st.session_state.user_id, ["イラスト生成"])
     st.write("---")
     content_place = st.container()
     total_page = len(st.session_state.tales["content"]) + 1
@@ -260,10 +262,10 @@ def view_edit():
 
                         if st.button(
                             "次のページを生成する",
-                            help="次のページの文章、イラスト、音声をAIによって生成します。",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="次のページの文章、イラスト、音声をAIによって生成します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="生成中...")
                             adding_page(0)
@@ -332,11 +334,15 @@ def view_edit():
                             events = ["イラスト生成"] * len(
                                 st.session_state.tales["content"]
                             )
+                            multi_disabled = is_not_enough_credit(
+                                st.session_state.user_id, events
+                            )
                             if st.button(
                                 "テキスト以外を一括で生成する",
-                                disabled=is_not_enough_credit(
-                                    st.session_state.user_id, events
-                                ),
+                                help="イラスト、音声を一括で生成します。"
+                                if not multi_disabled
+                                else f"クレジットが不足しています。必要量：{culc_use_credits(events)} 保有量：{get_user_credits(st.session_state.user_id)}",
+                                disabled=multi_disabled,
                             ):
                                 show_overlay(text="一括で生成中...")
                                 book_content = create_all(ignore_tale=True)
@@ -359,11 +365,15 @@ def view_edit():
                             events = ["イラスト生成"] * len(
                                 st.session_state.tales["content"]
                             )
+                            multi_disabled = is_not_enough_credit(
+                                st.session_state.user_id, events
+                            )
                             if st.button(
                                 "イラストを一括で生成する",
-                                disabled=is_not_enough_credit(
-                                    st.session_state.user_id, events
-                                ),
+                                help="表紙と各ページのイラストを一括で生成します。"
+                                if not multi_disabled
+                                else f"クレジットが不足しています。必要量：{culc_use_credits(events)} 保有量：{get_user_credits(st.session_state.user_id)}",
+                                disabled=multi_disabled,
                             ):
                                 show_overlay(text="一括で生成中...")
                                 prompt = (
@@ -404,11 +414,15 @@ def view_edit():
                             events = ["イラスト生成"] * len(
                                 st.session_state.tales["content"]
                             )
+                            multi_disabled = is_not_enough_credit(
+                                st.session_state.user_id, events
+                            )
                             if st.button(
                                 "イラストを一括で補正する",
-                                disabled=is_not_enough_credit(
-                                    st.session_state.user_id, events
-                                ),
+                                help="表紙と各ページのイラストを一括で補正します。"
+                                if not multi_disabled
+                                else f"クレジットが不足しています。必要量：{culc_use_credits(events)} 保有量：{get_user_credits(st.session_state.user_id)}",
+                                disabled=multi_disabled,
                             ):
                                 show_overlay(text="一括で補正中...")
 
@@ -486,10 +500,10 @@ def view_edit():
                         # AIによるコンテンツ生成機能
                         if st.button(
                             "次のページを生成する",
-                            help="次のページの文章、イラスト、音声をAIによって生成します。",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="次のページの文章、イラスト、音声をAIによって生成します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="生成中...")
                             adding_page(page_count + 1)
@@ -523,10 +537,10 @@ def view_edit():
 
                         if st.button(
                             "イラストを生成する",
-                            help="このページのイラストを、文章をベースにAIによって生成します。",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="このページのイラストを、文章をベースにAIによって生成します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="生成中...(イラスト)")
                             create_one_image(page_count, tale, st.session_state.user_id)
@@ -535,10 +549,10 @@ def view_edit():
                             st.rerun()
                         if st.button(
                             "イラストを補正する",
-                            help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。",
-                            disabled=is_not_enough_credit(
-                                st.session_state.user_id, ["イラスト生成"]
-                            ),
+                            help="このページのイラストを、現在のイラストと文章をベースにAIによって生成します。"
+                            if not one_disabled
+                            else f"クレジットが不足しています。必要量：{culc_use_credits(['イラスト生成'])} 保有量：{get_user_credits(st.session_state.user_id)}",
+                            disabled=one_disabled,
                         ):
                             show_overlay(text="イラストを補正中...")
                             st.session_state.images["content"][
@@ -867,9 +881,13 @@ def create():
             use_credit = culc_use_credits(events)
 
             st.caption(f"クレジット消費量：{use_credit}")
+            multi_disabled = is_not_enough_credit(st.session_state.user_id, events)
             submit = st.button(
                 "生成開始",
-                disabled=is_not_enough_credit(st.session_state.user_id, events),
+                help="指定された内容に従って絵本を生成します。"
+                if not multi_disabled
+                else f"クレジットが不足しています。必要量：{culc_use_credits(events)} 保有量：{get_user_credits(st.session_state.user_id)}",
+                disabled=multi_disabled,
             )
 
         if submit:

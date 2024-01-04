@@ -26,10 +26,16 @@ def culc_use_credits(events):
     return use_credit
 
 
-def is_not_enough_credit(user_id, events):
-    use_credit = culc_use_credits(events)
+def get_user_credits(user_id):
     credits_info = db.read_credits(user_id)
     credits = abs(sum([info["value"] for info in credits_info.data]))
+
+    return credits
+
+
+def is_not_enough_credit(user_id, events):
+    use_credit = culc_use_credits(events)
+    credits = get_user_credits(user_id)
 
     return credits - use_credit < 0
 
