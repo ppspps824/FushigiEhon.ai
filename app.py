@@ -1,19 +1,17 @@
 import os
 
 import const
-import openai
+import modules.database as db
 import streamlit as st
+import streamlit_antd_components as sac
 from modules.create import create
-from modules.setting import setting
-from modules.play import play
 from modules.database import *
+from modules.play import play
+from modules.setting import setting
 from PIL import Image
 from streamlit_card import card
 from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
-import modules.database as db
-import streamlit_antd_components as sac
-
 
 
 def init_state():
@@ -89,7 +87,7 @@ def main():
         ## About
         with title_image_place:
             st.image("assets/title_back.png")
-        
+
         with title_cols[0]:
             card_cols = st.columns(2)
 
@@ -165,7 +163,6 @@ def main():
                 st.video("https://youtu.be/tNwTA9wSVkM?feature=shared")
             elif step_num == 2:
                 st.video("https://youtu.be/ZZDwx4V__0I?feature=shared")
-            
 
         ## ライセンス表記
         st.write("")
@@ -177,7 +174,7 @@ def main():
         st.write("")
         st.write("---")
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
-        st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
+        st.link_button("特定商取引法に基づく表記", url=const.LEGAL)
 
         return
 
@@ -188,12 +185,10 @@ def main():
     st.session_state.email = session["user"]["email"]
     user_info = db.read_user(st.session_state.user_id)
     if not user_info.data:
-        db.create_user(user_id=st.session_state.user_id,email=st.session_state.email)
+        db.create_user(user_id=st.session_state.user_id, email=st.session_state.email)
         db.adding_credits(
             user_id=st.session_state.user_id, event="新規登録", value=-100
         )
-
-    openai.api_key = st.secrets["OPEN_AI_KEY"]
 
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.png")
@@ -224,10 +219,14 @@ def main():
                 "nav-link-selected": {"background-color": "004a55"},
             },
         )
-        logout_button() 
+        logout_button()
 
-
-        st.link_button("クレジット購入",url=st.secrets["stripe_link"]+"?prefilled_email="+st.session_state.email)
+        st.link_button(
+            "クレジット購入",
+            url=st.secrets["stripe_link"]
+            + "?prefilled_email="
+            + st.session_state.email,
+        )
         st.write("")
         st.write("")
         st.write("")
@@ -237,7 +236,7 @@ def main():
         ## ライセンス表記
         st.caption("© 2023- ふしぎえほん.ai All Rights Reserved.")
         st.caption("Contact fushigiehon@gmail.com")
-        st.link_button("特定商取引法に基づく表記",url=const.LEGAL)
+        st.link_button("特定商取引法に基づく表記", url=const.LEGAL)
     if selected == "つくる":
         create()
     elif selected == "よむ":
