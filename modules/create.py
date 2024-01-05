@@ -868,7 +868,7 @@ def create():
                             st.rerun()
                 bgm = st.selectbox("BGM", options=const.BGM_LIST)
                 if bgm not in ["ランダム", "なし"]:
-                    st.audio(f"assets/{bgm}.mp3")
+                    st.audio(f"assets/{bgm}.webm")
 
             only_tales = st.toggle("テキストだけ作成する")
 
