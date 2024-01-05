@@ -43,7 +43,7 @@ TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
 BGM_LIST = [
     os.path.splitext(os.path.basename(path))[0]
     for path in glob.glob("assets/*")
-    if "mp3" in path
+    if "webm" in path
 ]
 BGM_OPTIONS = ["ランダム", "なし"] + BGM_LIST
 
