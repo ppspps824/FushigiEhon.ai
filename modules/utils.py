@@ -277,6 +277,7 @@ def create_movie_and_pdf(book_info, bgm):
         final_clip.write_videofile(
             temp_video.name,  # write_videofileに一時ファイル名を提供
             remove_temp=True,
+            fps=1,
         )
 
         # ファイルからビデオを読み込んで表示
@@ -289,28 +290,6 @@ def create_movie_and_pdf(book_info, bgm):
     pdf_data = pdf_io.getvalue()
 
     return video_data, pdf_data
-
-
-def image_select_menu(images, captions):
-    if images:
-        select_book = (
-            image_select(
-                label=None,
-                images=images,
-                captions=captions,
-                return_value="index",
-                index=-1,
-                use_container_width=False,
-            )
-            + 1
-        )
-
-        return select_book
-    else:
-        st.info(
-            "おはなしがありません。「えほんをつくる」をおして、えほんをつくりましょう。"
-        )
-        st.stop()
 
 
 def add_caption_transparent(image_bytes, caption):
