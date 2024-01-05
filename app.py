@@ -58,7 +58,7 @@ def main():
 
     st.set_page_config(
         page_title="ふしぎえほん.ai",
-        page_icon=Image.open("assets/logo.png"),
+        page_icon=Image.open("assets/logo.webp"),
         layout="wide",
     )
 
@@ -83,10 +83,10 @@ def main():
     if not session:
         # Welcomページ
         with title_logo_cols[0]:
-            st.image("assets/header.png")
+            st.image("assets/header.webp")
         ## About
         with title_image_place:
-            st.image("assets/title_back.png")
+            st.image("assets/title_back.webp")
 
         with title_cols[0]:
             card_cols = st.columns(2)
@@ -191,7 +191,7 @@ def main():
         )
 
     header_cols = st.columns([1, 3, 1])
-    header_cols[0].image("assets/header.png")
+    header_cols[0].image("assets/header.webp")
     header_cols[2].caption(f"logged in {st.session_state.email}")
 
     menu_options = ["よむ", "つくる", "設定"]
