@@ -241,7 +241,7 @@ def create_movie_and_pdf(book_info, bgm):
         bgm = random.choice(const.BGM_LIST)
 
     if bgm != "なし":
-        bgm_clip = AudioFileClip(f"assets/{bgm}.webm")
+        bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
 
         # すべてのクリップを結合
         final_clip = concatenate_videoclips(
@@ -273,7 +273,7 @@ def create_movie_and_pdf(book_info, bgm):
         )
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
-    with tempfile.NamedTemporaryFile(delete=True, suffix=".webm") as temp_video:
+    with tempfile.NamedTemporaryFile(delete=True, suffix=".mp3") as temp_video:
         final_clip.write_videofile(
             temp_video.name,  # write_videofileに一時ファイル名を提供
             remove_temp=True,
