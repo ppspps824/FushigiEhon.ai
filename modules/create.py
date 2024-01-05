@@ -127,7 +127,7 @@ def view_edit():
 
         bgm = st.selectbox("BGM", options=const.BGM_OPTIONS)
         if bgm not in ["ランダム", "なし"]:
-            st.audio(f"assets/{bgm}.mp3")
+            st.audio(f"assets/{bgm}.webm")
 
         with title_col3:
             st.write("")
@@ -175,7 +175,7 @@ def view_edit():
                             st.session_state.images["title"], use_column_width="auto"
                         )
                     except:
-                        st.image("assets/noimage.png", use_column_width="auto")
+                        st.image("assets/noimage.webp", use_column_width="auto")
 
                     title_upload_file = st.file_uploader(
                         "画像をアップロード",
@@ -461,7 +461,7 @@ def view_edit():
                     try:
                         st.image(image, use_column_width="auto")
                     except:
-                        st.image("assets/noimage.png", use_column_width="auto")
+                        st.image("assets/noimage.webp", use_column_width="auto")
                     page_upload_file = st.file_uploader(
                         "画像をアップロード",
                         type=["png", "jpg"],
@@ -909,7 +909,7 @@ def create():
                 try:
                     st.image(book_content["images"]["title"], use_column_width="auto")
                 except:
-                    st.image("assets/noimage.png", use_column_width="auto")
+                    st.image("assets/noimage.webp", use_column_width="auto")
                 st.write(book_content["tales"]["description"])
 
             else:

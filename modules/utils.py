@@ -89,7 +89,7 @@ def get_images(titles, user_id):
             # 画像のリサイズ
 
         else:
-            image = Image.open("assets/noimage.png")
+            image = Image.open("assets/noimage.webp")
 
         resized_image = image.resize((256, 256))
         img_bytes = io.BytesIO()
@@ -170,7 +170,7 @@ def create_movie_and_pdf(book_info, bgm):
     title_image_clip = ImageClip(np_title_image).set_duration(3)
 
     # エンディング画像の準備 (PIL.Image形式)
-    end_image = Image.open("assets/header.png")
+    end_image = Image.open("assets/header.webp")
     base_width = 300
     wpercent = base_width / float(end_image.size[0])
     hsize = int((float(end_image.size[1]) * float(wpercent)))
@@ -274,13 +274,9 @@ def create_movie_and_pdf(book_info, bgm):
         )
 
     # 一時的なビデオファイルを作成するためにtempfileを使用
-    with tempfile.NamedTemporaryFile(delete=True, suffix=".mp4") as temp_video:
+    with tempfile.NamedTemporaryFile(delete=True, suffix=".webm") as temp_video:
         final_clip.write_videofile(
             temp_video.name,  # write_videofileに一時ファイル名を提供
-            fps=24,
-            codec="libx264",
-            audio_codec="aac",
-            temp_audiofile="temp-audio.m4a",
             remove_temp=True,
         )
 
