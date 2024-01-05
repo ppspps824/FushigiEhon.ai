@@ -81,9 +81,9 @@ def play():
 
         video_data = s3_download(
             "story-user-data",
-            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.mp4'
+            f'{const.BASE_PATH.replace("%%user_id%%", "guest").replace("%%title%%", title)}{title}.webm'
             if is_guest
-            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.mp4',
+            else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.webm',
         )
 
         pdf_data = s3_download(
@@ -100,8 +100,8 @@ def play():
                 st.download_button(
                     label="動画を保存",
                     data=video_data,
-                    file_name=f"{title}.mp4",
-                    mime="video/mp4",
+                    file_name=f"{title}.webm",
+                    mime="video/webm",
                 )
         else:
             st.error("データの読み込みに失敗しました。")
