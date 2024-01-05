@@ -14,7 +14,6 @@ from moviepy.editor import (
     concatenate_videoclips,
 )
 from PIL import Image, ImageDraw, ImageFont
-from streamlit_image_select import image_select
 
 
 def culc_use_credits(events):
