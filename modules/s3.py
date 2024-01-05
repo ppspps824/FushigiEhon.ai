@@ -4,15 +4,41 @@ import os
 import boto3
 import const
 import streamlit as st
-from modules.utils import (
-    hide_overlay,
-    show_overlay,
-)
 
 # AWSクレデンシャルを環境変数から取得
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 REGION_NAME = "ap-northeast-1"
+
+
+# オーバーレイを表示
+def show_overlay(text=""):
+    st.markdown(
+        f"""
+        <div class="overlay">
+            <div class="loader"></div>
+            <div class="loader-text">{text}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    pass
+
+
+# オーバーレイを非表示
+def hide_overlay():
+    st.markdown(
+        """
+    <style>
+    .loader, .overlay {
+        display: none !important;
+    }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+    pass
+
 
 # S3クライアントの初期化
 s3_client = boto3.client(
