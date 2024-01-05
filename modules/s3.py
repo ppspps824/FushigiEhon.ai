@@ -4,6 +4,10 @@ import os
 import boto3
 import const
 import streamlit as st
+from modules.utils import (
+    hide_overlay,
+    show_overlay,
+)
 
 # AWSクレデンシャルを環境変数から取得
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
@@ -80,37 +84,37 @@ def s3_delete_folder(bucket_name, prefix):
 
 
 def get_book_data(bucket_name, user_id, title):
-    with st.spinner("よみこみちゅう..."):
-        base_path = base_path = const.BASE_PATH.replace(
-            "%%user_id%%", user_id
-        ).replace("%%title%%", title)
+    show_overlay()
+    base_path = base_path = const.BASE_PATH.replace("%%user_id%%", user_id).replace(
+        "%%title%%", title
+    )
 
-        print(base_path)
+    print(base_path)
 
-        book_content = {
-            "create_date": "",
-            "tales": {},
-            "images": {"title": "", "content": []},
-            "audios": [],
-        }
+    book_content = {
+        "create_date": "",
+        "tales": {},
+        "images": {"title": "", "content": []},
+        "audios": [],
+    }
 
-        # tales.jsonの取得
-        tales_path = base_path + "tales.json"
-        print(tales_path)
-        result_json = s3_download(bucket_name, tales_path)
-        book_content["tales"] = json.loads(result_json)
+    # tales.jsonの取得
+    tales_path = base_path + "tales.json"
+    print(tales_path)
+    result_json = s3_download(bucket_name, tales_path)
+    book_content["tales"] = json.loads(result_json)
 
-        # タイトル画像の取得
-        title_image_path = base_path + "images/title.jpeg"
-        book_content["images"]["title"] = s3_download(bucket_name, title_image_path)
+    # タイトル画像の取得
+    title_image_path = base_path + "images/title.jpeg"
+    book_content["images"]["title"] = s3_download(bucket_name, title_image_path)
 
-        # ページ毎の画像とオーディオの取得
-        for ix in range(len(book_content["tales"]["content"])):
-            image_path = base_path + f"images/image_{ix}.jpeg"
-            audio_path = base_path + f"audios/audio_{ix}.mp3"
-            book_content["images"]["content"].append(
-                s3_download(bucket_name, image_path)
-            )
-            book_content["audios"].append(s3_download(bucket_name, audio_path))
+    # ページ毎の画像とオーディオの取得
+    for ix in range(len(book_content["tales"]["content"])):
+        image_path = base_path + f"images/image_{ix}.jpeg"
+        audio_path = base_path + f"audios/audio_{ix}.mp3"
+        book_content["images"]["content"].append(s3_download(bucket_name, image_path))
+        book_content["audios"].append(s3_download(bucket_name, audio_path))
+
+    hide_overlay()
 
     return book_content
