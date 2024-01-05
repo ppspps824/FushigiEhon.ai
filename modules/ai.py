@@ -13,9 +13,9 @@ from PIL import Image
 client = AsyncOpenAI(api_key=st.secrets["OPEN_AI_KEY"])
 
 
-def post_text_api(prompt):
+async def post_text_api(prompt):
     event = "テキスト生成"
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[{"role": "system", "content": prompt}],
     )
@@ -52,7 +52,7 @@ def create_tales(
     )
     for _ in range(3):
         try:
-            content_text = post_text_api(content)
+            content_text = asyncio.run(post_text_api(content))
             content_text = content_text.replace("json", "").replace("```", "")
             tales = json.loads(content_text)
             break
@@ -271,7 +271,7 @@ def create_one_tale(num):
             "\n".join(st.session_state.tales["content"][num + 1 :]),
         )
     )
-    generated_tale = post_text_api(prompt)
+    generated_tale = asyncio.run(post_text_api(prompt))
     if num < len(st.session_state.tales["content"]):
         st.session_state.tales["content"][num] = generated_tale
     else:
