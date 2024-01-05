@@ -92,10 +92,11 @@ def play():
             if is_guest
             else f'{const.BASE_PATH.replace("%%user_id%%", st.session_state.user_id).replace("%%title%%", title)}{title}.pdf',
         )
-        cols = st.columns([2, 1, 1])
         if video_data:
             st.video(video_data)
 
+        cols = st.columns([2, 1, 1])
+        if video_data:
             with cols[0]:
                 st.download_button(
                     label="動画を保存",
