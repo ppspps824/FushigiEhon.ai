@@ -117,6 +117,7 @@ async def post_image_api(prompt, user_id):
         db.adding_credits(user_id=user_id, value=culc_use_credits([event]), event=event)
         return buffer.getvalue()
     else:
+        st.toast("イラスト生成に失敗しました。")
         return ""
 
 
