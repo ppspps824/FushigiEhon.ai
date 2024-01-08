@@ -35,6 +35,20 @@ from modules.utils import (
 )
 from PIL import Image
 
+def get_event_loop():
+    try:
+        # 現在のスレッドに対するイベントループを取得または新規作成
+        loop = asyncio.get_event_loop()
+    except RuntimeError as ex:
+        # 'There is no current event loop in thread' エラーの対応
+        if "There is no current event loop in thread" in str(ex):
+            # 新しいイベントループを作成し、それを現在のスレッドのイベントループとして設定
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        else:
+            raise
+    
+    return loop
 
 def view_edit():
     one_disabled = is_not_enough_credit(st.session_state.user_id, ["イラスト生成"])
@@ -305,7 +319,7 @@ def view_edit():
                                 .replace("%%characters_placeholder%%", characters)
                             )
                                 # 非同期処理を実行するためのイベントループを取得
-                            loop = asyncio.get_event_loop()
+                            loop = get_event_loop()
                             # 非同期処理のmain関数を実行
                             st.session_state.images["title"] = loop.run_until_complete(post_image_api(prompt, user_id=st.session_state.user_id))
                             # st.session_state.images["title"] = asyncio.run(
