@@ -304,9 +304,13 @@ def view_edit():
                                 )
                                 .replace("%%characters_placeholder%%", characters)
                             )
-                            st.session_state.images["title"] = asyncio.run(
-                                post_image_api(prompt, user_id=st.session_state.user_id)
-                            )
+                                # 非同期処理を実行するためのイベントループを取得
+                            loop = asyncio.get_event_loop()
+                            # 非同期処理のmain関数を実行
+                            st.session_state.images["title"] = loop.run_until_complete(post_image_api(prompt, user_id=st.session_state.user_id))
+                            # st.session_state.images["title"] = asyncio.run(
+                            #     post_image_api(prompt, user_id=st.session_state.user_id)
+                            # )
                             modify()
                             hide_overlay()
 
