@@ -369,7 +369,7 @@ def view_edit():
                             ):
                                 show_overlay(text="一括で生成中...")
                                 book_content = create_all(ignore_tale=True)
-                                save_book(book_content, st.session_state.tales["title"])
+                                save_book(book_content, st.session_state.tales["title"],bgm)
                                 modify()
                                 hide_overlay()
                                 st.rerun()
