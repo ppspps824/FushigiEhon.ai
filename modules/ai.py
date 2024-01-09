@@ -107,7 +107,6 @@ async def post_image_api(prompt, user_id):
             break
         except Exception as e:
             print(e.args)
-            return ""
 
     if b64_json:
         decoded_b64_json = base64.b64decode(b64_json)
@@ -119,7 +118,7 @@ async def post_image_api(prompt, user_id):
         db.adding_credits(user_id=user_id, value=culc_use_credits([event]), event=event)
         return buffer.getvalue()
     else:
-        st.toast("イラスト生成に失敗しました。")
+        st.toast("イラスト生成に失敗しました。内容がコンテンツポリシーに抵触している可能性があります。")
         return ""
 
 
