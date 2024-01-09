@@ -3,6 +3,7 @@ import base64
 import datetime
 import io
 import json
+import time
 
 import const
 import pytz
@@ -47,7 +48,10 @@ def get_event_loop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         else:
-            raise
+            hide_overlay()
+            st.toast("イベントループの取得に失敗しました。")
+            time.sleep(2)
+            st.rerun()
 
     return loop
 
