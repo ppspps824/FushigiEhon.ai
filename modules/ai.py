@@ -17,7 +17,6 @@ def get_event_loop():
     try:
         # 現在のスレッドに対するイベントループを取得または新規作成
         loop = asyncio.get_event_loop()
-        return loop
     except RuntimeError as ex:
         # 'There is no current event loop in thread' エラーの対応
         if "There is no current event loop in thread" in str(ex):
@@ -25,8 +24,11 @@ def get_event_loop():
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         else:
-            raise
-
+            hide_overlay()
+            st.toast("イベントループの取得に失敗しました。")
+            time.sleep(2)
+            st.rerun()
+    return loop
 
 async def post_text_api(prompt):
     event = "テキスト生成"
