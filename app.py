@@ -1,17 +1,18 @@
 import os
 
-import const
-import modules.database as db
 import streamlit as st
 import streamlit_antd_components as sac
-from modules.create import create
-from modules.database import *
-from modules.play import play
-from modules.setting import setting
 from PIL import Image
 from streamlit_card import card
 from streamlit_option_menu import option_menu
 from streamlit_supabase_auth import login_form, logout_button
+
+import const
+import modules.database as db
+from modules.create import create
+from modules.database import *
+from modules.play import play
+from modules.setting import setting
 
 
 def init_state():
@@ -136,6 +137,10 @@ def main():
                         subtitle="タイトルだけで絵本を作ろう",
                     ),
                     sac.StepsItem(
+                        title="キラキラ！そうぞうがあふれだす",
+                        subtitle="あなたのアイディアが、ページごとに生き生きとしたイラストになります。",
+                    ),
+                    sac.StepsItem(
                         title="にこにこ。おもいでえほん",
                         subtitle="楽しかった一日を、写真と一緒に絵本にしよう。",
                     ),
@@ -160,8 +165,10 @@ def main():
             if step_num == 0:
                 st.video("https://youtu.be/1TiL2p5WSeQ?feature=shared")
             elif step_num == 1:
-                st.video("https://youtu.be/tNwTA9wSVkM?feature=shared")
+                st.video("https://youtu.be/qSV2wck61nc?feature=shared")
             elif step_num == 2:
+                st.video("https://youtu.be/tNwTA9wSVkM?feature=shared")
+            elif step_num == 3:
                 st.video("https://youtu.be/ZZDwx4V__0I?feature=shared")
 
         ## ライセンス表記
