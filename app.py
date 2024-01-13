@@ -137,7 +137,7 @@ def main():
                         subtitle="タイトルだけで絵本を作ろう",
                     ),
                     sac.StepsItem(
-                        title="キラキラ！そうぞうがあふれだす",
+                        title="きらきら！そうぞうがあふれだす",
                         subtitle="あなたのアイディアが、ページごとに生き生きとしたイラストになります。",
                     ),
                     sac.StepsItem(
