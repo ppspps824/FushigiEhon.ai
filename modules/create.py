@@ -4,12 +4,14 @@ import datetime
 import io
 import json
 
-import const
 import pytz
 import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_antd_components as sac
 import streamlit_shadcn_ui as ui
+from PIL import Image
+
+import const
 from modules.ai import (
     create_audios,
     create_images,
@@ -33,7 +35,6 @@ from modules.utils import (
     is_not_enough_credit,
     show_overlay,
 )
-from PIL import Image
 
 
 def view_edit():
@@ -127,7 +128,7 @@ def view_edit():
 
         bgm = st.selectbox("BGM", options=const.BGM_OPTIONS)
         if bgm not in ["ランダム", "なし"]:
-            st.audio(f"assets/{bgm}.webm")
+            st.audio(f"assets/{bgm}.mp3")
 
         with title_col3:
             st.write("")
@@ -868,7 +869,7 @@ def create():
                             st.rerun()
                 bgm = st.selectbox("BGM", options=const.BGM_LIST)
                 if bgm not in ["ランダム", "なし"]:
-                    st.audio(f"assets/{bgm}.webm")
+                    st.audio(f"assets/{bgm}.mp3")
 
             only_tales = st.toggle("テキストだけ作成する")
 

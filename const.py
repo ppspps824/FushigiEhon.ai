@@ -43,7 +43,7 @@ TITLE_BASE_PATH = "users/%%user_id%%/book_info/"
 BGM_LIST = [
     os.path.splitext(os.path.basename(path))[0]
     for path in glob.glob("assets/*")
-    if "webm" in path
+    if "mp3" in path
 ]
 BGM_OPTIONS = ["ランダム", "なし"] + BGM_LIST
 
@@ -382,7 +382,7 @@ TITLE_MARKDOWN = """
 PAGE_MARKDOWN = """
 
 <img src="data:image/jpg;base64,%%image_placeholder%%" height="400" />
-<audio data-autoplay src="data:audio/webm;base64,%%page_audio_placeholder%%" type="audio/webm"></audio>
+<audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
 
 ---
 
@@ -391,7 +391,7 @@ NO_IMAGE_PAGE_MARKDOWN = """
 
 %%content_placeholder%%
 
-<audio data-autoplay src="data:audio/webm;base64,%%page_audio_placeholder%%" type="audio/webm"></audio>
+<audio data-autoplay src="data:audio/mp3;base64,%%page_audio_placeholder%%" type="audio/mp3"></audio>
 
 ---
 
