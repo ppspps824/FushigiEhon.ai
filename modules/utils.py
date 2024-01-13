@@ -2,11 +2,8 @@ import io
 import random
 import tempfile
 
-import const
-import modules.database as db
 import numpy as np
 import streamlit as st
-from modules.s3 import s3_download
 from moviepy.editor import (
     AudioFileClip,
     CompositeAudioClip,
@@ -14,6 +11,10 @@ from moviepy.editor import (
     concatenate_videoclips,
 )
 from PIL import Image, ImageDraw, ImageFont
+
+import const
+import modules.database as db
+from modules.s3 import s3_download
 
 
 def culc_use_credits(events):
@@ -214,7 +215,7 @@ def create_movie_and_pdf(book_info, bgm):
         # 音声バイトデータからAudioFileClipを作成
         if audio:
             with tempfile.NamedTemporaryFile(
-                delete=True, suffix=".webm"
+                delete=True, suffix=".mp3"
             ) as temp_audio:  # 適切な拡張子を使用してください
                 temp_audio.write(audio)
                 temp_audio.seek(0)  # ファイルの先頭にシーク
@@ -241,7 +242,7 @@ def create_movie_and_pdf(book_info, bgm):
         bgm = random.choice(const.BGM_LIST)
 
     if bgm != "なし":
-        bgm_clip = AudioFileClip(f"assets/{bgm}.webm")
+        bgm_clip = AudioFileClip(f"assets/{bgm}.mp3")
 
         # すべてのクリップを結合
         final_clip = concatenate_videoclips(
