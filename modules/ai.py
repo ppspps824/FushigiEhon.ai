@@ -13,9 +13,26 @@ from PIL import Image
 client = AsyncOpenAI(api_key=st.secrets["OPEN_AI_KEY"])
 
 
-def post_text_api(prompt):
+def get_event_loop():
+    try:
+        # 現在のスレッドに対するイベントループを取得または新規作成
+        loop = asyncio.get_event_loop()
+    except RuntimeError as ex:
+        # 'There is no current event loop in thread' エラーの対応
+        if "There is no current event loop in thread" in str(ex):
+            # 新しいイベントループを作成し、それを現在のスレッドのイベントループとして設定
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        else:
+            hide_overlay()
+            st.toast("イベントループの取得に失敗しました。")
+            time.sleep(2)
+            st.rerun()
+    return loop
+
+async def post_text_api(prompt):
     event = "テキスト生成"
-    response = client.chat.completions.create(
+    response = await client.chat.completions.create(
         model="gpt-4-1106-preview",
         messages=[{"role": "system", "content": prompt}],
     )
@@ -52,7 +69,8 @@ def create_tales(
     )
     for _ in range(3):
         try:
-            content_text = post_text_api(content)
+            loop = get_event_loop()
+            content_text = loop.run_until_complete(post_text_api(content))
             content_text = content_text.replace("json", "").replace("```", "")
             tales = json.loads(content_text)
             break
@@ -89,7 +107,6 @@ async def post_image_api(prompt, user_id):
             break
         except Exception as e:
             print(e.args)
-            return ""
 
     if b64_json:
         decoded_b64_json = base64.b64decode(b64_json)
@@ -101,6 +118,7 @@ async def post_image_api(prompt, user_id):
         db.adding_credits(user_id=user_id, value=culc_use_credits([event]), event=event)
         return buffer.getvalue()
     else:
+        st.toast("イラスト生成に失敗しました。内容がコンテンツポリシーに抵触している可能性があります。")
         return ""
 
 
@@ -271,7 +289,9 @@ def create_one_tale(num):
             "\n".join(st.session_state.tales["content"][num + 1 :]),
         )
     )
-    generated_tale = post_text_api(prompt)
+    loop = get_event_loop()
+    # 非同期処理のmain関数を実行
+    generated_tale = loop.run_until_complete(post_text_api(prompt))
     if num < len(st.session_state.tales["content"]):
         st.session_state.tales["content"][num] = generated_tale
     else:
@@ -279,12 +299,15 @@ def create_one_tale(num):
 
 
 def create_one_audio(num, tale):
-    st.session_state.audios[num] = asyncio.run(post_audio_api(tale))
+    loop = get_event_loop()
+    # 非同期処理のmain関数を実行
+    st.session_state.audios[num] = loop.run_until_complete(post_audio_api(tale))
 
 
 def create_one_image(num, tale, user_id):
-    result = asyncio.run(
-        post_image_api(
+    loop = get_event_loop()
+    # 非同期処理のmain関数を実行
+    result = loop.run_until_complete(post_image_api(
             const.IMAGES_PROMPT.replace("%%tale_placeholder%%", tale)
             .replace("%%title_placeholder%%", st.session_state.tales["title"])
             .replace(
@@ -299,8 +322,7 @@ def create_one_image(num, tale, user_id):
                 json.dumps(st.session_state.tales["characters"], ensure_ascii=False),
             ),
             user_id,
-        )
-    )
+        ))
 
     if result:
         st.session_state.images["content"][num] = result

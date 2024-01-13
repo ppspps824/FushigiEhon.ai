@@ -3,6 +3,7 @@ import base64
 import datetime
 import io
 import json
+import time
 
 import pytz
 import streamlit as st
@@ -35,6 +36,25 @@ from modules.utils import (
     is_not_enough_credit,
     show_overlay,
 )
+
+
+def get_event_loop():
+    try:
+        # 現在のスレッドに対するイベントループを取得または新規作成
+        loop = asyncio.get_event_loop()
+    except RuntimeError as ex:
+        # 'There is no current event loop in thread' エラーの対応
+        if "There is no current event loop in thread" in str(ex):
+            # 新しいイベントループを作成し、それを現在のスレッドのイベントループとして設定
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        else:
+            hide_overlay()
+            st.toast("イベントループの取得に失敗しました。")
+            time.sleep(2)
+            st.rerun()
+
+    return loop
 
 
 def view_edit():
@@ -305,7 +325,10 @@ def view_edit():
                                 )
                                 .replace("%%characters_placeholder%%", characters)
                             )
-                            st.session_state.images["title"] = asyncio.run(
+                            # 非同期処理を実行するためのイベントループを取得
+                            loop = get_event_loop()
+                            # 非同期処理のmain関数を実行
+                            st.session_state.images["title"] = loop.run_until_complete(
                                 post_image_api(prompt, user_id=st.session_state.user_id)
                             )
                             modify()
@@ -321,7 +344,9 @@ def view_edit():
                             disabled=one_disabled,
                         ):
                             show_overlay(text="表紙を補正中...")
-                            st.session_state.images["title"] = asyncio.run(
+                            loop = get_event_loop()
+                            # 非同期処理のmain関数を実行
+                            st.session_state.images["title"] = loop.run_until_complete(
                                 image_upgrade(
                                     st.session_state.images["title"],
                                     json.dumps(st.session_state.tales["characters"]),
@@ -349,7 +374,7 @@ def view_edit():
                             ):
                                 show_overlay(text="一括で生成中...")
                                 book_content = create_all(ignore_tale=True)
-                                save_book(book_content, st.session_state.tales["title"])
+                                save_book(book_content, st.session_state.tales["title"],bgm)
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -358,9 +383,12 @@ def view_edit():
                                 "音声を一括で生成する",
                             ):
                                 show_overlay(text="生成中...(音声)")
-                                st.session_state.audios = asyncio.run(
+                                loop = get_event_loop()
+                                # 非同期処理のmain関数を実行
+                                st.session_state.audios = loop.run_until_complete(
                                     create_audios(st.session_state.tales["content"])
                                 )
+
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -403,7 +431,8 @@ def view_edit():
                                         ),
                                     )
                                 )
-                                st.session_state.images = asyncio.run(
+                                loop = get_event_loop()
+                                st.session_state.images = loop.run_until_complete(
                                     create_images(
                                         st.session_state.tales,
                                         st.session_state.user_id,
@@ -428,8 +457,9 @@ def view_edit():
                                 disabled=multi_disabled,
                             ):
                                 show_overlay(text="一括で補正中...")
-
-                                st.session_state.images = asyncio.run(
+                                loop = get_event_loop()
+                                # 非同期処理のmain関数を実行
+                                st.session_state.images = loop.run_until_complete(
                                     images_upgrade(
                                         [st.session_state.images["title"]]
                                         + st.session_state.images["content"],
@@ -558,9 +588,11 @@ def view_edit():
                             disabled=one_disabled,
                         ):
                             show_overlay(text="イラストを補正中...")
+                            loop = get_event_loop()
+                            # 非同期処理のmain関数を実行
                             st.session_state.images["content"][
                                 page_count
-                            ] = asyncio.run(
+                            ] = loop.run_until_complete(
                                 image_upgrade(
                                     st.session_state.images["content"][page_count],
                                     json.dumps(st.session_state.tales["characters"]),
@@ -568,6 +600,7 @@ def view_edit():
                                     st.session_state.user_id,
                                 )
                             )
+
                             modify()
                             hide_overlay()
                             st.rerun()
@@ -745,13 +778,16 @@ def create_all(only_tale=False, ignore_tale=False):
         }
         st.session_state.audios = ["" for _ in st.session_state.tales["content"]]
     else:
-        st.session_state.images = asyncio.run(
+        loop = get_event_loop()
+        # 非同期処理のmain関数を実行
+        st.session_state.images = loop.run_until_complete(
             create_images(
                 st.session_state.tales,
                 st.session_state.user_id,
             )
         )
-        st.session_state.audios = asyncio.run(
+        loop = get_event_loop()
+        st.session_state.audios = loop.run_until_complete(
             create_audios(st.session_state.tales["content"])
         )
 
