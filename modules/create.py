@@ -522,8 +522,10 @@ def view_edit():
                         "録音スタート", "録音ストップ", key=f"rec_audio_{page_count}"
                     )
 
-                    if len(rec_audio):
-                        audio = rec_audio.export().read()
+                    if len(rec_audio) > 0:
+                        audio = st.session_state.audios[
+                            page_count
+                        ] = rec_audio.export().read()
 
                     # ページのオーディオの表示
                     if audio:
