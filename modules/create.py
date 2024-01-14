@@ -513,7 +513,7 @@ def view_edit():
                         key=f"{page_count}_tale",
                         value=tale,
                         label_visibility="collapsed",
-                        max_chars=40,
+                        max_chars=80,
                     )
 
                     # ページのオーディオの表示

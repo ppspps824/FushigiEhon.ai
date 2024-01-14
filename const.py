@@ -200,7 +200,7 @@ TALES_PROMPT = """
 %%number_of_pages_placeholder%%
 
 ## 1ページの文字数
-40
+60
 
 ## 利用する文字種類の制限
 %%character_set_placeholder%%
@@ -309,7 +309,7 @@ DESCRIPTION_PROMPT = """
 %%character_set_placeholder%%
 
 ## 注意事項
-- 40字程度で作成してください。
+- 60字程度で作成してください。
 
 """
 
