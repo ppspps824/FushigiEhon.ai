@@ -10,6 +10,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import streamlit_antd_components as sac
 import streamlit_shadcn_ui as ui
+from audiorecorder import audiorecorder
 from PIL import Image
 
 import const
@@ -374,7 +375,9 @@ def view_edit():
                             ):
                                 show_overlay(text="一括で生成中...")
                                 book_content = create_all(ignore_tale=True)
-                                save_book(book_content, st.session_state.tales["title"],bgm)
+                                save_book(
+                                    book_content, st.session_state.tales["title"], bgm
+                                )
                                 modify()
                                 hide_overlay()
                                 st.rerun()
@@ -515,11 +518,17 @@ def view_edit():
                         label_visibility="collapsed",
                         max_chars=80,
                     )
+                    rec_audio = audiorecorder(
+                        "録音スタート", "録音ストップ", key=f"rec_audio_{page_count}"
+                    )
+
+                    if len(rec_audio):
+                        audio = rec_audio.export().read()
 
                     # ページのオーディオの表示
-                    try:
+                    if audio:
                         st.audio(audio)
-                    except:
+                    else:
                         pass
 
                     if st.button(

@@ -12,3 +12,4 @@ streamlit-card
 supabase
 pytz
 aiohttp
+streamlit-audiorecorder
