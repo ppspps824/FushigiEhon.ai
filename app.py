@@ -193,9 +193,7 @@ def main():
     user_info = db.read_user(st.session_state.user_id)
     if not user_info.data:
         db.create_user(user_id=st.session_state.user_id, email=st.session_state.email)
-        db.adding_credits(
-            user_id=st.session_state.user_id, event="新規登録", value=-100
-        )
+        db.adding_credits(user_id=st.session_state.user_id, event="新規登録", value=-50)
 
     header_cols = st.columns([1, 3, 1])
     header_cols[0].image("assets/header.webp")
