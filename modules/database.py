@@ -23,7 +23,7 @@ def adding_credits(user_id: str, event: str, value: int = 1):
     """クレジット消費を記録する"""
     if event == "新規登録":
         user_credits_info = read_credits(user_id)
-        if "新規登録" in user_credits_info.data["event"]:
+        if "新規登録" in [info["event"] for info in user_credits_info.data]:
             return None
     now = datetime.now(jst_tz).isoformat()
     data = {
