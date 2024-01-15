@@ -16,7 +16,7 @@ def create_user(user_id: str, email: str):
     """新しいユーザーを作成する"""
     now = datetime.now(jst_tz).isoformat()
     data = {"user_id": user_id, "created_at": now, "email": email}
-    supabase.table("users").insert(data).execute()
+    supabase.table("users").upsert(data).execute()
 
 
 def adding_credits(user_id: str, event: str, value: int = 1):
