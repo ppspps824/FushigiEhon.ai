@@ -185,7 +185,7 @@ def main():
 
         return
 
-    st.query_params(page=["success"])
+    st.experimental_set_query_params(page=["success"])
 
     # ログイン後画面
     st.session_state.user_id = session["user"]["id"]
