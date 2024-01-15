@@ -28,12 +28,7 @@ def adding_credits(user_id: str, event: str, value: int = 1):
         "event": event,
         "value": value,
     }
-    if event == "新規登録":
-        supabase.table("credits").upsert(
-            data, on_conflict=["user_id", "event"]
-        ).execute()
-    else:
-        supabase.table("credits").insert(data).execute()
+    supabase.table("credits").insert(data).execute()
     read_credits.clear()
     read_user.clear()
 
